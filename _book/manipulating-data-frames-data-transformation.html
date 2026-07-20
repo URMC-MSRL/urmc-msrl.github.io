@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>2.4 Manipulating Data Frames (Data Transformation) | Proteomic Data Analysis</title>
+  <meta name="description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="2.4 Manipulating Data Frames (Data Transformation) | Proteomic Data Analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/images/CART_logo_horizontal.png" />
+  <meta property="og:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2.4 Manipulating Data Frames (Data Transformation) | Proteomic Data Analysis" />
+  
+  <meta name="twitter:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="twitter:image" content="/images/CART_logo_horizontal.png" />
+
+<meta name="author" content="Kyle Swovick" />
+
+
+<meta name="date" content="2026-07-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="images/ur_logo_favicon.png" type="image/x-icon" />
+<link rel="prev" href="data-filtering.html"/>
+<link rel="next" href="determining-data-quality-and-filtering.html"/>
+<script src="assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="assets/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="assets/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="assets/plotly-binding-4.12.0/plotly.js"></script>
+<script src="assets/typedarray-0.1/typedarray.min.js"></script>
+<link href="assets/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="assets/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="assets/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="assets/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<script src="assets/core-js-2.5.3/shim.min.js"></script>
+<script src="assets/react-18.2.0/react.min.js"></script>
+<script src="assets/react-18.2.0/react-dom.min.js"></script>
+<script src="assets/reactwidget-2.0.0/react-tools.js"></script>
+<link href="assets/reactable-0.4.5/reactable.css" rel="stylesheet" />
+<script src="assets/reactable-binding-0.4.5/reactable.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Proteomic Data Analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="introduction-to-r-and-rstudio.html"><a href="introduction-to-r-and-rstudio.html"><i class="fa fa-check"></i><b>1</b> Introduction to R and RStudio</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="coding-basics.html"><a href="coding-basics.html"><i class="fa fa-check"></i><b>1.1</b> Coding Basics</a></li>
+<li class="chapter" data-level="1.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html"><i class="fa fa-check"></i><b>1.2</b> Creating New Objects in R</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#object-naming-conventions"><i class="fa fa-check"></i><b>1.2.1</b> Object Naming Conventions</a></li>
+<li class="chapter" data-level="1.2.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#working-with-object-assignments"><i class="fa fa-check"></i><b>1.2.2</b> Working with Object Assignments</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="calling-functions.html"><a href="calling-functions.html"><i class="fa fa-check"></i><b>1.3</b> Calling Functions</a></li>
+<li class="chapter" data-level="1.4" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html"><i class="fa fa-check"></i><b>1.4</b> Expanding R’s Functionality</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#installing-packages"><i class="fa fa-check"></i><b>1.4.1</b> Installing Packages</a></li>
+<li class="chapter" data-level="1.4.2" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#loading-packages-and-package-conflicts"><i class="fa fa-check"></i><b>1.4.2</b> Loading Packages and Package Conflicts</a></li>
+<li class="chapter" data-level="1.4.3" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#package-help-pages"><i class="fa fa-check"></i><b>1.4.3</b> Package Help Pages</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="working-with-data-in-r-and-rstudio.html"><a href="working-with-data-in-r-and-rstudio.html"><i class="fa fa-check"></i><b>2</b> Working with Data in R and RStudio</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="loading-data.html"><a href="loading-data.html"><i class="fa fa-check"></i><b>2.1</b> Loading Data</a></li>
+<li class="chapter" data-level="2.2" data-path="understanding-data-frames.html"><a href="understanding-data-frames.html"><i class="fa fa-check"></i><b>2.2</b> Understanding Data Frames</a></li>
+<li class="chapter" data-level="2.3" data-path="data-filtering.html"><a href="data-filtering.html"><i class="fa fa-check"></i><b>2.3</b> Data Filtering</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="data-filtering.html"><a href="data-filtering.html#comparison-operators"><i class="fa fa-check"></i><b>2.3.1</b> Comparison Operators</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html"><i class="fa fa-check"></i><b>2.4</b> Manipulating Data Frames (Data Transformation)</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#arrange-rows-with-arrange"><i class="fa fa-check"></i><b>2.4.1</b> Arrange Rows with <code>arrange()</code></a></li>
+<li class="chapter" data-level="2.4.2" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#select-columns-with-select"><i class="fa fa-check"></i><b>2.4.2</b> Select Columns with <code>select()</code></a></li>
+<li class="chapter" data-level="2.4.3" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#add-new-variables-with-mutate"><i class="fa fa-check"></i><b>2.4.3</b> Add New Variables with <code>mutate()</code></a></li>
+<li class="chapter" data-level="2.4.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#grouped-summaries-with-summarize"><i class="fa fa-check"></i><b>2.4.4</b> Grouped Summaries with <code>summarize()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="determining-data-quality-and-filtering.html"><a href="determining-data-quality-and-filtering.html"><i class="fa fa-check"></i><b>3</b> Determining Data Quality and Filtering</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="deciphering-dia-nn-search-result-files.html"><a href="deciphering-dia-nn-search-result-files.html"><i class="fa fa-check"></i><b>3.1</b> Deciphering DIA-NN Search Result Files</a></li>
+<li class="chapter" data-level="3.2" data-path="import-dia-nn-search-results.html"><a href="import-dia-nn-search-results.html"><i class="fa fa-check"></i><b>3.2</b> Import DIA-NN Search Results</a></li>
+<li class="chapter" data-level="3.3" data-path="evaluate-dia-nn-stats.html"><a href="evaluate-dia-nn-stats.html"><i class="fa fa-check"></i><b>3.3</b> Evaluate DIA-NN Stats</a></li>
+<li class="chapter" data-level="3.4" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html"><i class="fa fa-check"></i><b>3.4</b> Evaluate DIA-NN Results</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#explaining-the-dia-nn-report"><i class="fa fa-check"></i><b>3.4.1</b> Explaining the DIA-NN Report</a></li>
+<li class="chapter" data-level="3.4.2" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#evaluating-the-quality-of-the-runs"><i class="fa fa-check"></i><b>3.4.2</b> Evaluating the Quality of the Runs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="filtering-dia-nn-results.html"><a href="filtering-dia-nn-results.html"><i class="fa fa-check"></i><b>3.5</b> Filtering DIA-NN Results</a></li>
+<li class="chapter" data-level="3.6" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html"><i class="fa fa-check"></i><b>3.6</b> Prepare Data for Differential Expression Analysis (t-test)</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#filter-based-off-number-of-peptides-and-missing-values"><i class="fa fa-check"></i><b>3.6.1</b> Filter Based off Number of Peptides and Missing Values</a></li>
+<li class="chapter" data-level="3.6.2" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#impute-missing-values"><i class="fa fa-check"></i><b>3.6.2</b> Impute Missing Values</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="performing-differential-expression-statistics-t-test.html"><a href="performing-differential-expression-statistics-t-test.html"><i class="fa fa-check"></i><b>4</b> Performing Differential Expression Statistics (t-test)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>4.1</b> Background</a>
+<ul>
+<li class="chapter" data-level="" data-path="background.html"><a href="background.html#types-of-t-tests"><i class="fa fa-check"></i>Types of t-tests</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html"><i class="fa fa-check"></i><b>4.2</b> Prepare the t-test</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#create-the-comparison-table"><i class="fa fa-check"></i><b>4.2.1</b> Create the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#prepare-our-data-using-the-comparison-table"><i class="fa fa-check"></i><b>4.2.2</b> Prepare Our Data Using the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#define-the-t-test-input"><i class="fa fa-check"></i><b>4.2.3</b> Define the T-Test Input</a></li>
+<li class="chapter" data-level="4.2.4" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#fit-the-t-test-regression-models"><i class="fa fa-check"></i><b>4.2.4</b> Fit the T-Test Regression Models</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="create-a-t-test-results-table.html"><a href="create-a-t-test-results-table.html"><i class="fa fa-check"></i><b>4.3</b> Create a T-Test Results Table</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="visualizing-proteomic-data.html"><a href="visualizing-proteomic-data.html"><i class="fa fa-check"></i><b>5</b> Visualizing Proteomic Data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="prep-work.html"><a href="prep-work.html"><i class="fa fa-check"></i><b>5.1</b> Prep Work</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="prep-work.html"><a href="prep-work.html#make-a-common-plotting-theme"><i class="fa fa-check"></i><b>5.1.1</b> Make a Common Plotting Theme</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html"><i class="fa fa-check"></i><b>5.2</b> Replicate Comparisons</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#sample-heatmap-and-hierarchical-clustering"><i class="fa fa-check"></i><b>5.2.1</b> Sample Heatmap and Hierarchical Clustering</a></li>
+<li class="chapter" data-level="5.2.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#principal-component-analysis-pca"><i class="fa fa-check"></i><b>5.2.2</b> Principal Component Analysis (PCA)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="differential-expression.html"><a href="differential-expression.html"><i class="fa fa-check"></i><b>5.3</b> Differential Expression</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="differential-expression.html"><a href="differential-expression.html#protein-expression-heatmap"><i class="fa fa-check"></i><b>5.3.1</b> Protein Expression Heatmap</a></li>
+<li class="chapter" data-level="5.3.2" data-path="differential-expression.html"><a href="differential-expression.html#volcano-plot"><i class="fa fa-check"></i><b>5.3.2</b> Volcano Plot</a></li>
+<li class="chapter" data-level="5.3.3" data-path="differential-expression.html"><a href="differential-expression.html#gene-ontology"><i class="fa fa-check"></i><b>5.3.3</b> Gene Ontology</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Proteomic Data Analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="manipulating-data-frames-data-transformation" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> Manipulating Data Frames (Data Transformation)<a href="manipulating-data-frames-data-transformation.html#manipulating-data-frames-data-transformation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Rarely do you get the data in exactly the right form you need. Often you’ll need to create some new variables or summaries, or maybe you just want to rename the variables or re-order the observations in order to make the data a little easier to work with, which we’ll be doing through the <code>tidyverse</code> package <code>dplyr</code></p>
+<p>In this section, you are going to learn four of the five key <code>dplyr</code> functions that allow you to solve the vast majority of your data manipulation challenges (you already learned about <code>filter()</code> in the previous section:</p>
+<ul>
+<li><code>arrange()</code>- Reorder the rows</li>
+<li><code>select()</code>- Pick variables by their names</li>
+<li><code>mutate()</code>- Create new variables with functions of existing variables</li>
+<li><code>summarize()</code>- Collapse many values down to a single summary (can also be spelled as <code>summarise()</code>)</li>
+</ul>
+<p>These can all be used in conjunction with <code>group_by()</code> which changes the scope of each function from <strong>operating on the entire dataset</strong> to operating on it <strong>group-by-group</strong>. These six functions provide the <strong>verbs</strong> for a language of data manipulation.</p>
+<p>All <strong>verbs</strong> work similarly:</p>
+<ol style="list-style-type: decimal">
+<li><p>The first argument is a data frame.</p></li>
+<li><p>The subsequent arguments describe what to do with the data frame, using the variable names (without quotes).</p></li>
+<li><p>The result is a new data frame.</p></li>
+</ol>
+<p>Together these properties make it easy to chain together multiple simple steps to achieve a complex result. Let’s dive in and see how these verbs work.</p>
+<div id="arrange-rows-with-arrange" class="section level3 hasAnchor" number="2.4.1">
+<h3><span class="header-section-number">2.4.1</span> Arrange Rows with <code>arrange()</code><a href="manipulating-data-frames-data-transformation.html#arrange-rows-with-arrange" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><code>arrange()</code> works similarly to <code>filter()</code> except instead of <em>selecting</em> rows, it changes their <em>order.</em> It takes a <strong>data frame</strong> and a set of <strong>column names</strong> (or more complicated expressions) to order by. If you provide more than one column name, each additional column will be used to break ties in the values of preceding columns:</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="manipulating-data-frames-data-transformation.html#cb56-1" tabindex="-1"></a><span class="fu">arrange</span>(mpg, manufacturer, model, displ, year)</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 11
+##    manufacturer model      displ  year   cyl trans drv     cty   hwy fl    class
+##    &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;
+##  1 audi         a4           1.8  1999     4 auto… f        18    29 p     comp…
+##  2 audi         a4           1.8  1999     4 manu… f        21    29 p     comp…
+##  3 audi         a4           2    2008     4 manu… f        20    31 p     comp…
+##  4 audi         a4           2    2008     4 auto… f        21    30 p     comp…
+##  5 audi         a4           2.8  1999     6 auto… f        16    26 p     comp…
+##  6 audi         a4           2.8  1999     6 manu… f        18    26 p     comp…
+##  7 audi         a4           3.1  2008     6 auto… f        18    27 p     comp…
+##  8 audi         a4 quattro   1.8  1999     4 manu… 4        18    26 p     comp…
+##  9 audi         a4 quattro   1.8  1999     4 auto… 4        16    25 p     comp…
+## 10 audi         a4 quattro   2    2008     4 manu… 4        20    28 p     comp…
+## # ℹ 224 more rows</code></pre>
+<p>Use <code>desc()</code> to <strong>re-order by a column</strong> in <em>descending</em> order:</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="manipulating-data-frames-data-transformation.html#cb58-1" tabindex="-1"></a><span class="fu">arrange</span>(mpg, <span class="fu">desc</span>(manufacturer))</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 11
+##    manufacturer model displ  year   cyl trans      drv     cty   hwy fl    class
+##    &lt;chr&gt;        &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;      &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;
+##  1 volkswagen   gti     2    1999     4 manual(m5) f        21    29 r     comp…
+##  2 volkswagen   gti     2    1999     4 auto(l4)   f        19    26 r     comp…
+##  3 volkswagen   gti     2    2008     4 manual(m6) f        21    29 p     comp…
+##  4 volkswagen   gti     2    2008     4 auto(s6)   f        22    29 p     comp…
+##  5 volkswagen   gti     2.8  1999     6 manual(m5) f        17    24 r     comp…
+##  6 volkswagen   jetta   1.9  1999     4 manual(m5) f        33    44 d     comp…
+##  7 volkswagen   jetta   2    1999     4 manual(m5) f        21    29 r     comp…
+##  8 volkswagen   jetta   2    1999     4 auto(l4)   f        19    26 r     comp…
+##  9 volkswagen   jetta   2    2008     4 auto(s6)   f        22    29 p     comp…
+## 10 volkswagen   jetta   2    2008     4 manual(m6) f        21    29 p     comp…
+## # ℹ 224 more rows</code></pre>
+<p>Missing values are always sorted at the end:</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="manipulating-data-frames-data-transformation.html#cb60-1" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">2</span>, <span class="cn">NA</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 1
+##       x
+##   &lt;dbl&gt;
+## 1     5
+## 2     2
+## 3    NA</code></pre>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="manipulating-data-frames-data-transformation.html#cb62-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">2</span>, <span class="cn">NA</span>))</span>
+<span id="cb62-2"><a href="manipulating-data-frames-data-transformation.html#cb62-2" tabindex="-1"></a></span>
+<span id="cb62-3"><a href="manipulating-data-frames-data-transformation.html#cb62-3" tabindex="-1"></a><span class="fu">arrange</span>(df, x)</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 1
+##       x
+##   &lt;dbl&gt;
+## 1     2
+## 2     5
+## 3    NA</code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="manipulating-data-frames-data-transformation.html#cb64-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">2</span>, <span class="cn">NA</span>))</span>
+<span id="cb64-2"><a href="manipulating-data-frames-data-transformation.html#cb64-2" tabindex="-1"></a></span>
+<span id="cb64-3"><a href="manipulating-data-frames-data-transformation.html#cb64-3" tabindex="-1"></a><span class="fu">arrange</span>(df, <span class="fu">desc</span>(x))</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 1
+##       x
+##   &lt;dbl&gt;
+## 1     5
+## 2     2
+## 3    NA</code></pre>
+</div>
+<div id="select-columns-with-select" class="section level3 hasAnchor" number="2.4.2">
+<h3><span class="header-section-number">2.4.2</span> Select Columns with <code>select()</code><a href="manipulating-data-frames-data-transformation.html#select-columns-with-select" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>It’s not uncommon to get datasets with hundreds or even thousands of <em>variables.</em> In this case, the first challenge is often narrowing in on the variables you’re actually interested in. <code>select()</code> allows you to rapidly zoom in on a useful subset using operations based on the <em>names of the variables</em>.</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="manipulating-data-frames-data-transformation.html#cb66-1" tabindex="-1"></a><span class="fu">select</span>(mpg, manufacturer, model, year)</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 3
+##    manufacturer model       year
+##    &lt;chr&gt;        &lt;chr&gt;      &lt;int&gt;
+##  1 audi         a4          1999
+##  2 audi         a4          1999
+##  3 audi         a4          2008
+##  4 audi         a4          2008
+##  5 audi         a4          1999
+##  6 audi         a4          1999
+##  7 audi         a4          2008
+##  8 audi         a4 quattro  1999
+##  9 audi         a4 quattro  1999
+## 10 audi         a4 quattro  2008
+## # ℹ 224 more rows</code></pre>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="manipulating-data-frames-data-transformation.html#cb68-1" tabindex="-1"></a><span class="co">#selects just the columns &quot;manufacturer&quot;, &quot;model&quot;, and &quot;year&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="manipulating-data-frames-data-transformation.html#cb69-1" tabindex="-1"></a><span class="fu">select</span>(mpg, manufacturer, model<span class="sc">:</span>cyl)</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 5
+##    manufacturer model      displ  year   cyl
+##    &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt; &lt;int&gt;
+##  1 audi         a4           1.8  1999     4
+##  2 audi         a4           1.8  1999     4
+##  3 audi         a4           2    2008     4
+##  4 audi         a4           2    2008     4
+##  5 audi         a4           2.8  1999     6
+##  6 audi         a4           2.8  1999     6
+##  7 audi         a4           3.1  2008     6
+##  8 audi         a4 quattro   1.8  1999     4
+##  9 audi         a4 quattro   1.8  1999     4
+## 10 audi         a4 quattro   2    2008     4
+## # ℹ 224 more rows</code></pre>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="manipulating-data-frames-data-transformation.html#cb71-1" tabindex="-1"></a><span class="co">#selects the column &quot;manufacturer&quot; and every column between &quot;model&quot; and &quot;cyl&quot; (&quot;displ&quot;, and &quot;year&quot;)</span></span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="manipulating-data-frames-data-transformation.html#cb72-1" tabindex="-1"></a><span class="fu">select</span>(mpg, <span class="sc">-</span>(displ<span class="sc">:</span>drv))</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 6
+##    manufacturer model        cty   hwy fl    class  
+##    &lt;chr&gt;        &lt;chr&gt;      &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;  
+##  1 audi         a4            18    29 p     compact
+##  2 audi         a4            21    29 p     compact
+##  3 audi         a4            20    31 p     compact
+##  4 audi         a4            21    30 p     compact
+##  5 audi         a4            16    26 p     compact
+##  6 audi         a4            18    26 p     compact
+##  7 audi         a4            18    27 p     compact
+##  8 audi         a4 quattro    18    26 p     compact
+##  9 audi         a4 quattro    16    25 p     compact
+## 10 audi         a4 quattro    20    28 p     compact
+## # ℹ 224 more rows</code></pre>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="manipulating-data-frames-data-transformation.html#cb74-1" tabindex="-1"></a><span class="co">#selects every column EXCEPT the ones between &quot;model&quot; and &quot;drv&quot; (&quot;displ&quot;, &quot;year&quot;, &quot;cyl&quot;, &quot;trans&quot;). Note that the column ranges in this scenario must be in parentheses</span></span></code></pre></div>
+<p>There are a number of helper functions you can use within <code>select()</code>:</p>
+<ul>
+<li><p><code>starts_with("abc")</code>: matches names that <strong>begin</strong> with “abc”.</p></li>
+<li><p><code>ends_with("xyz")</code>: matches names that <strong>end</strong> with “xyz”.</p></li>
+<li><p><code>contains("ijk")</code>: matches names that <strong>contain</strong> “ijk”.</p></li>
+<li><p><code>matches("(.)\\1")</code>: selects variables that <strong>match</strong> a <em>regular expression</em>. This one matches <em>any variables that contain repeated characters</em>.</p></li>
+<li><p><code>num_range("x", 1:3)</code>: <strong>matches</strong> x1, x2 and x3.</p></li>
+</ul>
+<p>To see a longer list of other functions and more detailed usage, use <code>?select</code> for more details.</p>
+<p>You can also use <code>select()</code> to rename variables, but it’s rarely useful because it drops all of the variables not explicitly mentioned. Instead, use <code>rename()</code>, a variant of <code>select()</code>, that keeps all the variables that aren’t explicitly mentioned:</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="manipulating-data-frames-data-transformation.html#cb75-1" tabindex="-1"></a><span class="fu">rename</span>(mpg, <span class="at">make =</span> manufacturer)</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 11
+##    make  model      displ  year   cyl trans      drv     cty   hwy fl    class  
+##    &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;      &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;  
+##  1 audi  a4           1.8  1999     4 auto(l5)   f        18    29 p     compact
+##  2 audi  a4           1.8  1999     4 manual(m5) f        21    29 p     compact
+##  3 audi  a4           2    2008     4 manual(m6) f        20    31 p     compact
+##  4 audi  a4           2    2008     4 auto(av)   f        21    30 p     compact
+##  5 audi  a4           2.8  1999     6 auto(l5)   f        16    26 p     compact
+##  6 audi  a4           2.8  1999     6 manual(m5) f        18    26 p     compact
+##  7 audi  a4           3.1  2008     6 auto(av)   f        18    27 p     compact
+##  8 audi  a4 quattro   1.8  1999     4 manual(m5) 4        18    26 p     compact
+##  9 audi  a4 quattro   1.8  1999     4 auto(l5)   4        16    25 p     compact
+## 10 audi  a4 quattro   2    2008     4 manual(m6) 4        20    28 p     compact
+## # ℹ 224 more rows</code></pre>
+<p>Another option is to use <code>select()</code> in conjunction with the <code>everything()</code> helper. This is useful if you have a handful of variables you’d like to move to the start of the data frame.</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="manipulating-data-frames-data-transformation.html#cb77-1" tabindex="-1"></a><span class="fu">select</span>(mpg, year, model, manufacturer, <span class="fu">everything</span>())</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 11
+##     year model      manufacturer displ   cyl trans drv     cty   hwy fl    class
+##    &lt;int&gt; &lt;chr&gt;      &lt;chr&gt;        &lt;dbl&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;
+##  1  1999 a4         audi           1.8     4 auto… f        18    29 p     comp…
+##  2  1999 a4         audi           1.8     4 manu… f        21    29 p     comp…
+##  3  2008 a4         audi           2       4 manu… f        20    31 p     comp…
+##  4  2008 a4         audi           2       4 auto… f        21    30 p     comp…
+##  5  1999 a4         audi           2.8     6 auto… f        16    26 p     comp…
+##  6  1999 a4         audi           2.8     6 manu… f        18    26 p     comp…
+##  7  2008 a4         audi           3.1     6 auto… f        18    27 p     comp…
+##  8  1999 a4 quattro audi           1.8     4 manu… 4        18    26 p     comp…
+##  9  1999 a4 quattro audi           1.8     4 auto… 4        16    25 p     comp…
+## 10  2008 a4 quattro audi           2       4 manu… 4        20    28 p     comp…
+## # ℹ 224 more rows</code></pre>
+</div>
+<div id="add-new-variables-with-mutate" class="section level3 hasAnchor" number="2.4.3">
+<h3><span class="header-section-number">2.4.3</span> Add New Variables with <code>mutate()</code><a href="manipulating-data-frames-data-transformation.html#add-new-variables-with-mutate" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Besides selecting sets of existing columns, it’s often useful to <em>add new columns</em> that are <strong>functions of existing columns</strong>. That’s the job of <code>mutate()</code>.</p>
+<p><code>mutate()</code> always adds new columns at the <strong>end</strong> of your dataset, so we’ll start by creating a narrower dataset so we can see the new variables.</p>
+<p>Remember that when you’re in RStudio, the easiest way to see all the columns is <code>View()</code>.</p>
+<p>In the code chunk below, you’ll see a slightly different format than you’re probably used to. Up until now, we’ve kept all arguments and values for a function on a single line. Sometimes that can start to look quite busy and difficult to understand. Luckily, like mentioned earlier, R does not care about white space, so we can put each value on a new line. In fact, RStudio has a built-in functionality where new lines within a function will be indented to the same spot as the start of the first value. This way, it’s a little simpler to understand the code we’re reading. (RStudio even has a shortcut (<code>Alt</code> + <code>i</code>) to bring a new line to the proper indentation)</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="manipulating-data-frames-data-transformation.html#cb79-1" tabindex="-1"></a>mpg_small <span class="ot">&lt;-</span> <span class="fu">select</span>(mpg, </span>
+<span id="cb79-2"><a href="manipulating-data-frames-data-transformation.html#cb79-2" tabindex="-1"></a>                    manufacturer, </span>
+<span id="cb79-3"><a href="manipulating-data-frames-data-transformation.html#cb79-3" tabindex="-1"></a>                    model,</span>
+<span id="cb79-4"><a href="manipulating-data-frames-data-transformation.html#cb79-4" tabindex="-1"></a>                    displ, </span>
+<span id="cb79-5"><a href="manipulating-data-frames-data-transformation.html#cb79-5" tabindex="-1"></a>                    year, </span>
+<span id="cb79-6"><a href="manipulating-data-frames-data-transformation.html#cb79-6" tabindex="-1"></a>                    cty, </span>
+<span id="cb79-7"><a href="manipulating-data-frames-data-transformation.html#cb79-7" tabindex="-1"></a>                    hwy)</span>
+<span id="cb79-8"><a href="manipulating-data-frames-data-transformation.html#cb79-8" tabindex="-1"></a></span>
+<span id="cb79-9"><a href="manipulating-data-frames-data-transformation.html#cb79-9" tabindex="-1"></a><span class="co">#would be the same if we typed:</span></span>
+<span id="cb79-10"><a href="manipulating-data-frames-data-transformation.html#cb79-10" tabindex="-1"></a><span class="co">#mpg_small &lt;- select(mpg, manufacturer, model, year, cty, hwy)</span></span>
+<span id="cb79-11"><a href="manipulating-data-frames-data-transformation.html#cb79-11" tabindex="-1"></a></span>
+<span id="cb79-12"><a href="manipulating-data-frames-data-transformation.html#cb79-12" tabindex="-1"></a><span class="fu">mutate</span>(mpg_small,</span>
+<span id="cb79-13"><a href="manipulating-data-frames-data-transformation.html#cb79-13" tabindex="-1"></a>       <span class="at">mileage_diff =</span> hwy <span class="sc">-</span> cty,</span>
+<span id="cb79-14"><a href="manipulating-data-frames-data-transformation.html#cb79-14" tabindex="-1"></a>       <span class="at">cty_mileage_per_ltr =</span> cty <span class="sc">/</span> displ,</span>
+<span id="cb79-15"><a href="manipulating-data-frames-data-transformation.html#cb79-15" tabindex="-1"></a>       <span class="at">hwy_mileage_per_ltr =</span> hwy <span class="sc">/</span> displ)</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 9
+##    manufacturer model   displ  year   cty   hwy mileage_diff cty_mileage_per_ltr
+##    &lt;chr&gt;        &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;        &lt;int&gt;               &lt;dbl&gt;
+##  1 audi         a4        1.8  1999    18    29           11               10   
+##  2 audi         a4        1.8  1999    21    29            8               11.7 
+##  3 audi         a4        2    2008    20    31           11               10   
+##  4 audi         a4        2    2008    21    30            9               10.5 
+##  5 audi         a4        2.8  1999    16    26           10                5.71
+##  6 audi         a4        2.8  1999    18    26            8                6.43
+##  7 audi         a4        3.1  2008    18    27            9                5.81
+##  8 audi         a4 qua…   1.8  1999    18    26            8               10   
+##  9 audi         a4 qua…   1.8  1999    16    25            9                8.89
+## 10 audi         a4 qua…   2    2008    20    28            8               10   
+## # ℹ 224 more rows
+## # ℹ 1 more variable: hwy_mileage_per_ltr &lt;dbl&gt;</code></pre>
+<p>You can also refer to columns that you’ve just created:</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="manipulating-data-frames-data-transformation.html#cb81-1" tabindex="-1"></a><span class="fu">mutate</span>(mpg_small,</span>
+<span id="cb81-2"><a href="manipulating-data-frames-data-transformation.html#cb81-2" tabindex="-1"></a>       <span class="at">mileage_diff =</span> hwy <span class="sc">-</span> cty,</span>
+<span id="cb81-3"><a href="manipulating-data-frames-data-transformation.html#cb81-3" tabindex="-1"></a>       <span class="at">mileage_diff_per_ltr =</span> mileage_diff <span class="sc">/</span> displ)</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 8
+##    manufacturer model  displ  year   cty   hwy mileage_diff mileage_diff_per_ltr
+##    &lt;chr&gt;        &lt;chr&gt;  &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;        &lt;int&gt;                &lt;dbl&gt;
+##  1 audi         a4       1.8  1999    18    29           11                 6.11
+##  2 audi         a4       1.8  1999    21    29            8                 4.44
+##  3 audi         a4       2    2008    20    31           11                 5.5 
+##  4 audi         a4       2    2008    21    30            9                 4.5 
+##  5 audi         a4       2.8  1999    16    26           10                 3.57
+##  6 audi         a4       2.8  1999    18    26            8                 2.86
+##  7 audi         a4       3.1  2008    18    27            9                 2.90
+##  8 audi         a4 qu…   1.8  1999    18    26            8                 4.44
+##  9 audi         a4 qu…   1.8  1999    16    25            9                 5   
+## 10 audi         a4 qu…   2    2008    20    28            8                 4   
+## # ℹ 224 more rows</code></pre>
+<p>If you only want to keep the new variables (<em>i.e.</em>, you do not want any of the old ones), you can use <code>transmute()</code>:</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="manipulating-data-frames-data-transformation.html#cb83-1" tabindex="-1"></a><span class="fu">transmute</span>(mpg,</span>
+<span id="cb83-2"><a href="manipulating-data-frames-data-transformation.html#cb83-2" tabindex="-1"></a>          <span class="at">cty_mileage_per_ltr =</span> cty <span class="sc">/</span> displ,</span>
+<span id="cb83-3"><a href="manipulating-data-frames-data-transformation.html#cb83-3" tabindex="-1"></a>          <span class="at">hwy_mileage_per_ltr =</span> hwy <span class="sc">/</span> displ)</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 2
+##    cty_mileage_per_ltr hwy_mileage_per_ltr
+##                  &lt;dbl&gt;               &lt;dbl&gt;
+##  1               10                  16.1 
+##  2               11.7                16.1 
+##  3               10                  15.5 
+##  4               10.5                15   
+##  5                5.71                9.29
+##  6                6.43                9.29
+##  7                5.81                8.71
+##  8               10                  14.4 
+##  9                8.89               13.9 
+## 10               10                  14   
+## # ℹ 224 more rows</code></pre>
+<div id="useful-creation-functions" class="section level4 hasAnchor" number="2.4.3.1">
+<h4><span class="header-section-number">2.4.3.1</span> Useful creation functions<a href="manipulating-data-frames-data-transformation.html#useful-creation-functions" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>There are many functions for creating new variables that you can use with <code>mutate()</code>. The key property is that the function must be <strong>vectorised</strong>: it must take a <em>vector</em> of <em>values</em> as <em>input</em>, <em>return</em> a <em>vector</em> with the <em>same number of values</em> as <em>output.</em> T</p>
+<p>There’s no way to list every possible function that you might use, but here’s a selection of functions that are frequently useful:</p>
+<ul>
+<li><p>Arithmetic operators: <code>+</code>, <code>-</code>,<code>*</code>, <code>/</code>, <code>^</code></p>
+<ul>
+<li><p>These are all vectorised, using the so called “recycling rules”. If one parameter is shorter than the other, it will be automatically extended to be the same length. This is most useful when one of the arguments is a single number: <code>displ * 3.4</code>, <code>cty / 1.5</code>, etc.</p></li>
+<li><p>Arithmetic operators are also useful in conjunction with the aggregate functions. For example, <code>x / sum(x)</code> calculates the <em>proportion of a total</em>, and <code>y - mean(y)</code> computes the <em>difference from the mean</em>.</p></li>
+<li><p>Modular arithmetic: <code>%/%</code> (integer division) and <code>%%</code> (remainder), where <code>x == y * (x %/% y) + (x %% y)</code>.</p>
+<ul>
+<li>Modular arithmetic is a handy tool because it allows you to break integers up into pieces. For example, in the flights dataset, you can compute hour and minute from dep_time with:</li>
+</ul></li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="manipulating-data-frames-data-transformation.html#cb85-1" tabindex="-1"></a><span class="fu">transmute</span>(mpg,</span>
+<span id="cb85-2"><a href="manipulating-data-frames-data-transformation.html#cb85-2" tabindex="-1"></a>          model,</span>
+<span id="cb85-3"><a href="manipulating-data-frames-data-transformation.html#cb85-3" tabindex="-1"></a>          year,</span>
+<span id="cb85-4"><a href="manipulating-data-frames-data-transformation.html#cb85-4" tabindex="-1"></a>          <span class="at">millenium =</span> year <span class="sc">%/%</span> <span class="dv">1000</span>,</span>
+<span id="cb85-5"><a href="manipulating-data-frames-data-transformation.html#cb85-5" tabindex="-1"></a>          <span class="at">century_decade_year =</span> year <span class="sc">%%</span> <span class="dv">1000</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 234 × 4
+##    model       year millenium century_decade_year
+##    &lt;chr&gt;      &lt;int&gt;     &lt;dbl&gt;               &lt;dbl&gt;
+##  1 a4          1999         1                 999
+##  2 a4          1999         1                 999
+##  3 a4          2008         2                   8
+##  4 a4          2008         2                   8
+##  5 a4          1999         1                 999
+##  6 a4          1999         1                 999
+##  7 a4          2008         2                   8
+##  8 a4 quattro  1999         1                 999
+##  9 a4 quattro  1999         1                 999
+## 10 a4 quattro  2008         2                   8
+## # ℹ 224 more rows</code></pre>
+<ul>
+<li><p>Logs: <code>log()</code>, <code>log2()</code>, <code>log10()</code>. Logarithms are an incredibly useful transformation for dealing with data that ranges across multiple orders of magnitude.</p></li>
+<li><p>Offsets: <code>lead()</code> and <code>lag()</code> allow you to refer to leading or lagging values.</p>
+<ul>
+<li>This allows you to compute running differences (<em>e.g.</em>, <code>x - lag(x)</code>) or find when values change (<code>x != lag(x)</code>). They are most useful in conjunction with <code>group_by()</code></li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="manipulating-data-frames-data-transformation.html#cb87-1" tabindex="-1"></a>(x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="manipulating-data-frames-data-transformation.html#cb89-1" tabindex="-1"></a><span class="fu">lag</span>(x)</span></code></pre></div>
+<pre><code>##  [1] NA  1  2  3  4  5  6  7  8  9</code></pre>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="manipulating-data-frames-data-transformation.html#cb91-1" tabindex="-1"></a><span class="fu">lead</span>(x)</span></code></pre></div>
+<pre><code>##  [1]  2  3  4  5  6  7  8  9 10 NA</code></pre>
+<ul>
+<li>Cumulative and rolling aggregates: R provides functions for running sums, products, mins and maxes: <code>cumsum()</code>, <code>cumprod()</code>, <code>cummin()</code>, <code>cummax()</code>; and <code>dplyr</code> provides <code>cummean()</code> for cumulative means.</li>
+</ul>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="manipulating-data-frames-data-transformation.html#cb93-1" tabindex="-1"></a>(x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="manipulating-data-frames-data-transformation.html#cb95-1" tabindex="-1"></a><span class="fu">cumsum</span>(x)</span></code></pre></div>
+<pre><code>##  [1]  1  3  6 10 15 21 28 36 45 55</code></pre>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="manipulating-data-frames-data-transformation.html#cb97-1" tabindex="-1"></a><span class="fu">cummean</span>(x)</span></code></pre></div>
+<pre><code>##  [1] 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5</code></pre>
+<ul>
+<li><p>Logical comparisons (<code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>!=</code>, and <code>==</code>), which you learned about earlier. If you’re doing a complex sequence of logical operations it’s often a good idea to store the interim values in new variables so you can check that each step is working as expected.</p></li>
+<li><p>Ranking: there are a number of ranking functions, but you should start with <code>min_rank()</code>. It does the most usual type of ranking (<em>e.g.</em>, 1st, 2nd, 2nd, 4th). The default gives smallest values the small ranks; use <code>desc(x)</code> to give the largest values the smallest ranks.</p></li>
+</ul>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="manipulating-data-frames-data-transformation.html#cb99-1" tabindex="-1"></a>(y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="cn">NA</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span></code></pre></div>
+<pre><code>## [1]  1  2  2 NA  3  4</code></pre>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="manipulating-data-frames-data-transformation.html#cb101-1" tabindex="-1"></a><span class="fu">min_rank</span>(y)</span></code></pre></div>
+<pre><code>## [1]  1  2  2 NA  4  5</code></pre>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="manipulating-data-frames-data-transformation.html#cb103-1" tabindex="-1"></a><span class="fu">min_rank</span>(<span class="fu">desc</span>(y))</span></code></pre></div>
+<pre><code>## [1]  5  3  3 NA  2  1</code></pre>
+</div>
+</div>
+<div id="grouped-summaries-with-summarize" class="section level3 hasAnchor" number="2.4.4">
+<h3><span class="header-section-number">2.4.4</span> Grouped Summaries with <code>summarize()</code><a href="manipulating-data-frames-data-transformation.html#grouped-summaries-with-summarize" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The last key verb is <code>summarise()</code>. It collapses a data frame to a single row:</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="manipulating-data-frames-data-transformation.html#cb105-1" tabindex="-1"></a><span class="fu">summarise</span>(mpg, </span>
+<span id="cb105-2"><a href="manipulating-data-frames-data-transformation.html#cb105-2" tabindex="-1"></a>          <span class="at">mean_hwy =</span> <span class="fu">mean</span>(hwy, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 1
+##   mean_hwy
+##      &lt;dbl&gt;
+## 1     23.4</code></pre>
+<p>(We’ll come back to what that <code>na.rm = TRUE</code> means very shortly.)</p>
+<p><code>summarise()</code> is not terribly useful unless we pair it with <code>group_by()</code>. This <strong>changes the unit of analysis</strong> from the <em>complete dataset</em> to <em>individual groups</em>. Then, when you use the <code>dplyr</code> verbs on a <em>grouped data frame</em> they’ll be automatically <em>applied “by group”</em>. For example, if we applied the exact same code to a data frame <strong>grouped by</strong> car manufacturer, we get the average highway mileage per manufacturer:</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="manipulating-data-frames-data-transformation.html#cb107-1" tabindex="-1"></a>by_make <span class="ot">&lt;-</span> <span class="fu">group_by</span>(mpg, manufacturer)</span>
+<span id="cb107-2"><a href="manipulating-data-frames-data-transformation.html#cb107-2" tabindex="-1"></a><span class="fu">summarise</span>(by_make, </span>
+<span id="cb107-3"><a href="manipulating-data-frames-data-transformation.html#cb107-3" tabindex="-1"></a>          <span class="at">mean_hwy =</span> <span class="fu">mean</span>(hwy, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 15 × 2
+##    manufacturer mean_hwy
+##    &lt;chr&gt;           &lt;dbl&gt;
+##  1 audi             26.4
+##  2 chevrolet        21.9
+##  3 dodge            17.9
+##  4 ford             19.4
+##  5 honda            32.6
+##  6 hyundai          26.9
+##  7 jeep             17.6
+##  8 land rover       16.5
+##  9 lincoln          17  
+## 10 mercury          18  
+## 11 nissan           24.6
+## 12 pontiac          26.4
+## 13 subaru           25.6
+## 14 toyota           24.9
+## 15 volkswagen       29.2</code></pre>
+<p>Together, <code>group_by()</code> and <code>summarise()</code> provide one of the tools that you’ll use most commonly when working with <code>dplyr</code>: <strong>grouped summaries</strong>.</p>
+<p>But before we go any further with this, we need to introduce a powerful new idea: the <strong>pipe</strong>.</p>
+<div id="combining-multiple-operations-with-the-pipe" class="section level4 hasAnchor" number="2.4.4.1">
+<h4><span class="header-section-number">2.4.4.1</span> Combining Multiple Operations With the Pipe<a href="manipulating-data-frames-data-transformation.html#combining-multiple-operations-with-the-pipe" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Imagine that we want to explore the relationship between the city and highway mileage for each engine size. Using what you know about <code>dplyr</code>, you might write code like this:</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="manipulating-data-frames-data-transformation.html#cb109-1" tabindex="-1"></a>by_engine <span class="ot">&lt;-</span> <span class="fu">group_by</span>(mpg, displ)</span>
+<span id="cb109-2"><a href="manipulating-data-frames-data-transformation.html#cb109-2" tabindex="-1"></a>mileage <span class="ot">&lt;-</span> <span class="fu">summarise</span>(by_engine,</span>
+<span id="cb109-3"><a href="manipulating-data-frames-data-transformation.html#cb109-3" tabindex="-1"></a>                     <span class="at">count =</span> <span class="fu">n</span>(),</span>
+<span id="cb109-4"><a href="manipulating-data-frames-data-transformation.html#cb109-4" tabindex="-1"></a>                     <span class="at">hwy_mean =</span> <span class="fu">mean</span>(hwy, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb109-5"><a href="manipulating-data-frames-data-transformation.html#cb109-5" tabindex="-1"></a>                     <span class="at">cty_mean =</span> <span class="fu">mean</span>(cty, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb109-6"><a href="manipulating-data-frames-data-transformation.html#cb109-6" tabindex="-1"></a>)</span>
+<span id="cb109-7"><a href="manipulating-data-frames-data-transformation.html#cb109-7" tabindex="-1"></a></span>
+<span id="cb109-8"><a href="manipulating-data-frames-data-transformation.html#cb109-8" tabindex="-1"></a>mileage <span class="ot">&lt;-</span> <span class="fu">filter</span>(mileage,</span>
+<span id="cb109-9"><a href="manipulating-data-frames-data-transformation.html#cb109-9" tabindex="-1"></a>                  count <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb109-10"><a href="manipulating-data-frames-data-transformation.html#cb109-10" tabindex="-1"></a></span>
+<span id="cb109-11"><a href="manipulating-data-frames-data-transformation.html#cb109-11" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mileage, </span>
+<span id="cb109-12"><a href="manipulating-data-frames-data-transformation.html#cb109-12" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> hwy_mean, <span class="at">y =</span> cty_mean)) <span class="sc">+</span></span>
+<span id="cb109-13"><a href="manipulating-data-frames-data-transformation.html#cb109-13" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> displ,</span>
+<span id="cb109-14"><a href="manipulating-data-frames-data-transformation.html#cb109-14" tabindex="-1"></a>                 <span class="at">size =</span> count)) <span class="sc">+</span></span>
+<span id="cb109-15"><a href="manipulating-data-frames-data-transformation.html#cb109-15" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-56-1.png" alt="" width="672" /></p>
+<p>There are three steps to prepare this data:</p>
+<ol style="list-style-type: decimal">
+<li><p>Group cars by engine size</p></li>
+<li><p>Summarize to compute average city and highway mileage, and number of cars with each engine size</p></li>
+<li><p>Filter to remove noisy points (<em>i.e.,</em> engine sizes with only one car)</p></li>
+</ol>
+<p>This code is a little frustrating to write because we have to give each intermediate data frame a name, even though we don’t care about it. Naming things is hard, so this slows down our analysis and can lead to additional errors.</p>
+<p>There’s another way to tackle the same problem: with the <strong>pipe</strong> (<code>%&gt;%</code>):</p>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="manipulating-data-frames-data-transformation.html#cb111-1" tabindex="-1"></a>mileage <span class="ot">&lt;-</span> mpg <span class="sc">%&gt;%</span> </span>
+<span id="cb111-2"><a href="manipulating-data-frames-data-transformation.html#cb111-2" tabindex="-1"></a>  <span class="fu">group_by</span>(displ) <span class="sc">%&gt;%</span> </span>
+<span id="cb111-3"><a href="manipulating-data-frames-data-transformation.html#cb111-3" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>(),</span>
+<span id="cb111-4"><a href="manipulating-data-frames-data-transformation.html#cb111-4" tabindex="-1"></a>            <span class="at">hwy_mean =</span> <span class="fu">mean</span>(hwy, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb111-5"><a href="manipulating-data-frames-data-transformation.html#cb111-5" tabindex="-1"></a>            <span class="at">cty_mean =</span> <span class="fu">mean</span>(cty, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb111-6"><a href="manipulating-data-frames-data-transformation.html#cb111-6" tabindex="-1"></a>  <span class="fu">filter</span>(count <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb111-7"><a href="manipulating-data-frames-data-transformation.html#cb111-7" tabindex="-1"></a></span>
+<span id="cb111-8"><a href="manipulating-data-frames-data-transformation.html#cb111-8" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mileage,</span>
+<span id="cb111-9"><a href="manipulating-data-frames-data-transformation.html#cb111-9" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> hwy_mean, <span class="at">y =</span> cty_mean)) <span class="sc">+</span></span>
+<span id="cb111-10"><a href="manipulating-data-frames-data-transformation.html#cb111-10" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> displ,</span>
+<span id="cb111-11"><a href="manipulating-data-frames-data-transformation.html#cb111-11" tabindex="-1"></a>                 <span class="at">size =</span> count)) <span class="sc">+</span></span>
+<span id="cb111-12"><a href="manipulating-data-frames-data-transformation.html#cb111-12" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-57-1.png" alt="" width="672" /></p>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="manipulating-data-frames-data-transformation.html#cb113-1" tabindex="-1"></a>mpg <span class="sc">%&gt;%</span> </span>
+<span id="cb113-2"><a href="manipulating-data-frames-data-transformation.html#cb113-2" tabindex="-1"></a>  <span class="fu">group_by</span>(displ) <span class="sc">%&gt;%</span> </span>
+<span id="cb113-3"><a href="manipulating-data-frames-data-transformation.html#cb113-3" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>(),</span>
+<span id="cb113-4"><a href="manipulating-data-frames-data-transformation.html#cb113-4" tabindex="-1"></a>            <span class="at">hwy_mean =</span> <span class="fu">mean</span>(hwy, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb113-5"><a href="manipulating-data-frames-data-transformation.html#cb113-5" tabindex="-1"></a>            <span class="at">cty_mean =</span> <span class="fu">mean</span>(cty, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb113-6"><a href="manipulating-data-frames-data-transformation.html#cb113-6" tabindex="-1"></a>  <span class="fu">filter</span>(count <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb113-7"><a href="manipulating-data-frames-data-transformation.html#cb113-7" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> hwy_mean, <span class="at">y =</span> cty_mean)) <span class="sc">+</span></span>
+<span id="cb113-8"><a href="manipulating-data-frames-data-transformation.html#cb113-8" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> displ,</span>
+<span id="cb113-9"><a href="manipulating-data-frames-data-transformation.html#cb113-9" tabindex="-1"></a>                 <span class="at">size =</span> count)) <span class="sc">+</span></span>
+<span id="cb113-10"><a href="manipulating-data-frames-data-transformation.html#cb113-10" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-58-1.png" alt="" width="672" /></p>
+<p>This focuses <em>on the transformations</em>, not <em>what’s being transformed</em>, which makes the code easier to read. You can read it as a series of imperative statements:</p>
+<ol style="list-style-type: decimal">
+<li><p>Take the <code>mpg</code> <em>data frame</em> <strong>THEN</strong></p></li>
+<li><p>Group it by <code>displ</code> <strong>THEN</strong></p></li>
+<li><p>Summarize by the <code>displ</code> group <strong>THEN</strong></p></li>
+<li><p>Filter the summarized groups <strong>THEN</strong></p></li>
+<li><p>Plot the results</p></li>
+</ol>
+<p>As suggested by this reading, a good way to pronounce <code>%&gt;%</code> when reading code is <strong>“then”</strong>.</p>
+<p>Behind the scenes, <code>x %&gt;% f(y)</code> turns into <code>f(x, y)</code>, and <code>x %&gt;% f(y) %&gt;% g(z)</code> turns into <code>g(f(x, y), z)</code> and so on.</p>
+<p>You can use the pipe to rewrite multiple operations in a way that you can read <em>left-to-right</em>, <em>top-to-bottom</em>. We’ll use <strong>piping</strong> frequently from now on because it considerably improves the readability of code.</p>
+<p>Working with the <strong>pipe</strong> is one of the key criteria for belonging to the <em>tidyverse.</em> The only exception is <code>ggplot2</code>…it was written before the pipe was discovered.</p>
+</div>
+<div id="missing-values" class="section level4 hasAnchor" number="2.4.4.2">
+<h4><span class="header-section-number">2.4.4.2</span> Missing values<a href="manipulating-data-frames-data-transformation.html#missing-values" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>You may have wondered about the <code>na.rm</code> argument we used above. What happens if we don’t set it?</p>
+<p>While the <code>mpg</code> dataset may not be the best example of missing values (they are none in the data frame), we can still discuss some of the key components pertaining to them.</p>
+<p>As a basic rule, when aggregating missing values, “<em>if there are any missing values in the input, the output will be a missing value</em>”.</p>
+<p>Fortunately, all aggregation functions have an <code>na.rm</code> argument which removes the missing values prior to computation:</p>
+</div>
+<div id="useful-summary-functions" class="section level4 hasAnchor" number="2.4.4.3">
+<h4><span class="header-section-number">2.4.4.3</span> Useful summary functions<a href="manipulating-data-frames-data-transformation.html#useful-summary-functions" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Just using <em>means</em>, <em>counts</em>, and <em>sum</em> can get you a long way, but R provides many other useful summary functions:</p>
+<ul>
+<li><p>Measures of location: we’ve used <code>mean(x)</code>, but you can also use <code>median(x)</code></p>
+<ul>
+<li>It’s sometimes useful to combine aggregation with logical sub-setting</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="manipulating-data-frames-data-transformation.html#cb115-1" tabindex="-1"></a>mpg <span class="sc">%&gt;%</span> </span>
+<span id="cb115-2"><a href="manipulating-data-frames-data-transformation.html#cb115-2" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span> </span>
+<span id="cb115-3"><a href="manipulating-data-frames-data-transformation.html#cb115-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avg_hwy =</span> <span class="fu">mean</span>(hwy),</span>
+<span id="cb115-4"><a href="manipulating-data-frames-data-transformation.html#cb115-4" tabindex="-1"></a>            <span class="at">avg_2L_hwy =</span> <span class="fu">mean</span>(hwy[displ <span class="sc">&gt;</span> <span class="dv">2</span>])) <span class="co">#the mean highway mileage of only cars with an engine larger than 2 liters</span></span></code></pre></div>
+<pre><code>## # A tibble: 38 × 3
+##    model              avg_hwy avg_2L_hwy
+##    &lt;chr&gt;                &lt;dbl&gt;      &lt;dbl&gt;
+##  1 4runner 4wd           18.8       18.8
+##  2 a4                    28.3       26.3
+##  3 a4 quattro            25.8       25  
+##  4 a6 quattro            24         24  
+##  5 altima                28.7       28.7
+##  6 c1500 suburban 2wd    17.8       17.8
+##  7 camry                 28.3       28.3
+##  8 camry solara          28.1       28.1
+##  9 caravan 2wd           22.4       22.4
+## 10 civic                 32.6      NaN  
+## # ℹ 28 more rows</code></pre>
+<ul>
+<li>Measures of spread:
+<ul>
+<li><code>sd(x)</code>- Standard deviation, the root mean squared deviation</li>
+<li><code>IQR(x)</code>- Interquartile range</li>
+<li><code>mad(x)</code>- Median absolute deviation</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="manipulating-data-frames-data-transformation.html#cb117-1" tabindex="-1"></a>mpg <span class="sc">%&gt;%</span> </span>
+<span id="cb117-2"><a href="manipulating-data-frames-data-transformation.html#cb117-2" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span> </span>
+<span id="cb117-3"><a href="manipulating-data-frames-data-transformation.html#cb117-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">hwy_sd =</span> <span class="fu">sd</span>(hwy)) <span class="sc">%&gt;%</span> </span>
+<span id="cb117-4"><a href="manipulating-data-frames-data-transformation.html#cb117-4" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(hwy_sd))</span></code></pre></div>
+<pre><code>## # A tibble: 38 × 2
+##    model              hwy_sd
+##    &lt;chr&gt;               &lt;dbl&gt;
+##  1 new beetle           7.63
+##  2 jetta                6.07
+##  3 grand cherokee 4wd   3.25
+##  4 corolla              2.65
+##  5 civic                2.55
+##  6 altima               2.42
+##  7 gti                  2.30
+##  8 dakota pickup 4wd    2.29
+##  9 k1500 tahoe 4wd      2.22
+## 10 camry solara         2.19
+## # ℹ 28 more rows</code></pre>
+<ul>
+<li>Measures of rank: <code>min(x)</code>, <code>quantile(x, 0.25)</code>, <code>max(x)</code>. Quantiles are a generalization of the median. For example, <code>quantile(x, 0.25)</code> will find a value of x that is greater than 25% of the values, and less than the remaining 75%.</li>
+</ul>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="manipulating-data-frames-data-transformation.html#cb119-1" tabindex="-1"></a>mpg <span class="sc">%&gt;%</span> </span>
+<span id="cb119-2"><a href="manipulating-data-frames-data-transformation.html#cb119-2" tabindex="-1"></a>  <span class="fu">group_by</span>(manufacturer) <span class="sc">%&gt;%</span> </span>
+<span id="cb119-3"><a href="manipulating-data-frames-data-transformation.html#cb119-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">guzzler =</span> <span class="fu">min</span>(hwy),</span>
+<span id="cb119-4"><a href="manipulating-data-frames-data-transformation.html#cb119-4" tabindex="-1"></a>            <span class="at">effiicient =</span> <span class="fu">max</span>(hwy))</span></code></pre></div>
+<pre><code>## # A tibble: 15 × 3
+##    manufacturer guzzler effiicient
+##    &lt;chr&gt;          &lt;int&gt;      &lt;int&gt;
+##  1 audi              23         31
+##  2 chevrolet         14         30
+##  3 dodge             12         24
+##  4 ford              15         26
+##  5 honda             29         36
+##  6 hyundai           24         31
+##  7 jeep              12         22
+##  8 land rover        15         18
+##  9 lincoln           16         18
+## 10 mercury           17         19
+## 11 nissan            17         32
+## 12 pontiac           25         28
+## 13 subaru            23         27
+## 14 toyota            15         37
+## 15 volkswagen        23         44</code></pre>
+<ul>
+<li>Counts: <code>n()</code> returns the size of the current group.
+<ul>
+<li>To count the number of non-missing values, use <code>sum(!is.na(x))</code></li>
+<li>To count the number of distinct (unique) values, use <code>n_distinct(x)</code></li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="manipulating-data-frames-data-transformation.html#cb121-1" tabindex="-1"></a>mpg <span class="sc">%&gt;%</span> </span>
+<span id="cb121-2"><a href="manipulating-data-frames-data-transformation.html#cb121-2" tabindex="-1"></a>  <span class="fu">group_by</span>(manufacturer, model) <span class="sc">%&gt;%</span> </span>
+<span id="cb121-3"><a href="manipulating-data-frames-data-transformation.html#cb121-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_model_years =</span> <span class="fu">n_distinct</span>(year)) <span class="sc">%&gt;%</span> </span>
+<span id="cb121-4"><a href="manipulating-data-frames-data-transformation.html#cb121-4" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n_model_years))</span></code></pre></div>
+<pre><code>## `summarise()` has regrouped the output.
+## ℹ Summaries were computed grouped by manufacturer and model.
+## ℹ Output is grouped by manufacturer.
+## ℹ Use `summarise(.groups = &quot;drop_last&quot;)` to silence this message.
+## ℹ Use `summarise(.by = c(manufacturer, model))` for per-operation grouping (`?dplyr::dplyr_by`) instead.</code></pre>
+<pre><code>## # A tibble: 38 × 3
+## # Groups:   manufacturer [15]
+##    manufacturer model              n_model_years
+##    &lt;chr&gt;        &lt;chr&gt;                      &lt;int&gt;
+##  1 audi         a4                             2
+##  2 audi         a4 quattro                     2
+##  3 audi         a6 quattro                     2
+##  4 chevrolet    c1500 suburban 2wd             2
+##  5 chevrolet    corvette                       2
+##  6 chevrolet    k1500 tahoe 4wd                2
+##  7 chevrolet    malibu                         2
+##  8 dodge        caravan 2wd                    2
+##  9 dodge        dakota pickup 4wd              2
+## 10 dodge        durango 4wd                    2
+## # ℹ 28 more rows</code></pre>
+<ul>
+<li>Counts are so useful that <code>dplyr</code> provides a simple helper if all you want is a count:</li>
+</ul>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="manipulating-data-frames-data-transformation.html#cb124-1" tabindex="-1"></a>mpg <span class="sc">%&gt;%</span> </span>
+<span id="cb124-2"><a href="manipulating-data-frames-data-transformation.html#cb124-2" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">&#39;auto&#39;</span>, trans), <span class="co">#keep any row that contains the string &quot;auto&quot; in the `trans` column</span></span>
+<span id="cb124-3"><a href="manipulating-data-frames-data-transformation.html#cb124-3" tabindex="-1"></a>         drv <span class="sc">==</span><span class="st">&#39;f&#39;</span>,</span>
+<span id="cb124-4"><a href="manipulating-data-frames-data-transformation.html#cb124-4" tabindex="-1"></a>         cyl <span class="sc">==</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb124-5"><a href="manipulating-data-frames-data-transformation.html#cb124-5" tabindex="-1"></a>  <span class="fu">group_by</span>(manufacturer, model) <span class="sc">%&gt;%</span> </span>
+<span id="cb124-6"><a href="manipulating-data-frames-data-transformation.html#cb124-6" tabindex="-1"></a>  <span class="fu">count</span>(model) <span class="co">#The number of times a car model was released that has an automatic transmission, is front-wheel drive, and has 6 cylinders</span></span></code></pre></div>
+<pre><code>## # A tibble: 12 × 3
+## # Groups:   manufacturer, model [12]
+##    manufacturer model            n
+##    &lt;chr&gt;        &lt;chr&gt;        &lt;int&gt;
+##  1 audi         a4               2
+##  2 chevrolet    malibu           3
+##  3 dodge        caravan 2wd     10
+##  4 hyundai      sonata           2
+##  5 hyundai      tiburon          1
+##  6 nissan       altima           1
+##  7 nissan       maxima           2
+##  8 pontiac      grand prix       4
+##  9 toyota       camry            2
+## 10 toyota       camry solara     2
+## 11 volkswagen   jetta            1
+## 12 volkswagen   passat           2</code></pre>
+</div>
+<div id="ungrouping" class="section level4 hasAnchor" number="2.4.4.4">
+<h4><span class="header-section-number">2.4.4.4</span> Ungrouping<a href="manipulating-data-frames-data-transformation.html#ungrouping" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>If you need to remove grouping, and return to operations on un-grouped data, use <code>ungroup()</code>.</p>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="manipulating-data-frames-data-transformation.html#cb126-1" tabindex="-1"></a>grouped_mpg <span class="ot">&lt;-</span> mpg <span class="sc">%&gt;%</span> </span>
+<span id="cb126-2"><a href="manipulating-data-frames-data-transformation.html#cb126-2" tabindex="-1"></a>  <span class="fu">group_by</span>(manufacturer, model)</span>
+<span id="cb126-3"><a href="manipulating-data-frames-data-transformation.html#cb126-3" tabindex="-1"></a></span>
+<span id="cb126-4"><a href="manipulating-data-frames-data-transformation.html#cb126-4" tabindex="-1"></a>grouped_mpg <span class="sc">%&gt;%</span> </span>
+<span id="cb126-5"><a href="manipulating-data-frames-data-transformation.html#cb126-5" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb126-6"><a href="manipulating-data-frames-data-transformation.html#cb126-6" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_model_years =</span> <span class="fu">n</span>()) </span></code></pre></div>
+<pre><code>## # A tibble: 1 × 1
+##   n_model_years
+##           &lt;int&gt;
+## 1           234</code></pre>
+
+</div>
+</div>
+</div>
+<!-- </div> -->
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="data-filtering.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="determining-data-quality-and-filtering.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/lunr.js"></script>
+<script src="assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "lunr",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection",
+    "scroll_highlight": true
+  },
+  "toolbar": {
+    "position": "static"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

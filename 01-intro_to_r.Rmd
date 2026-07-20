@@ -1,0 +1,269 @@
+# Introduction to R and RStudio 
+
+In this chapter, you will learn:
+
+- Coding basics within R
+- How to create new **objects** and **saving** results to **objects**
+- How to call **functions**
+- How to install and load **packages**
+
+**Pre-requisites:**
+
+- R installed
+- RStudio installed
+
+## Coding Basics
+
+Before going any further, we should go over some basics of R to get your feet wet. 
+
+For example, you can use R as a calculator:
+
+```{r}
+1/200 * 30
+```
+```{r}
+(59 + 73 + 2)/3
+```
+```{r}
+sin(pi / 2)
+```
+
+**Note:** unlike some other coding languages, R does not care about empty spaces (white space); you can leave as many spaces between characters as you want...or leave none.
+
+## Creating New Objects in R
+
+You can create new **objects** and **save** results of calculations to those objects.
+For example:
+
+```{r}
+x <- 3 * 4
+```
+
+Now, the result of 3x4 is **saved** as the **object** `x`. If we wanted to see what the value saved to `x` is, we would type `x` and press enter:
+```{r}
+x <- 3 * 4
+x
+```
+
+All R statements creating objects, also called **assignment statements**, use the same syntax:
+
+```{r, eval=FALSE}
+object_name <- value
+```
+
+When reading the above code, you should say “`object name` gets `value`” in your head.
+
+#### RStudio Assignment Shortcut {-}
+
+You will be making a lot of **assignments** and you may be thinking `<-` is really annoying to type. Luckily, RStudio has a built in shortcut: `Alt` + `-` will have RStudio automatically create `<-`.
+
+**Note:** RStudio automatically surrounds <- with spaces, which is good code formatting practice.
+
+### Object Naming Conventions
+
+There are some common rules and conventions you should know about before going much further:
+
+1. **Object** names MUST start with a letter
+2. **Object** names can only contain letters, numbers, `.`, and `_`
+3. Your **object** names should be descriptive...you should come up with a common naming convention for multiple words
+  1. Common practice is called **snake_case**, where all letters are lowercase and each word is separated with `_`
+  2. A few examples of **snake_case** and other common practices can be seen below:
+  
+```{r, eval=FALSE}
+i_use_snake_case
+otherPeopleUseCamleCase
+some.people.use.periods
+And_aFew.PeopleRENOUNCEconvention
+```
+
+### Working with Object Assignments
+
+To inspect any **object**, you can type its name and press enter
+
+```{r}
+x <- 3*4
+x
+```
+
+Let's make another assignment, but this time with a much longer name than just `x`,
+
+```{r}
+this_is_a_really_long_name <- 2.5
+```
+
+To inspect the object, try RStudio’s completion functionality: type `this`, press `TAB`. Then simply add more characters until you have a unique prefix and press enter.
+
+Oh no! We made a mistake and `this_is_a_really_long_name` is actually supposed to have a value of 3.5, not 2.5. We can use another keyboard shortcut to fix it. Again, type `this` and then press `Ctrl`(Windows)/`Cmd`(Mac) + `Up arrow key`. That will list all the commands you’ve typed that start those letters. Use the arrows keys to navigate, then press Enter to retype the command. 
+Change 2.5 to 3.5 and re-run.
+
+Let’s make yet another assignment. 
+Make an object called proteomics_rocks and make it equal to 2 ^ 3
+
+```{r}
+proteomics_rocks <- 2 ^ 3
+```
+
+And then let’s try to inspect this new object:
+
+```{r}
+proteomics_rocks <- 2 ^ 3
+
+proteomics_rocks
+```
+
+What happens if we accidentally forget to type the last `s`?
+
+```{r, eval=FALSE}
+proteomics_rocks <- 2 ^ 3
+
+proteomics_rock
+```
+
+```{r, eval=FALSE}
+Error:
+! object 'proteomics_rock' not found
+```
+
+
+There is an implied contract between you and R: it will do the tedious computation for you, but in return, you MUST be completely precise in your instructions. **Typos matter. Case matters.**
+
+## Calling Functions
+
+The power of R stems from the vast number of **functions** available not only in **base R**, but that are also freely available to download from numerous sources like CRAN, Bioconductor, and Github.
+
+**Functions** are invaluable because they automate repetitive tasks and eliminate code redundancy, both of which result in more reproducible data analysis. And since R can be described as a **functional programming language** (i.e., it's structured around functions), R is innately suited for reproducible data analysis.
+
+On its own, R has a large collection of built-in functions that can be called like this:
+
+```{r, eval=FALSE}
+function_name(arg1 = val1, arg2 = val2, ...)
+```
+
+As an example, let’s use the function `seq()`, which makes regular sequences of numbers, to learn about **functions** along with some additional features of RStudio that help make life just a little easier.
+
+Type "se" and hit `TAB`. A pop-up shows you all the possible completions. Specify `seq()` by typing more letters (“q” in this case) to disambiguate, or by using the up or down arrows to select. Take note of the floating tooltip that pops up, reminding you of the function’s arguments and purpose. If you want more help, press F1 to get all details in the “Help” tab in the lower right pane of RStudio. Additionally, you can type `?seq()` into the console and press Enter to bring up the same “Help” tab
+
+Press TAB once more when you’ve selected the function you want. RStudio will add matching opening and closing parentheses for you (`(` and `)` respectively).
+
+For the `seq()` **function**, the **arguments** we need to provide are `from` and `to`, declaring what number we want the sequence to start with (`from`) and what number we want the sequence to end with (`to`). We can provide a value for `by` to declare how much we want each subsequent number to increase from the previous number. However, we do not NEED to enter a value for this **argument**. Some function arguments do not require us to provide values. Instead, the function will use a **default value**. In the case of `seq()`, if we do provide a value for `by`, it will default to 1, meaning each number will be 1 more than the previous.
+
+So let's see what happens when we use the `seq()` function to make a sequence of numbers starting from 1 and ending at 10:
+
+```{r}
+seq(from = 1, to = 10)
+```
+
+As you can see, we are creating a sequence of numbers that starts at one, with each number increasing by one from the previous number until we reach 10, at which point, we create no new numbers.
+
+What were to happen if we were to enter the `by` argument and set it’s value to 1?
+
+```{r}
+seq(from = 1, to = 10, by = 1)
+```
+
+It’s the exact same result, since we entered the same value for by as the **default value**. However, what if we were to change by to 2?
+
+```{r}
+seq(from = 1, to = 10, by = 2)
+```
+
+The numbers are now increasing by 2 for each number. Additionally, the last number never reaches 10, since the number after 9 would be 11, which is greater than our to value, so it stops the evaluation at 9.
+
+What would happen if we do not explicitly write out the argument names, but instead, only enter the values?
+
+```{r}
+seq(1, 10)
+```
+
+We receive the same results as our previous examples. R does not care whether or not the actual name of the **argument** is explicitly stated; it will still use the **value** entered and assign it to the **argument** that is at the “position”. In the case of `seq()`, **argument1** is `from` and **argument2** is `to`, while **argument3** is `by`. The exact order of each argument can be found on the "Help" tab of each function (remember, `?seq()`)
+
+If you mix up the order of your values, it will create problems downstream. 
+
+What would happen if we again use `seq()`, but do not explicitly define our **arguments** while also flipping the order of our **values**?
+
+```{r}
+seq(10, 1)
+```
+
+We now have a sequence of numbers starting at 10 and ending at 1.
+
+What were to happen if we use the same order of **values** as in the previous example, but explicitly state the **arguments** as `from = 1` and `to = 1`?
+
+```{r}
+seq(to = 10, from = 1)
+```
+
+We still get the same answer as our very first example! 
+This is because we explicitly matched our **values** to our **arguments**. While it is not necessary to do this, it is highly recommended to always explicitly state your **arguments** and **values** to not only avoid mistakes, but to also make our code easier to understand by ourselves and others in the future.
+
+## Expanding R's Functionality
+
+While base R (R as you install it, with nothing else added) is very versatile and provides a lot of functionality, most times you are going to need additional functions to simplify your data analysis and make it more reproducible. 
+
+Luckily, R provides a framework that easily allows for anyone to make their own functions, combine them into a **package**, and make them publicly available. Installing these packages greatly expands R's capabilities. 
+
+In general, there are 3 main ways to install new **libraries**:
+
+1. CRAN (Comprehensive R Archive Network)- The official repository for R. All packages uploaded to CRAN have to meet certain minimum criteria and are more thoroughly tested with each new version of R.
+  
+    - To install a package from CRAN, use: `install.packages("<package_name>")`
+
+2. Bioconductor- A heavily curated, community-driven repository designed specifically for life science applications. Submissions undergo formal review by bioinformatics experts to ensure code quality. Bioconductor releases operate on a strict 6-month cycle that pairs exactly with specific R versions to prevent dependency conflicts.
+  
+    - To install a package from Bioconductor, you first need to install the package `BiocManager` from CRAN (`install.packages("BiocManager")`). Then to install packages from Bioconductor, use: `BiocManager::install("<package_name>")`
+
+3. GitHub- A code-hosting platform where people can upload packages through *Git* version control system. These do not have any review or update criteria so the quality of packages can vary greatly between authors. 
+
+    - To install a package from GitHub, you first need to install the package `remotes` from CRAN (`install.packages("remotes")`). Then to install packages from GitHub, use: 
+`remotes::install_github("<github_url>")`
+
+**Packages** are the fundamental, standardized unit of share-able code used to extend the capabilities of R. You can think of a **package** as a
+*book*, while *R*, providing the foundational functions and logic, is the entire *bookshelf*. Installing a **package** simply adds specialized *book* to that *bookshelf*
+
+You only need to **install a package once**, but you need to **reload it every time you start of a new R session**. To continue with the *bookshelf* metaphor, the *bookshelf* is always there, along with it's *books* (the **installed packages**). But the when you leave the room with the *bookshelf*, the *books* always have to be put back on the *bookshelf*. To be able to use the information contained in the *books*, we need to take them off the *bookshelf* every time we go into the room.
+
+To do this, use the *function* `library(<package name>)`, which takes the *book* off the *bookshelf*, allowing us to now use that *book* until we put it back on the *bookshelf* and leave the room ( *i.e.,* close RStudio).
+
+### Installing Packages
+
+To start, let's install the `tidyverse`, a set of packages (`dplyr`, `readr`, `forcats`, `stringr`, `ggplot2`, `tibble`, `lubridate`, `tidyr`, `purrr`) that comprise most of the functions you'll need for the majority of your data science tasks, all using the same common conceptual framework.
+
+```{r, eval = FALSE}
+install.packages('tidyverse')
+```
+
+RStudio will then handle downloading and installing the packages. Once all the packages are installed, `>` should be visible at the bottom line of your console, indicating R is ready for your next command.
+
+### Loading Packages and Package Conflicts
+
+Now that you have the `tidyverse` installed, let's open it using `library()` as we described above. Using `library()` on tidyverse will load ALL of the package components at once instead of making you type each one out individually.
+
+```{r}
+library(tidyverse)
+```
+
+This specific output tells you which functions from the `tidyverse` were loaded, along with which functions from which package **conflict** with functions in base R (or from other packages you might have loaded). For example, one of the conflicts is `dplyr::filter() masks stats::filter()`. This means that when you use `filter()`, R is going to use `filter()` from the `tidyverse` **package** instead of `filter()` from the `stats` **package** (`dplyr filter()` **masks** `stats filter()`). Even though these two functions share the same name and serve a similar purpose, they have different **arguments** and syntax, so it is important to keep note of any function conflicts. 
+
+If you find yourself in the scenario where `functionA()` from `packageX` **masks** `functionA()` from `packageY` but you still want to use `functionsA()` from `packageY`, you can be very explicit about which package you want R to use for `functionA()`. In the example above, where `dplyr::filter()` is masking `stats::filter()`, say we nede to use `filter()` from `stats` instead of from `dplyr`. The way we accomplish this is as follows:
+
+```{r, eval=FALSE}
+stats::filter()
+```
+
+Where you enter the exact package, followed by `::` and then the exact function from that package.
+
+### Package Help Pages
+
+As a part of any package, a brief description needs to be made for every function, telling the user how exactly to use that function. As described earlier, this can be accessed by typing `?` followed by the function name and pressing Enter.
+
+Every function's help page is made up of four parts:
+
+- **Description:** a brief description of what the function does
+
+- **Usage:** an example of how you would enter the required variables
+
+- **Arguments:** a list of each of the variables (arguments) in the
+  function along with a brief explanation of what it means and what kind
+  of data it requires
+
+- **Details:** additional information required to fully use the package

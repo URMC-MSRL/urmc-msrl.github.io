@@ -1,0 +1,36 @@
+--- 
+title: "Proteomic Data Analysis"
+author: "Kyle Swovick"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+description: |
+  This is a guide on how to work with R and analyze LC-MS/MS proteomic data.
+favicon: images/ur_logo_favicon.png
+cover-image: images/CART_logo_horizontal.png
+link-citations: yes
+github-repo: rstudio/bookdown-demo
+---
+
+# Introduction {-}
+
+This is a guide to help biologists at all levels analyze LC-MS/MS-based bottom-up proteomic data. 
+
+Included in this guide are: 
+
+- Basic explanations of R and RStudio
+- Walk-through on each part of the proteomic data analysis pipeline including:
+  - Data quality check
+  - Data filtering
+  - Handling missing values by imputation
+  - Differential expression analysis using `limma`
+  - Data visualization using `ggplot2`
+
+
+```{r include=FALSE}
+# automatically create a bib database for R packages
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'knitr', 'rmarkdown'
+), 'packages.bib')
+```

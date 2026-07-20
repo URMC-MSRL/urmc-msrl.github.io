@@ -1,0 +1,1185 @@
+# Visualizing Proteomic Data
+
+In this chapter, you'll learn:
+
+- Various ways to visualize proteomic data, including:
+
+  - Sample heatmap and hierarchical clustering
+  
+  - Principle component analysis (PCA)
+  
+  - Protein heatmap
+  
+  - Volcano plot
+  
+  - Gene Ontology (GO) analysis
+
+**Pre-requisites:**
+
+- A basic understanding of R and RStudio
+
+- A set of of proteomic data with group differences calculated through a t-test
+
+- The following R packages installed from CRAN (recall, `install.packages("<package_name>"`):
+
+  - `tidyverse`
+
+  - `BiocManager`
+  
+  - `plotly`
+  
+  - `dendextend`
+  
+  - `ggforce`
+  
+  - `ggrepel`
+  
+  - `RColorBrewer`
+  
+  - `gridExtra`
+  
+  - `rio`
+  
+  - `pheatmap`
+  
+  - `rbioapi`
+  
+  - `dendextend`
+  
+  - `seriation`
+  
+  - `reactable`
+  
+  -`reactablefmtr`
+
+- The following R packages installed from Bioconductor (recall, `BiocManager::install("<package_name>")`):
+
+  - `ComplexHeatmap`
+  
+  - `InteractiveComplexHeatmap`
+  
+  - `ensembldb`
+  
+  - `org.Sc.sgd.db` (Note: This is the yeast Ensembl database. In order to get a different species database), you are going to have to download the library for that species as well.
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(plotly)
+library(dendextend)
+library(ggforce)
+library(ggrepel)
+library(RColorBrewer)
+library(gridExtra)
+library(rio)
+library(pheatmap)
+library(rbioapi)
+library(dendextend)
+library(seriation)
+library(ComplexHeatmap)
+library(InteractiveComplexHeatmap)
+library(ensembldb)
+library(org.Sc.sgd.db)
+library(reactable)
+library(reactablefmtr)
+```
+
+## Prep Work
+
+```{r, echo=FALSE, message=FALSE}
+ttest_data <- read_tsv('ttest_ecoli_msr_data.tsv')
+ttest_data_prep_wt_comps <- read_tsv('ttest_input_justWTcomps_ecoli_msr_data.tsv')
+imputed_data_wide_df <- read_tsv('imputed_wide_ecoli_msr_data.tsv')
+```
+
+We will load in some data that may be useful at some point in our analysis:
+
+1. Sample metadata: a description of each sample, including genotype, bio-replicate, acquisition settings, etc.
+
+2. Protein descriptions: a description of each protein identified in the experiment, including: protein name, gene name, amino acid sequence, etc. 
+
+```{r}
+metadata <- read_tsv('ecoli_msr_metadata.txt')
+protein_description <- read_tsv('report.protein_description.tsv')
+
+metadata
+protein_description
+```
+
+We will also make a new data frame from our imputed data frame that we will be using across all of our replicate comparison plots. This will already be in a format more amenable to plotting so we won't need to perform all the same transformations multiple times before drawing every plot.
+
+```{r}
+sample_level <- ttest_data_prep_wt_comps %>% 
+  dplyr::select(-c(group, rep, n_detect, n_replicates, comparison)) %>% 
+  mutate(Run = gsub('_', '', Run)) %>% 
+  left_join(metadata %>% 
+              dplyr::select(Run, Condition, Replicate),
+            by = 'Run') %>% 
+  set_names('sample', 'protein_group', 'log2_abundance', 'group', 'rep') %>% 
+  group_by(protein_group, group) %>% 
+  mutate(mean_log2_abundance = mean(log2_abundance)) %>% 
+  mutate(abundance = 2^log2_abundance, .after = log2_abundance) %>% 
+  left_join(imputed_data_wide_df %>% 
+              distinct(Protein.Group, Genes) %>% 
+              set_names('protein_group', 'gene_name'),
+            by = 'protein_group') %>% 
+  left_join(protein_description %>% 
+              distinct(Gene, Description) %>% 
+              set_names('gene_name', 'protein_name'),
+            by = 'gene_name') %>% 
+  relocate(gene_name:protein_name, .after = protein_group) %>% 
+  relocate(protein_group:protein_name, .before = 'sample') %>% 
+  relocate(group:rep, .after = 'sample') %>% 
+  ungroup()
+```
+
+We will also make a new data frame from out t-test results that we will be using across all of our differential expression plots for similar reasons as above.
+
+```{r}
+diff_expression_level <- ttest_data %>% 
+  dplyr::rename(protein_group = 'Protein.Group') %>% 
+  left_join(y = sample_level %>% 
+              ungroup() %>% 
+              distinct(protein_group, gene_name, protein_name),
+            by = 'protein_group') %>% 
+  relocate(gene_name:protein_name, .after = protein_group) %>% 
+  relocate(comparison, .after = protein_name) %>% 
+  mutate(comparison = sub('_vs_', '/', comparison))
+```
+
+### Make a Common Plotting Theme
+
+Lastly, we will make a common theme for our plots and saving them to a new object called `plot_theme`. We can then apply these themes to all of our plots by simply calling `plot_theme` instead of typing all these theming components for each plot.
+
+```{r}
+plot_theme <- theme_bw() +
+   theme(plot.title   = element_text(size = 20),
+         axis.title.x = element_text(size = 15),
+         axis.text.y  = element_text(size = 15),
+         axis.text.x  = element_text(size  = 12,
+                                     angle = 75,
+                                     hjust = 1),
+         axis.title.y = element_text(size = 15),
+         legend.title = element_text(size = 15),
+         legend.text  = element_text(size = 15))
+```
+
+
+## Replicate Comparisons
+
+In order to properly ensure our experimental design was well thought out, we should evaluate how all of our samples compare to each other. We will be doing this several different ways:
+  
+  - Clustering: Cluster all our samples according to the Spearman correlation of our overall protein abundances and draw a heatmap of those correlations. 
+    
+    - Ideally, all of the replicates from the same group will be more clustered with the other reps from the same group than with any samples from other groups
+      
+  - Principal Component Analysis (PCA): A **dimensionality reduction technique** that can be used for extracting information from high-dimensional space (*i.e.*, a biological experiment where variation can stem from a large number of variables) by projecting it into a lower-dimensional sub-space (*i.e.* a very few number of **components** that can readily be quantified and, ideally, subsequently identified). Dimensions are nothing but **features** that represent the data.
+    
+    - Ideally, all of the replicates from the same group will be more clustered with the other reps from the same group than with any samples from other groups
+      
+      - Indicates that the major sources of variation are coming from the biological groups than from any source of variation that was applied across all the samples (*e.g.*, sample prep or data acquisition)
+
+### Sample Heatmap and Hierarchical Clustering
+
+#### Prepare the Heatmap Annotation
+
+##### Set the Heatmap Annotation Scheme {-}
+
+To properly connect the heatmap to our samples and groups, we need to get just a list of each sample and the group it belongs too (akin to the metadata).
+
+It also needs to samples as row names (Currently is sample name in each row with the column name 'sample').
+
+```{r}
+smpl_htmp_annotation <- sample_level %>% 
+  ungroup() %>% 
+  dplyr::rename(Condition = 'group') %>% 
+  distinct(sample,
+           Condition) %>%
+  tibble::column_to_rownames(var = 'sample') 
+
+smpl_htmp_annotation
+```
+
+##### {-} Define the Heatmap Variables
+
+```{r}
+smpl_htmp_conditions <- unique(pull(smpl_htmp_annotation, Condition))
+
+smpl_htmp_conditions
+```
+
+```{r}
+n_smpl_htmp_conditions <- length(smpl_htmp_conditions)
+
+n_smpl_htmp_conditions
+```
+
+```{r}
+smpl_htmp_conditions_colors <- c(brewer.pal(n_smpl_htmp_conditions, 'Set1'))
+
+smpl_htmp_conditions_colors
+```
+
+```{r}
+names(smpl_htmp_conditions_colors) <- smpl_htmp_conditions
+
+smpl_htmp_conditions_colors
+```
+
+```{r}
+smpl_htmp_annotation_colors <- list(smpl_htmp_conditions_colors)
+
+smpl_htmp_annotation_colors
+```
+
+```{r}
+names(smpl_htmp_annotation_colors) <- 'Condition'
+
+smpl_htmp_annotation_colors
+```
+
+#### Calculate the Spearman Rank Correlation
+
+```{r}
+correlation <- sample_level %>% 
+   ungroup() %>% 
+   distinct(sample, protein_group, log2_abundance) %>% 
+   pivot_wider(names_from = sample, values_from = log2_abundance) %>% 
+   column_to_rownames(var = 'protein_group') %>% 
+   cor(method = 'spearman', use = 'complete.obs')
+
+correlation
+```
+
+#### Create Dendrograms for the Heatmap
+
+```{r}
+distance <- dist(correlation)
+hierachical_clustering <- hclust(distance)
+dendrogram <- as.dendrogram(hierachical_clustering)
+dendrogram_row <- seriate_dendrogram(dendrogram, distance, method = "OLO")
+dendrogram_column <- rotate(
+  dendrogram_row,
+  order = rev(labels(distance)[get_order(as.hclust(dendrogram_row))])
+)
+```
+
+#### Create the Heatmap
+
+##### Create the Annotation Labels for the Heatmap {-}
+
+```{r}
+smpl_htmp_complex_annotation = HeatmapAnnotation(
+  Condition = smpl_htmp_annotation$Condition,
+  col = smpl_htmp_annotation_colors,
+  height = unit(6, 'cm')
+)
+```
+
+##### Create the Heatmap {-}
+
+```{r}
+smpl_htmp_list <- Heatmap(
+  correlation,
+  cluster_rows = as.hclust(dendrogram_row),
+  cluster_columns = as.hclust(dendrogram_column),
+  show_row_dend = FALSE,
+  top_annotation = smpl_htmp_complex_annotation,
+  name = 'Spearman',
+  column_title = "Correlation-based Hierachical Clustering",
+  column_title_gp = gpar(fontsize = 15, 
+                         fontface = 'bold'),
+  col = brewer.pal(9, 'YlGnBu'),
+  rect_gp = gpar(col = 'grey', 
+                 lwd = 0.25),
+  heatmap_legend_param = list(legend_height = unit(10, 'cm'),
+                              legend_gp = gpar(fontsize = 11),
+                              title = 
+                                'Spearman 
+Correlation'),
+column_names_gp = gpar(fontsize = 10),
+row_names_gp = gpar(fontsize = 10),
+)
+```
+
+##### Render the Heatmap {-}
+
+```{r}
+draw(smpl_htmp_list, merge_legend = TRUE)
+```
+
+### Principal Component Analysis (PCA)
+
+How does a PCA work?
+
+1. We calculate a matrix that summarizes how all of our variables (*i.e.*, the abundance of each protein in each sample) relate to one another. 
+
+2. Break this matrix down into two separate aspects: **direction** and **magnitude** (Vectorman would be so proud). We can then understand the **directions** (the *components*) of our data and its **magnitude** (*i.e.*, how "important" each **direction** is). 
+
+#### Prepare the PCA Data
+
+As the description above implies, we need to make a matrix of the **magnitude** of each **direction** (component). To do this, we first just need to make a matrix of our protein abundances, which we'll be using our sample comparison data frame we made at the beginning of this chapter.
+
+```{r}
+pca_input <- sample_level %>% 
+  ungroup() %>% 
+  distinct(sample, protein_group, log2_abundance) %>% 
+  group_by(sample, protein_group) %>% 
+  summarise(intensity = sum(log2_abundance),
+            .groups = 'drop') %>% #If we have multiple protein_groups per sample, we are simply going to add them together
+  pivot_wider(names_from = sample, values_from = intensity) %>% 
+  drop_na() %>% 
+  dplyr::select(-protein_group) %>% 
+  t() #Make the data into a matrix
+ 
+pca_input[,1:6]
+```
+We are then going to make a data frame containing our metadata (*i.e.*, the group name of each sample) so that we can more easily modify the plots we plan to make in a little bit.
+```{r}
+pca_annotation <- sample_level %>% 
+  distinct(sample, group)
+```
+
+#### Perform the Principal Component Analysis
+
+We are now going to use a function from the `stats` package (`prcomp()`) to perform the PCA and obtain the values for each component.
+
+```{r}
+pca <- prcomp(pca_input, 
+              center = TRUE)
+```
+
+#### Extract the PCA Results
+
+`prcomp()` outputs a matrix. To make the data more amenable to downstream transformations and plotting, we are going to make it into a data frame and then add back in our metadata (genotypes). 
+
+```{r}
+pca_df <- as.data.frame(pca$x) %>% 
+  mutate(sample := factor(row.names(.))) %>% 
+  left_join(pca_annotation, by = 'sample')
+
+pca_df
+```
+
+One other important piece of data `prcomp()` provides us is the standard deviation of the total experiment "explained" by each **component**. By adding up enough of our **components**, the variation of our experiment should eventually be completely explained.
+
+This information is stored in `pca$sdev`, which we will extract and again make into a data frame.
+
+```{r}
+pca_sdev_df <- as.data.frame(pca$sdev)
+
+pca_sdev_df
+```
+
+We will then measure the **percent variace** each component captures from our dataset:
+
+1- Retrieve the standard deviation of each component
+
+2- Square the standard deviation to calculate the **eigenvalues** (the variance of **each component**, `pca$sdev^2`)
+
+3- Calculate the total variance across **all components** combined (`sum(pca$sdev^2))
+
+4- Divide each component's variance by the totalo variance to get a proportion (`/`)
+
+5- Convert the proporation into a percentage (`*100`)
+
+```{r}
+pca_sdev_df <- pca_sdev_df %>% 
+  mutate(percent_variance = (pca$sdev^2/sum(pca$sdev^2)*100),
+         dimension = row.names(.)) %>% 
+  mutate(dimension = factor(.data$dimension,
+                            levels = unique(str_sort(.data$dimension, 
+                                                     numeric = TRUE))))
+
+pca_sdev_df
+```
+
+#### Plot the PCA Results
+
+Now that we have the components measures and total variance, we can make our PCA plots.
+
+We will be making three total plots. 
+
+1- A static PCA plot each with the first component (PC1) as the x-axis and the second component (PC2) as the y-axis, with each genotype having a different color
+
+2- A dynamic PCA plot each with the first component (PC1) as the x-axis and the second component (PC2) as the y-axis, again with each genotype having a different color. 
+
+  - Now when you hover over each point, a pop-up box will appear, showing the sample matching to that point. This can be used to see which specific samples might be considered an outlier of the rest of the group, if there are any. 
+  
+3- A Scree plot: a simple line segment plot that show the eigenvalues for each individual **principal component**. The individual components are the x-axis eigenvalues are the y-axis. 
+  
+  - The main purpose of a scree plot is to determine the number of principal components to retain in downstream statistical analyses. Generally speaking, if you need more than 3 or 4 principal components to describe ~80% of your variance, a PCA might not be the best method to visualize your data, instead you might want to look into a more advanced dimensionality reduction technique (*e.g.*, t-SNE or UMAP).
+
+##### Static PCA Plot {-}
+
+```{r}
+ggplot(data = pca_df,
+       mapping = aes(x = !!rlang::sym('PC1'), y = !!rlang::sym('PC2'),
+                     col = group, label = sample)) +
+  geom_point(size = 3) +
+  labs(
+    title = "Principal Component Analysis",
+    x = paste(
+      'PC1', "(",
+      round(
+        pca_sdev_df$percent_variance[pca_sdev_df$dimension==str_extract('PC1',
+                                                                        "\\d")], 
+        1), "%)"
+    ),
+    y = paste(
+      'PC2', "(",
+      round(
+        pca_sdev_df$percent_variance[pca_sdev_df$dimension==str_extract('PC2', 
+                                                                        "\\d")], 
+        1), "%)"
+    ),
+    color = "Condition"
+  ) +
+  scale_color_manual(values = brewer.pal(n_distinct(pca_annotation$group), 
+                                         'Set1')) +
+  plot_theme
+```
+
+##### Interactive PCA Plot {-}
+
+```{r}
+ggplotly(ggplot(data = pca_df,
+                mapping = aes(x = !!rlang::sym('PC1'), y = !!rlang::sym('PC2'),
+                              col = group, label = sample)) +
+           geom_point(size = 3) +
+           labs(
+             title = "Principal Component Analysis",
+             x = paste(
+               'PC1', "(",
+               round(
+                 pca_sdev_df$percent_variance[pca_sdev_df$dimension==str_extract('PC1',
+                                                                                 "\\d")], 
+                 1), "%)"
+             ),
+             y = paste(
+               'PC2', "(",
+               round(
+                 pca_sdev_df$percent_variance[pca_sdev_df$dimension==str_extract('PC2', 
+                                                                                 "\\d")], 
+                 1), "%)"
+             ),
+             color = "Condition"
+           ) +
+           scale_color_manual(values = brewer.pal(n_distinct(pca_annotation$group), 
+                                                  'Set1')) +
+           plot_theme)
+```
+
+##### Scree Plot {-}
+
+```{r}
+ggplot(data = pca_sdev_df %>% 
+         add_row(`pca$sdev` = as.double(0),
+                 percent_variance = as.double(0),
+                 dimension = as.factor(0),
+                 .before = 1) %>%
+         mutate(cumulative_variance = cumsum(percent_variance),
+                dimension = as.numeric(as.character(dimension))), 
+       mapping = aes(x = dimension, 
+                     y = cumulative_variance,
+                     group = 1)) +
+  geom_line() +
+  geom_point() +
+  geom_hline(yintercept = 80, color = 'red') +
+  labs(x = "Number of Features",
+       y = "Cumulative Variance Explained (%)") +
+  plot_theme
+```
+
+
+From all of the above plots, we can pretty confidently say our experiment is pretty sound and all the reps for each of our genotypes accurately represent each genotype. 
+
+With this confidence, we can now move ahead and see if there are any proteins, or groups of proteins that are differentially expressed between the different genotypes. 
+
+## Differential Expression
+
+We are going to look how proteins are differentially expressed between genotypes through three main techniques:
+
+1. Protein expression heatmap- A heatmap displaying how abundant different proteins are between the genotypes
+
+2. Volcano plot- a dot plot showing the degree at which proteins are differentially expressed between groups and the confidence in that measurement (the results from the moderated t-test, p-value or adjusted p-value).
+
+3- Gene Ontology (GO)- A method to determine if certain "groups" of proteins (**gene ontologies**) are together more highly expressed in one genotype when compared to another. 
+
+### Protein Expression Heatmap
+
+For our protein expression heatmap, we will display only the top 100 most significant proteins, as determined by our moderated t-test (*i.e.*, we will be selecting the proteins with the 100 lowest p-values). In reality, you can choose however many proteins you desire or use another criteria like log2 fold change. I personally like to use lowest p-values across the entire experiment.  
+
+#### Prepare The Data
+
+From our replicate comparison data frame, we will take the following columns:
+
+- Protein group
+
+- Sample
+
+- Protein abundance (log2)
+
+```{r}
+protein_abundance_wide <- sample_level %>% 
+  distinct(protein_group, sample, log2_abundance) %>% 
+  pivot_wider(names_from = sample, values_from = log2_abundance) %>% 
+  drop_na() %>% 
+  column_to_rownames(var = 'protein_group')
+```
+
+From our t-test data frame, we will sort the adjust p-value column (feel free to use something else if you desire) and sort it so the lowest p-values are first. Then we will select only the first 100 rows (`slice_head(n=100)`), and make a vector of the protein group IDs of those 100 proteins (`pull(protein_group)`). 
+
+```{r}
+significant_proteins <- diff_expression_level %>% 
+  arrange(adj_pval) %>% 
+  slice_head(n = 100) %>% 
+  pull(protein_group)
+```
+
+Make the protein abundance data frame, keep only the rows that match the gene names selected above (`[significant_proteins, ]`) and convert it to a matrix.
+
+```{r}
+heatmapData <- protein_abundance_wide[significant_proteins, ]
+```
+
+#### Clustering
+
+We will then cluster both the protein expression profiles and samples by the abundance of those 100 proteins. 
+
+In our plot, we will only be using the sample clustering, but if we decide to, we can also add the protein clustering now.
+
+```{r}
+
+hclustGene <- hclust(dist(heatmapData), #Clusters the proteins by expression profile
+                     method = "complete")
+
+hclustSample <- hclust(dist(t(heatmapData)), #Clusters the samples
+                       method = "complete")
+```
+
+#### Prepare the Heatmap Annotation
+
+Like we did for our sample-level heatmap, we will need to make a series of annotation items to help us label of heatmap.
+
+##### Sample Colors {-}
+
+The first thing we'll do is create a tibble (`prot_htmp_sample_columns`) containing all the sample information. Specifically, the names of the samples (`sample`) and the genotype of that sample (`group`). **Note: ** the text in the `sample` column has to match EXACTLY the text of the sample names in the matrix `heatmapData` while the `group` names can be whatever you want.
+
+```{r}
+prot_htmp_sample_columns <- tibble(
+  sample = c('bisC1', 'bisC2', 'bisC3', 
+             'msrA1', 'msrA2', 'msrA3',
+             'msrB1', 'msrB2', 'msrB3',
+             'msrC1', 'msrC3',
+             'WT1', 'WT2', 'WT3'),
+  group = c(rep('bisC', 3), rep('msrA', 3), rep('msrB', 3), rep('msrC', 2), rep('WT', 3)) #Can be whatever you want to set it as
+)
+
+prot_htmp_sample_columns
+```
+
+We will then select a set of colors to label of samples, with the number of different colors equal to the number of groups (genotypes) we are analyzing.
+
+- In this scenario, we are going to create a color to label each sample, and there will be a total of 5 unique colors. 
+
+```{r}
+prot_htmp_sample_columns_colors <- hcl(
+  h = seq(15, 375, 
+          length = 5 + 1), #The number of total groups we have in our experiment
+  l = 65,
+  c = 100)[1:5] #Select the number of colors equal to the number of groups we have in our experiment
+
+prot_htmp_sample_columns_colors
+```
+
+
+##### Heatmap Colors {-}
+
+Next we need to define how we want the actual heatmap to be colored (*i.e.*, the individual proteins). 
+
+```{r}
+prot_map_colors <- brewer.pal(n = 11, name = 'RdBu') #The heatmap will use 11 total colors from the "RdBu" color palette to span the abundance profile. Feel free to play around with this number to better fit your data
+prot_map_colors <- colorRampPalette(prot_map_colors)(50) #We will span those 11 colors over a total of 50 ramps
+prot_map_colors = rev(prot_map_colors)
+```
+
+##### Annotation Colors {-}
+
+Next we will define how each group (genotype) will be colored.
+
+```{r}
+prot_htmp_groups_colors <- c(hcl(h = seq(15, 375, length = 5 + 1),
+                                       l = 65,
+                                       c = 100)[1:5]) #We take the same 5 colors used earlier for our group annotation and make them into a vector
+
+#We will formally describe our group annotations here
+prot_htmp_annotation_colors = list( 
+  Group = c('bisC' = prot_htmp_groups_colors[[1]],
+            'msrA' = prot_htmp_groups_colors[[2]],
+            'msrB' = prot_htmp_groups_colors[[3]],
+            'msrC' = prot_htmp_groups_colors[[4]],
+            'WT' = prot_htmp_groups_colors[[5]])
+)
+```
+
+#### Make the Heatmap
+
+Now that we have both our heatmap data, clustering data, and heatmap annotations, we can combine everything together using `pheatmap()` from `ComplexHeatmap`. 
+
+**Note:** There are a ton of different possible settings. So feel free to mess around with the plot using the various arguments (hint, `?ComplexHeatmap::pheatmap()`)
+
+```{r}
+pheatmap(
+  as.matrix(heatmapData),
+  color = prot_map_colors,
+  fontsize_row = 5,
+  main = 'Top 100 Differentially Expressed Protein (Lowest Adj. p-value)',
+  annotation_col = prot_htmp_sample_columns,
+  cutree_cols = 5,
+  heatmap_legend_param = list(title = 'log2 Abundance', at = c(15, 20, 25, 30, 35)),
+  annotation_colors = prot_htmp_annotation_colors
+)
+```
+
+### Volcano Plot
+
+Next we will work on how to display the results of the moderated t-test with a volcano plot. We'll go over how plotting using adjusted and un-adjusted p-values change the plots, along with various options to display your plots, including both static and dynamic plots.
+
+#### Using Un-adjusted p-value
+
+##### Static Volcano Plot
+
+```{r}
+ggplot(data = diff_expression_level %>% 
+         dplyr::filter(log2fc > -1 |
+                         log2fc < 1 &
+                         pval > 0.05)) +
+  # Plot all genes
+  geom_point(aes(x = log2fc, y = -log10(pval)),
+             color = '#9da7bf') +
+  # Plot up-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(log2fc >= 1 &
+                               pval <= 0.05),
+             aes(x = log2fc, y = -log10(pval)),
+             color = "#082544",
+             size = 2) +
+  # Plot down-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(log2fc <= -1 &
+                               pval <= 0.05),
+             aes(x = log2fc, y = -log10(pval)),
+             color = "#DE3C37",
+             size = 2) +
+  # Add cut-off lines
+  geom_vline(xintercept = c(1, -1), linetype = 'dashed') +
+  geom_hline(yintercept = -log10(0.05), linetype = 'dashed') +
+  # Draw each comparison separately
+  facet_wrap(~comparison, scales = 'free') +
+  # Add labels and themes
+  labs(x = 'log2 Fold Change',
+       y = 'p-value (-log10)') +
+  plot_theme
+```
+
+```{r, fig.height=15}
+ggplot(data = diff_expression_level %>% 
+         dplyr::filter(log2fc > -1 |
+                         log2fc < 1 &
+                         pval > 0.05)) +
+  # Plot all genes
+  geom_point(aes(x = log2fc, y = -log10(pval)),
+             color = '#9da7bf') +
+  # Plot up-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(log2fc >= 1 &
+                               pval <= 0.05),
+             aes(x = log2fc, y = -log10(pval)),
+             color = "#082544",
+             size = 2) +
+  # Plot down-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(log2fc <= -1 &
+                               pval <= 0.05),
+             aes(x = log2fc, y = -log10(pval)),
+             color = "#DE3C37",
+             size = 2) +
+  # Add cut-off lines
+  geom_vline(xintercept = c(1, -1), linetype = 'dashed') +
+  geom_hline(yintercept = -log10(0.05), linetype = 'dashed') +
+  # Draw each comparison separately
+  facet_wrap_paginate(~ comparison, 
+                       ncol = 1, 
+                       nrow = 4) +
+  # Add labels and themes
+  labs(x = 'log2 Fold Change',
+       y = 'p-value (-log10)') +
+  plot_theme
+```
+
+```{r}
+ggplot(data = diff_expression_level %>% 
+         dplyr::filter(comparison == 'WT/msrA') %>% 
+         dplyr::filter(log2fc > -1 |
+                         log2fc < 1 &
+                         pval > 0.05)) +
+  # Plot all genes
+  geom_point(aes(x = log2fc, y = -log10(pval)),
+             color = '#9da7bf') +
+  # Plot up-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(comparison == 'WT/msrA') %>% 
+               dplyr::filter(log2fc >= 1 &
+                               pval <= 0.05),
+             aes(x = log2fc, y = -log10(pval)),
+             color = "#082544",
+             size = 2) +
+  # Plot down-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(comparison == 'WT/msrA') %>% 
+               dplyr::filter(log2fc <= -1 &
+                               pval <= 0.05),
+             aes(x = log2fc, y = -log10(pval)),
+             color = "#DE3C37",
+             size = 2) +
+  # Add cut-off lines
+  geom_vline(xintercept = c(1, -1), linetype = 'dashed') +
+  geom_hline(yintercept = -log10(0.05), linetype = 'dashed') +
+  # Add labels and themes
+  labs(x = 'log2 Fold Change',
+       y = 'p-value (-log10)',
+       title = 'WT/msrA') +
+  plot_theme
+```
+
+##### Interactive Volcano Plot
+
+```{r}
+ggplotly(
+  ggplot(data = diff_expression_level %>% 
+           dplyr::filter(comparison == 'WT/msrA') %>% 
+           dplyr::filter(log2fc > -1 |
+                           log2fc < 1 &
+                           pval > 0.05),
+         aes(label1 = gene_name,
+             label2 = protein_group)) +
+    # Plot all genes
+    geom_point(aes(x = log2fc, y = -log10(pval)),
+               color = '#9da7bf') +
+    # Plot up-regulated genes
+    geom_point(data = diff_expression_level %>% 
+                 dplyr::filter(comparison == 'WT/msrA') %>% 
+                 dplyr::filter(log2fc >= 1 &
+                                 pval <= 0.05),
+               aes(x = log2fc, y = -log10(pval)),
+               color = "#082544",
+               size = 2) +
+    # Plot down-regulated genes
+    geom_point(data = diff_expression_level %>% 
+                 dplyr::filter(comparison == 'WT/msrA') %>% 
+                 dplyr::filter(log2fc <= -1 &
+                                 pval <= 0.05),
+               aes(x = log2fc, y = -log10(pval)),
+               color = "#DE3C37",
+               size = 2) +
+    # Add cut-off lines
+    geom_vline(xintercept = c(1, -1), linetype = 'dashed') +
+    geom_hline(yintercept = -log10(0.05), linetype = 'dashed') +
+    # Add labels and themes
+    labs(x = 'log2 Fold Change',
+         y = 'p-value (-log10)',
+         title = 'WT/msrA') +
+    plot_theme
+  )
+```
+
+#### Using Adjusted p-value
+
+##### Static Volcano Plot
+
+```{r}
+ggplot(data = diff_expression_level %>% 
+         dplyr::filter(log2fc > -1 |
+                         log2fc < 1 &
+                         adj_pval > 0.05)) +
+  # Plot all genes
+  geom_point(aes(x = log2fc, y = -log10(adj_pval)),
+             color = '#9da7bf') +
+  # Plot up-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(log2fc >= 1 &
+                               adj_pval <= 0.05),
+             aes(x = log2fc, y = -log10(adj_pval)),
+             color = "#082544",
+             size = 2) +
+  # Plot down-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(log2fc <= -1 &
+                               adj_pval <= 0.05),
+             aes(x = log2fc, y = -log10(adj_pval)),
+             color = "#DE3C37",
+             size = 2) +
+  # Add cut-off lines
+  geom_vline(xintercept = c(1, -1), linetype = 'dashed') +
+  geom_hline(yintercept = -log10(0.05), linetype = 'dashed') +
+  # Draw each comparison separately
+  facet_wrap(~comparison, scales = 'free') +
+  # Add labels and themes
+  labs(x = 'log2 Fold Change',
+       y = 'Adj. p-value (-log10)') +
+  plot_theme
+```
+
+```{r}
+ggplot(data = diff_expression_level %>% 
+         dplyr::filter(comparison == 'WT/msrA') %>% 
+         dplyr::filter(log2fc > -1 |
+                         log2fc < 1 &
+                         adj_pval > 0.05)) +
+  # Plot all genes
+  geom_point(aes(x = log2fc, y = -log10(adj_pval)),
+             color = '#9da7bf') +
+  # Plot up-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(comparison == 'WT/msrA') %>% 
+               dplyr::filter(log2fc >= 1 &
+                               adj_pval <= 0.05),
+             aes(x = log2fc, y = -log10(adj_pval)),
+             color = "#082544",
+             size = 2) +
+  # Plot down-regulated genes
+  geom_point(data = diff_expression_level %>% 
+               dplyr::filter(comparison == 'WT/msrA') %>% 
+               dplyr::filter(log2fc <= -1 &
+                               adj_pval <= 0.05),
+             aes(x = log2fc, y = -log10(adj_pval)),
+             color = "#DE3C37",
+             size = 2) +
+  # Add cut-off lines
+  geom_vline(xintercept = c(1, -1), linetype = 'dashed') +
+  geom_hline(yintercept = -log10(0.05), linetype = 'dashed') +
+  # Add labels and themes
+  labs(x = 'log2 Fold Change',
+       y = 'Adj. p-value (-log10)',
+       title = 'WT/msrA') +
+  plot_theme
+```
+
+##### Interactive Volcano Plot
+
+```{r}
+ggplotly(
+  ggplot(data = diff_expression_level %>% 
+           dplyr::filter(comparison == 'WT/msrA') %>% 
+           dplyr::filter(log2fc > -1 |
+                           log2fc < 1 &
+                           adj_pval > 0.05),
+         aes(label1 = gene_name,
+             label2 = protein_group)) +
+    # Plot all genes
+    geom_point(aes(x = log2fc, y = -log10(adj_pval)),
+               color = '#9da7bf') +
+    # Plot up-regulated genes
+    geom_point(data = diff_expression_level %>% 
+                 dplyr::filter(comparison == 'WT/msrA') %>% 
+                 dplyr::filter(log2fc >= 1 &
+                                 adj_pval <= 0.05),
+               aes(x = log2fc, y = -log10(adj_pval)),
+               color = "#082544",
+               size = 2) +
+    # Plot down-regulated genes
+    geom_point(data = diff_expression_level %>% 
+                 dplyr::filter(comparison == 'WT/msrA') %>% 
+                 dplyr::filter(log2fc <= -1 &
+                                 pval <= 0.05),
+               aes(x = log2fc, y = -log10(adj_pval)),
+               color = "#DE3C37",
+               size = 2) +
+    # Add cut-off lines
+    geom_vline(xintercept = c(1, -1), linetype = 'dashed') +
+    geom_hline(yintercept = -log10(0.05), linetype = 'dashed') +
+    # Add labels and themes
+    labs(x = 'log2 Fold Change',
+         y = 'Adj. p-value (-log10)',
+         title = 'WT/msrA') +
+    plot_theme
+  )
+```
+
+### Gene Ontology
+
+The STRING database aims to collect, score, and integrate all publicly available sources of protein-protein interaction information, and to complement these with computational predictions. Its goal is to achieve a comprehensive and objective global network, including direct (physical) as well as indirect (functional) interactions.
+
+Protein expression levels were compared between bulk samples and each purified cell type. This was done for both stained and unstained populations.
+
+For all comparisons, proteins with a log2 fold change of greater than 0.5 in the purified population compared to the bulk sample were analyzed for enrichment analyses.
+
+#### Map STRING IDs to enriched proteins
+
+Proteins more abundant in WT than MsrA KO
+
+*E. coli* taxon ID: 562
+
+```{r}
+wt_v_msra_protein_list_up_wt <- diff_expression_level %>% 
+  dplyr::filter(comparison == 'WT/msrA') %>% 
+  distinct(protein_group, gene_name, log2fc, adj_pval) %>% 
+  dplyr::filter(log2fc > 0.5) %>% 
+  arrange(desc(log2fc)) %>% 
+  pull(gene_name)
+
+wt_v_msra_protein_list_up_ko <- diff_expression_level %>% 
+  dplyr::filter(comparison == 'WT/msrA') %>% 
+  distinct(protein_group, gene_name, log2fc, adj_pval) %>% 
+  dplyr::filter(log2fc < -0.5) %>% 
+  arrange(desc(log2fc)) %>% 
+  pull(gene_name)
+
+head(wt_v_msra_protein_list_up_wt)
+```
+
+```{r}
+wt_v_msra_mappedProteins_up_wt <- rba_string_map_ids(
+  ids = wt_v_msra_protein_list_up_wt,
+  species = 562
+)
+
+wt_v_msra_mappedProteins_up_ko <- rba_string_map_ids(
+  ids = wt_v_msra_protein_list_up_ko,
+  species = 562
+)
+
+wt_v_msra_mappedProteins_up_wt
+```
+
+#### Interaction Networks
+
+Below are a set of tables displaying interaction networks for each protein identified within a given comparison. Within each table, "Target Protein" is a protein from our comparison, and all the entries under "Interacting Protein" is each a protein from the dataset that is known to interact with the target protein.
+
+The data has been filtered to have a Log2 Fold-change of greater than 0.5 in WT compared to MsrA KO (both for the target and interacting proteins) and to have the highest confidence for "interaction score", meaning these two proteins are highly confident to be interacting partners.
+
+```{r}
+reactable(
+  rba_string_interactions_network(
+    #ids = wt_v_msra_mappedProteins_up_wt$stringId[1:100],
+    ids = wt_v_msra_mappedProteins_up_wt$preferredName[1:110],
+    species = 528,
+    required_score = 100
+  ) %>% 
+    dplyr::select(c('preferredName_A', 'preferredName_B',
+                    'score', 'ascore')),
+  groupBy = 'preferredName_A',
+  columns = list(preferredName_A = colDef(name = 'Target'),
+                 preferredName_B = colDef(name = 'Interacting'),
+                 score = colDef(name = 'Combined'),
+                 ascore = colDef(name = 'Co-Expression')),
+  columnGroups = list(colGroup(name = 'Protein Names',
+                               columns = c('preferredName_A',
+                                           'preferredName_B')),
+                      colGroup(name = 'STRING Interaction Scores',
+                               columns = c('score', 'ascore'))),
+  theme = reactableTheme(
+    borderColor = "#dfe2e5",
+    stripedColor = "#f6f8fa",
+    highlightColor = "#f0f5f9",
+    cellPadding = "8px 12px",
+    style = list(
+      fontFamily = "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+      ),
+    searchInputStyle = list(width = "100%")
+  ),
+  pageSizeOptions = c(10, 20, 30),
+  defaultPageSize = 10,
+  highlight = TRUE,
+  resizable = TRUE,
+  showSortable = TRUE
+) %>% 
+  add_title(title = 'WT vs MsrA KO: STRING Interacting Proteins',
+            font_size = 23)
+```
+
+#### Functional Enrichment Plots
+
+Below are plots showing the 10 most enriched GO terms when comparing WT to MsrA KO (*i.e.*, the proteins belonging to that terms are more highly expressed in WT when
+compared MsrA KO). There are several different terms used including:
+
+-   KEGG Pathways: Assigns functional meaning to genes at both the molecular and higher levels.
+
+-   GO Cellular Component: The place in the cell the protein is active
+
+-   GO Molecular Function: The biochemical activity of the protein
+
+-   GO Biological Process: The biological objective the protein contributes towards. This process is accomplished through one or more ordered assemblies of molecular functions
+
+-   UniProt Keyword: A controlled vocabulary used by UniProtKB that summarizes the content of a protein entry. The main difference between GO terms and UniProt keywords is UniProt keywords are developed specifically for proteins added to the UniProt database while GO terms describe gene and gene product attributes independently of any database.
+
+##### KEGG Pathways {-}
+
+```{r}
+wt_v_msra_kegg_up_wt <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_wt$string[1:150],
+  species = 562,
+  category = "KEGG",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+
+wt_v_msra_kegg_up_ko <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_ko$string[1:200],
+  species = 562,
+  category = "KEGG",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+```
+
+```{r}
+grid.arrange(textGrob('More Abundant in WT', 
+                      gp = gpar(fontsize = 8,
+                                fontface = 'bold')),
+             rasterGrob(wt_v_msra_kegg_up_wt),
+             textGrob('More Abundant in MsrA KO',
+                      gp = gpar(fontsize = 8,
+                                fontface = 'bold')),
+             rasterGrob(wt_v_msra_kegg_up_ko),
+             nrow = 4, ncol = 1, heights = c(1, 9, 1, 9))
+```
+
+##### GO Component {-}
+
+```{r}
+wt_v_msra_component_up_wt <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_wt$string[1:200],
+  species = 562,
+  category = "Component",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+
+wt_v_msra_component_up_ko <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_ko$string[1:200],
+  species = 562,
+  category = "Component",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+```
+
+```{r}
+grid.arrange(textGrob('More Abundant in WT', 
+                      gp = gpar(fontsize = 8,
+                                fontface = 'bold')),
+             rasterGrob(wt_v_msra_component_up_wt),
+             textGrob('More Abundant in MsrA KO',
+                      gp = gpar(fontsize = 8,
+                                fontface = 'bold')),
+             rasterGrob(wt_v_msra_component_up_ko),
+             nrow = 4, ncol = 1, heights = c(1, 9, 1, 9))
+```
+##### GO Molecular Function {-}
+
+```{r}
+wt_v_msra_function_up_wt <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_wt$string[1:200],
+  species = 562,
+  category = "Function",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+
+wt_v_msra_function_up_ko <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_ko$string[1:200],
+  species = 562,
+  category = "Function",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+```
+
+There were not enough genes that were up-regulated in MsrA KO to be able to enrich any members of this GO category. Therefore, we will not be able to plot it.
+
+```{r}
+grid.arrange(textGrob('More Abundant in WT', 
+                      gp = gpar(fontsize = 8,
+                                fontface = 'bold')),
+             rasterGrob(wt_v_msra_function_up_wt),
+             #textGrob('More Abundant in MsrA KO',
+             #         gp = gpar(fontsize = 8,
+             #                   fontface = 'bold')),
+             #rasterGrob(wt_v_msra_function_up_ko),
+             nrow = 2, ncol = 1, heights = c(1, 9))
+```
+
+##### GO Biological Process {-}
+
+```{r}
+wt_v_msra_process_up_wt <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_wt$string[1:200],
+  species = 562,
+  category = "Process",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+
+wt_v_msra_process_up_ko <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_ko$string[1:200],
+  species = 562,
+  category = "Process",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+```
+
+```{r}
+grid.arrange(textGrob('More Abundant in WT', 
+                      gp = gpar(fontsize = 8,
+                                fontface = 'bold')),
+             rasterGrob(wt_v_msra_process_up_wt),
+             textGrob('More Abundant in MsrA KO',
+                      gp = gpar(fontsize = 8,
+                                fontface = 'bold')),
+             rasterGrob(wt_v_msra_process_up_ko),
+             nrow = 4, ncol = 1, heights = c(1, 9, 1, 9))
+```
+##### UniProt Keyword {-}
+
+```{r}
+wt_v_msra_uniprot_up_wt <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_wt$string[1:200],
+  species = 562,
+  category = "Keyword",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+
+wt_v_msra_uniprot_up_ko <- rba_string_enrichment_image(
+  ids = wt_v_msra_mappedProteins_up_ko$string[1:200],
+  species = 562,
+  category = "Keyword",
+  image_format = "highres_image",
+  save_image = FALSE,
+  group_by_similarity = 0.6
+  )
+```
+
+```{r}
+grid.arrange(textGrob('More Abundant in WT', 
+                      gp = gpar(fontsize = 8,
+                                fontface = 'bold')),
+             rasterGrob(wt_v_msra_uniprot_up_wt),
+             textGrob('More Abundant in MsrA KO',
+                      gp = gpar(fontsize = 8,
+                                fontface = 'bold')),
+             rasterGrob(wt_v_msra_uniprot_up_ko),
+             nrow = 4, ncol = 1, heights = c(1, 9, 1, 9))
+```

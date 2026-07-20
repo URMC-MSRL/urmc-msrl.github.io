@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>4.2 Prepare the t-test | Proteomic Data Analysis</title>
+  <meta name="description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="4.2 Prepare the t-test | Proteomic Data Analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/images/CART_logo_horizontal.png" />
+  <meta property="og:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="4.2 Prepare the t-test | Proteomic Data Analysis" />
+  
+  <meta name="twitter:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="twitter:image" content="/images/CART_logo_horizontal.png" />
+
+<meta name="author" content="Kyle Swovick" />
+
+
+<meta name="date" content="2026-07-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="images/ur_logo_favicon.png" type="image/x-icon" />
+<link rel="prev" href="background.html"/>
+<link rel="next" href="create-a-t-test-results-table.html"/>
+<script src="assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="assets/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="assets/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="assets/plotly-binding-4.12.0/plotly.js"></script>
+<script src="assets/typedarray-0.1/typedarray.min.js"></script>
+<link href="assets/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="assets/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="assets/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="assets/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<script src="assets/core-js-2.5.3/shim.min.js"></script>
+<script src="assets/react-18.2.0/react.min.js"></script>
+<script src="assets/react-18.2.0/react-dom.min.js"></script>
+<script src="assets/reactwidget-2.0.0/react-tools.js"></script>
+<link href="assets/reactable-0.4.5/reactable.css" rel="stylesheet" />
+<script src="assets/reactable-binding-0.4.5/reactable.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Proteomic Data Analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="introduction-to-r-and-rstudio.html"><a href="introduction-to-r-and-rstudio.html"><i class="fa fa-check"></i><b>1</b> Introduction to R and RStudio</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="coding-basics.html"><a href="coding-basics.html"><i class="fa fa-check"></i><b>1.1</b> Coding Basics</a></li>
+<li class="chapter" data-level="1.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html"><i class="fa fa-check"></i><b>1.2</b> Creating New Objects in R</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#object-naming-conventions"><i class="fa fa-check"></i><b>1.2.1</b> Object Naming Conventions</a></li>
+<li class="chapter" data-level="1.2.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#working-with-object-assignments"><i class="fa fa-check"></i><b>1.2.2</b> Working with Object Assignments</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="calling-functions.html"><a href="calling-functions.html"><i class="fa fa-check"></i><b>1.3</b> Calling Functions</a></li>
+<li class="chapter" data-level="1.4" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html"><i class="fa fa-check"></i><b>1.4</b> Expanding R’s Functionality</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#installing-packages"><i class="fa fa-check"></i><b>1.4.1</b> Installing Packages</a></li>
+<li class="chapter" data-level="1.4.2" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#loading-packages-and-package-conflicts"><i class="fa fa-check"></i><b>1.4.2</b> Loading Packages and Package Conflicts</a></li>
+<li class="chapter" data-level="1.4.3" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#package-help-pages"><i class="fa fa-check"></i><b>1.4.3</b> Package Help Pages</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="working-with-data-in-r-and-rstudio.html"><a href="working-with-data-in-r-and-rstudio.html"><i class="fa fa-check"></i><b>2</b> Working with Data in R and RStudio</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="loading-data.html"><a href="loading-data.html"><i class="fa fa-check"></i><b>2.1</b> Loading Data</a></li>
+<li class="chapter" data-level="2.2" data-path="understanding-data-frames.html"><a href="understanding-data-frames.html"><i class="fa fa-check"></i><b>2.2</b> Understanding Data Frames</a></li>
+<li class="chapter" data-level="2.3" data-path="data-filtering.html"><a href="data-filtering.html"><i class="fa fa-check"></i><b>2.3</b> Data Filtering</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="data-filtering.html"><a href="data-filtering.html#comparison-operators"><i class="fa fa-check"></i><b>2.3.1</b> Comparison Operators</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html"><i class="fa fa-check"></i><b>2.4</b> Manipulating Data Frames (Data Transformation)</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#arrange-rows-with-arrange"><i class="fa fa-check"></i><b>2.4.1</b> Arrange Rows with <code>arrange()</code></a></li>
+<li class="chapter" data-level="2.4.2" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#select-columns-with-select"><i class="fa fa-check"></i><b>2.4.2</b> Select Columns with <code>select()</code></a></li>
+<li class="chapter" data-level="2.4.3" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#add-new-variables-with-mutate"><i class="fa fa-check"></i><b>2.4.3</b> Add New Variables with <code>mutate()</code></a></li>
+<li class="chapter" data-level="2.4.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#grouped-summaries-with-summarize"><i class="fa fa-check"></i><b>2.4.4</b> Grouped Summaries with <code>summarize()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="determining-data-quality-and-filtering.html"><a href="determining-data-quality-and-filtering.html"><i class="fa fa-check"></i><b>3</b> Determining Data Quality and Filtering</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="deciphering-dia-nn-search-result-files.html"><a href="deciphering-dia-nn-search-result-files.html"><i class="fa fa-check"></i><b>3.1</b> Deciphering DIA-NN Search Result Files</a></li>
+<li class="chapter" data-level="3.2" data-path="import-dia-nn-search-results.html"><a href="import-dia-nn-search-results.html"><i class="fa fa-check"></i><b>3.2</b> Import DIA-NN Search Results</a></li>
+<li class="chapter" data-level="3.3" data-path="evaluate-dia-nn-stats.html"><a href="evaluate-dia-nn-stats.html"><i class="fa fa-check"></i><b>3.3</b> Evaluate DIA-NN Stats</a></li>
+<li class="chapter" data-level="3.4" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html"><i class="fa fa-check"></i><b>3.4</b> Evaluate DIA-NN Results</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#explaining-the-dia-nn-report"><i class="fa fa-check"></i><b>3.4.1</b> Explaining the DIA-NN Report</a></li>
+<li class="chapter" data-level="3.4.2" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#evaluating-the-quality-of-the-runs"><i class="fa fa-check"></i><b>3.4.2</b> Evaluating the Quality of the Runs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="filtering-dia-nn-results.html"><a href="filtering-dia-nn-results.html"><i class="fa fa-check"></i><b>3.5</b> Filtering DIA-NN Results</a></li>
+<li class="chapter" data-level="3.6" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html"><i class="fa fa-check"></i><b>3.6</b> Prepare Data for Differential Expression Analysis (t-test)</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#filter-based-off-number-of-peptides-and-missing-values"><i class="fa fa-check"></i><b>3.6.1</b> Filter Based off Number of Peptides and Missing Values</a></li>
+<li class="chapter" data-level="3.6.2" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#impute-missing-values"><i class="fa fa-check"></i><b>3.6.2</b> Impute Missing Values</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="performing-differential-expression-statistics-t-test.html"><a href="performing-differential-expression-statistics-t-test.html"><i class="fa fa-check"></i><b>4</b> Performing Differential Expression Statistics (t-test)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>4.1</b> Background</a>
+<ul>
+<li class="chapter" data-level="" data-path="background.html"><a href="background.html#types-of-t-tests"><i class="fa fa-check"></i>Types of t-tests</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html"><i class="fa fa-check"></i><b>4.2</b> Prepare the t-test</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#create-the-comparison-table"><i class="fa fa-check"></i><b>4.2.1</b> Create the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#prepare-our-data-using-the-comparison-table"><i class="fa fa-check"></i><b>4.2.2</b> Prepare Our Data Using the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#define-the-t-test-input"><i class="fa fa-check"></i><b>4.2.3</b> Define the T-Test Input</a></li>
+<li class="chapter" data-level="4.2.4" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#fit-the-t-test-regression-models"><i class="fa fa-check"></i><b>4.2.4</b> Fit the T-Test Regression Models</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="create-a-t-test-results-table.html"><a href="create-a-t-test-results-table.html"><i class="fa fa-check"></i><b>4.3</b> Create a T-Test Results Table</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="visualizing-proteomic-data.html"><a href="visualizing-proteomic-data.html"><i class="fa fa-check"></i><b>5</b> Visualizing Proteomic Data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="prep-work.html"><a href="prep-work.html"><i class="fa fa-check"></i><b>5.1</b> Prep Work</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="prep-work.html"><a href="prep-work.html#make-a-common-plotting-theme"><i class="fa fa-check"></i><b>5.1.1</b> Make a Common Plotting Theme</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html"><i class="fa fa-check"></i><b>5.2</b> Replicate Comparisons</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#sample-heatmap-and-hierarchical-clustering"><i class="fa fa-check"></i><b>5.2.1</b> Sample Heatmap and Hierarchical Clustering</a></li>
+<li class="chapter" data-level="5.2.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#principal-component-analysis-pca"><i class="fa fa-check"></i><b>5.2.2</b> Principal Component Analysis (PCA)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="differential-expression.html"><a href="differential-expression.html"><i class="fa fa-check"></i><b>5.3</b> Differential Expression</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="differential-expression.html"><a href="differential-expression.html#protein-expression-heatmap"><i class="fa fa-check"></i><b>5.3.1</b> Protein Expression Heatmap</a></li>
+<li class="chapter" data-level="5.3.2" data-path="differential-expression.html"><a href="differential-expression.html#volcano-plot"><i class="fa fa-check"></i><b>5.3.2</b> Volcano Plot</a></li>
+<li class="chapter" data-level="5.3.3" data-path="differential-expression.html"><a href="differential-expression.html#gene-ontology"><i class="fa fa-check"></i><b>5.3.3</b> Gene Ontology</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Proteomic Data Analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="prepare-the-t-test" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Prepare the t-test<a href="prepare-the-t-test.html#prepare-the-t-test" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The first thing we need to do is design all the parameters for our t-test. In other words, declare what groups we want compared to each other.</p>
+<div id="create-the-comparison-table" class="section level3 hasAnchor" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Create the Comparison Table<a href="prepare-the-t-test.html#create-the-comparison-table" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="prepare-the-t-test.html#cb166-1" tabindex="-1"></a><span class="co">#Create a list of all conditions</span></span>
+<span id="cb166-2"><a href="prepare-the-t-test.html#cb166-2" tabindex="-1"></a>all_conditions <span class="ot">&lt;-</span> imputed_data_df <span class="sc">%&gt;%</span> </span>
+<span id="cb166-3"><a href="prepare-the-t-test.html#cb166-3" tabindex="-1"></a>  <span class="fu">distinct</span>(group) <span class="sc">%&gt;%</span> </span>
+<span id="cb166-4"><a href="prepare-the-t-test.html#cb166-4" tabindex="-1"></a>  <span class="fu">pull</span>()</span>
+<span id="cb166-5"><a href="prepare-the-t-test.html#cb166-5" tabindex="-1"></a></span>
+<span id="cb166-6"><a href="prepare-the-t-test.html#cb166-6" tabindex="-1"></a>all_conditions</span></code></pre></div>
+<pre><code>## [1] &quot;WT&quot;   &quot;bisC&quot; &quot;msrA&quot; &quot;msrB&quot; &quot;msrC&quot;</code></pre>
+<p>We then need to create a data frame containing all possible condition comparisons</p>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="prepare-the-t-test.html#cb168-1" tabindex="-1"></a>all_combinations <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">t</span>(<span class="fu">combn</span>(all_conditions, <span class="at">m =</span> <span class="dv">2</span>)),</span>
+<span id="cb168-2"><a href="prepare-the-t-test.html#cb168-2" tabindex="-1"></a>                              <span class="at">.name_repair =</span> <span class="sc">~</span> <span class="fu">make.names</span>(., <span class="at">unique =</span> T)) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-3"><a href="prepare-the-t-test.html#cb168-3" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">V1 =</span> X, <span class="at">V2 =</span> X<span class="fl">.1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-4"><a href="prepare-the-t-test.html#cb168-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">combinations =</span> <span class="fu">paste0</span>(V1, <span class="st">&#39;_vs_&#39;</span>, V2)) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-5"><a href="prepare-the-t-test.html#cb168-5" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(V1, V2),</span>
+<span id="cb168-6"><a href="prepare-the-t-test.html#cb168-6" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&#39;name&#39;</span>,</span>
+<span id="cb168-7"><a href="prepare-the-t-test.html#cb168-7" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&#39;group&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-8"><a href="prepare-the-t-test.html#cb168-8" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>name) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-9"><a href="prepare-the-t-test.html#cb168-9" tabindex="-1"></a>  <span class="fu">group_by</span>(group) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-10"><a href="prepare-the-t-test.html#cb168-10" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comparison =</span> <span class="fu">list</span>(combinations)) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-11"><a href="prepare-the-t-test.html#cb168-11" tabindex="-1"></a>  <span class="fu">distinct</span>(comparison, group)</span>
+<span id="cb168-12"><a href="prepare-the-t-test.html#cb168-12" tabindex="-1"></a></span>
+<span id="cb168-13"><a href="prepare-the-t-test.html#cb168-13" tabindex="-1"></a>all_combinations</span></code></pre></div>
+<pre><code>## # A tibble: 5 × 2
+## # Groups:   group [5]
+##   comparison group
+##   &lt;list&gt;     &lt;chr&gt;
+## 1 &lt;chr [4]&gt;  WT   
+## 2 &lt;chr [4]&gt;  bisC 
+## 3 &lt;chr [4]&gt;  msrA 
+## 4 &lt;chr [4]&gt;  msrB 
+## 5 &lt;chr [4]&gt;  msrC</code></pre>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="prepare-the-t-test.html#cb170-1" tabindex="-1"></a>all_combinations<span class="sc">$</span>comparison</span></code></pre></div>
+<pre><code>## [[1]]
+## [1] &quot;WT_vs_bisC&quot; &quot;WT_vs_msrA&quot; &quot;WT_vs_msrB&quot; &quot;WT_vs_msrC&quot;
+## 
+## [[2]]
+## [1] &quot;WT_vs_bisC&quot;   &quot;bisC_vs_msrA&quot; &quot;bisC_vs_msrB&quot; &quot;bisC_vs_msrC&quot;
+## 
+## [[3]]
+## [1] &quot;WT_vs_msrA&quot;   &quot;bisC_vs_msrA&quot; &quot;msrA_vs_msrB&quot; &quot;msrA_vs_msrC&quot;
+## 
+## [[4]]
+## [1] &quot;WT_vs_msrB&quot;   &quot;bisC_vs_msrB&quot; &quot;msrA_vs_msrB&quot; &quot;msrB_vs_msrC&quot;
+## 
+## [[5]]
+## [1] &quot;WT_vs_msrC&quot;   &quot;bisC_vs_msrC&quot; &quot;msrA_vs_msrC&quot; &quot;msrB_vs_msrC&quot;</code></pre>
+<p>This data frame is made up of two columns:</p>
+<ul>
+<li><p><strong>group</strong>: A string denoting the condition, or group (in this case, the <em>E. coli</em> genotype)</p></li>
+<li><p><strong>comparison</strong>: a list made up of all the possible group comparison for the specific group, with each group separated by “<em>vs</em>”.</p>
+<ul>
+<li><p>For example, the <code>group</code> <code>WT</code> contains the following comparisons:</p>
+<ul>
+<li><p>“WT_vs_bisC”</p></li>
+<li><p>“WT_vs_msrA”</p></li>
+<li><p>“WT_vs_msrB”</p></li>
+<li><p>“WT_vs_msrC”</p></li>
+</ul></li>
+<li><p>While the <code>group</code> <code>bisC</code> contains:</p>
+<ul>
+<li><p>“WT_vs_bisC”</p></li>
+<li><p>“bisC_vs_msrA”</p></li>
+<li><p>“bisC_vs_msrB”</p></li>
+<li><p>“bisC_vs_msrC”</p></li>
+</ul></li>
+<li><p>And so on for the other 3 genotypes</p></li>
+</ul></li>
+</ul>
+</div>
+<div id="prepare-our-data-using-the-comparison-table" class="section level3 hasAnchor" number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> Prepare Our Data Using the Comparison Table<a href="prepare-the-t-test.html#prepare-our-data-using-the-comparison-table" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>We are nor almost ready to perform a t-test.</p>
+<p>Recall that we will be using our data frame containing the imputed values. Before going any further, we need to add a new column to that data frame: a comlumn containing replicate number</p>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="prepare-the-t-test.html#cb172-1" tabindex="-1"></a>imputed_data_df <span class="ot">&lt;-</span> imputed_data_df <span class="sc">%&gt;%</span> </span>
+<span id="cb172-2"><a href="prepare-the-t-test.html#cb172-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rep =</span> <span class="fu">as.integer</span>(<span class="fu">str_sub</span>(Run, <span class="sc">-</span><span class="dv">1</span>)))</span></code></pre></div>
+<p>Now that our data frame is ready, we will move it around so it’s in a form that is full ready for <code>limma</code>.</p>
+<p>The main we need to do for this is to each each comparison we want to have evaluated.</p>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="prepare-the-t-test.html#cb173-1" tabindex="-1"></a>ttest_data_prep <span class="ot">&lt;-</span> imputed_data_df <span class="sc">%&gt;%</span></span>
+<span id="cb173-2"><a href="prepare-the-t-test.html#cb173-2" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb173-3"><a href="prepare-the-t-test.html#cb173-3" tabindex="-1"></a>  <span class="fu">distinct</span>(Protein.Group, group, rep, PG.MaxLFQ) <span class="sc">%&gt;%</span></span>
+<span id="cb173-4"><a href="prepare-the-t-test.html#cb173-4" tabindex="-1"></a>  <span class="fu">complete</span>(<span class="fu">nesting</span>(group, rep),</span>
+<span id="cb173-5"><a href="prepare-the-t-test.html#cb173-5" tabindex="-1"></a>           Protein.Group) <span class="sc">%&gt;%</span></span>
+<span id="cb173-6"><a href="prepare-the-t-test.html#cb173-6" tabindex="-1"></a>  <span class="fu">group_by</span>(Protein.Group, group) <span class="sc">%&gt;%</span></span>
+<span id="cb173-7"><a href="prepare-the-t-test.html#cb173-7" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_detect =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(PG.MaxLFQ))) <span class="sc">%&gt;%</span></span>
+<span id="cb173-8"><a href="prepare-the-t-test.html#cb173-8" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_replicates =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb173-9"><a href="prepare-the-t-test.html#cb173-9" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb173-10"><a href="prepare-the-t-test.html#cb173-10" tabindex="-1"></a>  <span class="fu">left_join</span>(all_combinations, <span class="at">by =</span> <span class="st">&#39;group&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb173-11"><a href="prepare-the-t-test.html#cb173-11" tabindex="-1"></a>  <span class="fu">unnest</span>(comparison) <span class="sc">%&gt;%</span> </span>
+<span id="cb173-12"><a href="prepare-the-t-test.html#cb173-12" tabindex="-1"></a>  <span class="fu">unite</span>(group<span class="sc">:</span>rep, <span class="at">col =</span> <span class="st">&#39;Run&#39;</span>, <span class="at">sep =</span> <span class="st">&#39;_&#39;</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb173-13"><a href="prepare-the-t-test.html#cb173-13" tabindex="-1"></a></span>
+<span id="cb173-14"><a href="prepare-the-t-test.html#cb173-14" tabindex="-1"></a>ttest_data_prep</span></code></pre></div>
+<pre><code>## # A tibble: 170,184 × 8
+##    Run    group   rep Protein.Group PG.MaxLFQ n_detect n_replicates comparison  
+##    &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;chr&gt;             &lt;dbl&gt;    &lt;int&gt;        &lt;int&gt; &lt;chr&gt;       
+##  1 bisC_1 bisC      1 O52982             19.3        3            3 WT_vs_bisC  
+##  2 bisC_1 bisC      1 O52982             19.3        3            3 bisC_vs_msrA
+##  3 bisC_1 bisC      1 O52982             19.3        3            3 bisC_vs_msrB
+##  4 bisC_1 bisC      1 O52982             19.3        3            3 bisC_vs_msrC
+##  5 bisC_1 bisC      1 P00350             29.8        3            3 WT_vs_bisC  
+##  6 bisC_1 bisC      1 P00350             29.8        3            3 bisC_vs_msrA
+##  7 bisC_1 bisC      1 P00350             29.8        3            3 bisC_vs_msrB
+##  8 bisC_1 bisC      1 P00350             29.8        3            3 bisC_vs_msrC
+##  9 bisC_1 bisC      1 P00363             29.2        3            3 WT_vs_bisC  
+## 10 bisC_1 bisC      1 P00363             29.2        3            3 bisC_vs_msrA
+## # ℹ 170,174 more rows</code></pre>
+<p>Now we have a data frame with all our protein expression levels alnog with which group they belong to and what comparison we want to perform.</p>
+<p>However, for the purposes of this tutorial, we really are only interested in WT compared to each of the knockouts, so we will get rid of all the other comparisons (<em>e.g.</em> “msrA_vs_msrB”)</p>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="prepare-the-t-test.html#cb175-1" tabindex="-1"></a>ttest_data_prep_wt_comps <span class="ot">&lt;-</span> ttest_data_prep <span class="sc">%&gt;%</span> </span>
+<span id="cb175-2"><a href="prepare-the-t-test.html#cb175-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">&#39;WT_vs&#39;</span>, comparison))</span>
+<span id="cb175-3"><a href="prepare-the-t-test.html#cb175-3" tabindex="-1"></a></span>
+<span id="cb175-4"><a href="prepare-the-t-test.html#cb175-4" tabindex="-1"></a>ttest_data_prep_wt_comps</span></code></pre></div>
+<pre><code>## # A tibble: 69,897 × 8
+##    Run    group   rep Protein.Group PG.MaxLFQ n_detect n_replicates comparison
+##    &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;chr&gt;             &lt;dbl&gt;    &lt;int&gt;        &lt;int&gt; &lt;chr&gt;     
+##  1 bisC_1 bisC      1 O52982             19.3        3            3 WT_vs_bisC
+##  2 bisC_1 bisC      1 P00350             29.8        3            3 WT_vs_bisC
+##  3 bisC_1 bisC      1 P00363             29.2        3            3 WT_vs_bisC
+##  4 bisC_1 bisC      1 P00370             25.3        3            3 WT_vs_bisC
+##  5 bisC_1 bisC      1 P00393             26.9        3            3 WT_vs_bisC
+##  6 bisC_1 bisC      1 P00448             30.1        3            3 WT_vs_bisC
+##  7 bisC_1 bisC      1 P00452             27.1        3            3 WT_vs_bisC
+##  8 bisC_1 bisC      1 P00490             27.8        3            3 WT_vs_bisC
+##  9 bisC_1 bisC      1 P00509             29.1        3            3 WT_vs_bisC
+## 10 bisC_1 bisC      1 P00547             24.6        3            3 WT_vs_bisC
+## # ℹ 69,887 more rows</code></pre>
+<p>Next, we need to count the number of replicates within each group.</p>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="prepare-the-t-test.html#cb177-1" tabindex="-1"></a>comparison_data <span class="ot">&lt;-</span> ttest_data_prep_wt_comps <span class="sc">%&gt;%</span> </span>
+<span id="cb177-2"><a href="prepare-the-t-test.html#cb177-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">ifelse</span>(group <span class="sc">==</span> <span class="fu">str_extract</span>(group, <span class="at">pattern =</span> <span class="st">&#39;(?&lt;=_vs_).+&#39;</span>),</span>
+<span id="cb177-3"><a href="prepare-the-t-test.html#cb177-3" tabindex="-1"></a>                       <span class="st">&#39;control&#39;</span>, </span>
+<span id="cb177-4"><a href="prepare-the-t-test.html#cb177-4" tabindex="-1"></a>                       <span class="st">&#39;experimental&#39;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb177-5"><a href="prepare-the-t-test.html#cb177-5" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">factor</span>(Protein.Group, <span class="at">levels =</span> <span class="fu">unique</span>(<span class="fu">str_sort</span>(Protein.Group,</span>
+<span id="cb177-6"><a href="prepare-the-t-test.html#cb177-6" tabindex="-1"></a>                                                         <span class="at">numeric =</span> T)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb177-7"><a href="prepare-the-t-test.html#cb177-7" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>type)</span>
+<span id="cb177-8"><a href="prepare-the-t-test.html#cb177-8" tabindex="-1"></a></span>
+<span id="cb177-9"><a href="prepare-the-t-test.html#cb177-9" tabindex="-1"></a>comparison_data</span></code></pre></div>
+<pre><code>## # A tibble: 69,897 × 8
+##    Run    group   rep Protein.Group PG.MaxLFQ n_detect n_replicates comparison
+##    &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;chr&gt;             &lt;dbl&gt;    &lt;int&gt;        &lt;int&gt; &lt;chr&gt;     
+##  1 bisC_1 bisC      1 O52982             19.3        3            3 WT_vs_bisC
+##  2 bisC_2 bisC      2 O52982             17.8        3            3 WT_vs_bisC
+##  3 bisC_3 bisC      3 O52982             19.8        3            3 WT_vs_bisC
+##  4 msrA_1 msrA      1 O52982             18.6        3            3 WT_vs_msrA
+##  5 msrA_2 msrA      2 O52982             19.5        3            3 WT_vs_msrA
+##  6 msrA_3 msrA      3 O52982             18.3        3            3 WT_vs_msrA
+##  7 msrB_1 msrB      1 O52982             16.3        3            3 WT_vs_msrB
+##  8 msrB_2 msrB      2 O52982             16.4        3            3 WT_vs_msrB
+##  9 msrB_3 msrB      3 O52982             16.7        3            3 WT_vs_msrB
+## 10 msrC_1 msrC      1 O52982             16.1        2            2 WT_vs_msrC
+## # ℹ 69,887 more rows</code></pre>
+</div>
+<div id="define-the-t-test-input" class="section level3 hasAnchor" number="4.2.3">
+<h3><span class="header-section-number">4.2.3</span> Define the T-Test Input<a href="prepare-the-t-test.html#define-the-t-test-input" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="prepare-the-t-test.html#cb179-1" tabindex="-1"></a>moderated_t_test_map <span class="ot">&lt;-</span> comparison_data <span class="sc">%&gt;%</span> </span>
+<span id="cb179-2"><a href="prepare-the-t-test.html#cb179-2" tabindex="-1"></a>  <span class="fu">distinct</span>(Run, group) <span class="sc">%&gt;%</span> </span>
+<span id="cb179-3"><a href="prepare-the-t-test.html#cb179-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group :=</span> <span class="fu">paste0</span>(<span class="st">&#39;x&#39;</span>, group),</span>
+<span id="cb179-4"><a href="prepare-the-t-test.html#cb179-4" tabindex="-1"></a>         <span class="at">group =</span> <span class="fu">sub</span>(<span class="st">&#39;WT&#39;</span>, <span class="st">&#39;wt&#39;</span>, group)) <span class="sc">%&gt;%</span> </span>
+<span id="cb179-5"><a href="prepare-the-t-test.html#cb179-5" tabindex="-1"></a>  <span class="fu">arrange</span>(Run) <span class="sc">%&gt;%</span> </span>
+<span id="cb179-6"><a href="prepare-the-t-test.html#cb179-6" tabindex="-1"></a>  <span class="fu">arrange</span>(group) <span class="sc">%&gt;%</span> </span>
+<span id="cb179-7"><a href="prepare-the-t-test.html#cb179-7" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group =</span> <span class="fu">sub</span>(<span class="st">&#39;wt&#39;</span>, <span class="st">&#39;WT&#39;</span>, group))</span>
+<span id="cb179-8"><a href="prepare-the-t-test.html#cb179-8" tabindex="-1"></a></span>
+<span id="cb179-9"><a href="prepare-the-t-test.html#cb179-9" tabindex="-1"></a>moderated_t_test_map</span></code></pre></div>
+<pre><code>## # A tibble: 14 × 2
+##    Run    group
+##    &lt;chr&gt;  &lt;chr&gt;
+##  1 bisC_1 xbisC
+##  2 bisC_2 xbisC
+##  3 bisC_3 xbisC
+##  4 msrA_1 xmsrA
+##  5 msrA_2 xmsrA
+##  6 msrA_3 xmsrA
+##  7 msrB_1 xmsrB
+##  8 msrB_2 xmsrB
+##  9 msrB_3 xmsrB
+## 10 msrC_1 xmsrC
+## 11 msrC_3 xmsrC
+## 12 WT_1   xWT  
+## 13 WT_2   xWT  
+## 14 WT_3   xWT</code></pre>
+<p><strong>Important Note</strong></p>
+<p>You might have noticed that I had to re-order our <code>group</code> column. Due to how we design the contract matrix, it is imperative that we have the groups column be in alphabetical order (regardless of case-type). Before proceeding, make sure this is done through whatever is necessary.</p>
+<p>In this scenario, R sorts alphabetically by putting capital letters first, regardless of position in the alphabet. To get around this, we first made <code>WT</code> all lowercase, then sorted group to get <code>WT</code> last, and then replaced it again with capital letters to match the rest of our metadata.</p>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="prepare-the-t-test.html#cb181-1" tabindex="-1"></a>moderated_t_test_design <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(</span>
+<span id="cb181-2"><a href="prepare-the-t-test.html#cb181-2" tabindex="-1"></a>  <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">factor</span>(<span class="fu">str_replace_all</span>(<span class="fu">pull</span>(moderated_t_test_map, group),</span>
+<span id="cb181-3"><a href="prepare-the-t-test.html#cb181-3" tabindex="-1"></a>                               <span class="at">pattern =</span> <span class="st">&#39; &#39;</span>, <span class="at">replacement =</span> <span class="st">&#39;_&#39;</span>))</span>
+<span id="cb181-4"><a href="prepare-the-t-test.html#cb181-4" tabindex="-1"></a>)</span>
+<span id="cb181-5"><a href="prepare-the-t-test.html#cb181-5" tabindex="-1"></a></span>
+<span id="cb181-6"><a href="prepare-the-t-test.html#cb181-6" tabindex="-1"></a><span class="fu">colnames</span>(moderated_t_test_design) <span class="ot">&lt;-</span> <span class="fu">levels</span>(</span>
+<span id="cb181-7"><a href="prepare-the-t-test.html#cb181-7" tabindex="-1"></a>  <span class="fu">factor</span>(<span class="fu">str_replace_all</span>(<span class="fu">pull</span>(moderated_t_test_map, group),</span>
+<span id="cb181-8"><a href="prepare-the-t-test.html#cb181-8" tabindex="-1"></a>                         <span class="at">pattern =</span> <span class="st">&#39; &#39;</span>,</span>
+<span id="cb181-9"><a href="prepare-the-t-test.html#cb181-9" tabindex="-1"></a>                         <span class="at">replacement =</span> <span class="st">&#39;_&#39;</span>))</span>
+<span id="cb181-10"><a href="prepare-the-t-test.html#cb181-10" tabindex="-1"></a>)</span>
+<span id="cb181-11"><a href="prepare-the-t-test.html#cb181-11" tabindex="-1"></a></span>
+<span id="cb181-12"><a href="prepare-the-t-test.html#cb181-12" tabindex="-1"></a>moderated_t_test_design</span></code></pre></div>
+<pre><code>##    xbisC xmsrA xmsrB xmsrC xWT
+## 1      1     0     0     0   0
+## 2      1     0     0     0   0
+## 3      1     0     0     0   0
+## 4      0     1     0     0   0
+## 5      0     1     0     0   0
+## 6      0     1     0     0   0
+## 7      0     0     1     0   0
+## 8      0     0     1     0   0
+## 9      0     0     1     0   0
+## 10     0     0     0     1   0
+## 11     0     0     0     1   0
+## 12     0     0     0     0   1
+## 13     0     0     0     0   1
+## 14     0     0     0     0   1
+## attr(,&quot;assign&quot;)
+## [1] 1 1 1 1 1
+## attr(,&quot;contrasts&quot;)
+## attr(,&quot;contrasts&quot;)$`factor(str_replace_all(pull(moderated_t_test_map, group), pattern = &quot; &quot;, replacement = &quot;_&quot;))`
+## [1] &quot;contr.treatment&quot;</code></pre>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="prepare-the-t-test.html#cb183-1" tabindex="-1"></a>moderated_t_test_input <span class="ot">&lt;-</span> comparison_data <span class="sc">%&gt;%</span></span>
+<span id="cb183-2"><a href="prepare-the-t-test.html#cb183-2" tabindex="-1"></a>  <span class="fu">distinct</span>(Protein.Group, Run, PG.MaxLFQ) <span class="sc">%&gt;%</span></span>
+<span id="cb183-3"><a href="prepare-the-t-test.html#cb183-3" tabindex="-1"></a>  <span class="fu">drop_na</span>(PG.MaxLFQ) <span class="sc">%&gt;%</span></span>
+<span id="cb183-4"><a href="prepare-the-t-test.html#cb183-4" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Run, <span class="at">values_from =</span> PG.MaxLFQ) <span class="sc">%&gt;%</span></span>
+<span id="cb183-5"><a href="prepare-the-t-test.html#cb183-5" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="fu">as_name</span>(<span class="st">&#39;Protein.Group&#39;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb183-6"><a href="prepare-the-t-test.html#cb183-6" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
+<span id="cb183-7"><a href="prepare-the-t-test.html#cb183-7" tabindex="-1"></a></span>
+<span id="cb183-8"><a href="prepare-the-t-test.html#cb183-8" tabindex="-1"></a><span class="fu">head</span>(moderated_t_test_input)</span></code></pre></div>
+<pre><code>##          bisC_1   bisC_2   bisC_3   msrA_1   msrA_2   msrA_3   msrB_1   msrB_2
+## O52982 19.29890 17.79146 19.81199 18.63035 19.50781 18.33279 16.30386 16.35503
+## P0A6A0 24.41219 24.53014 24.53707 24.36473 24.23157 24.43114 24.42678 24.39503
+## P0A6A3 29.91380 29.84098 29.94195 29.84820 30.07785 29.93447 30.08902 30.07973
+## P0A6A6 22.75671 22.63532 22.82311 22.81776 22.54452 22.77207 22.37473 22.35439
+## P0A6A8 31.25234 28.73889 30.73127 30.36263 30.62161 30.98298 29.17690 29.95281
+## P0A6B4 23.07596 23.22823 23.19370 23.35303 23.43028 23.29200 23.26301 23.20609
+##          msrB_3   msrC_1   msrC_3     WT_1     WT_2     WT_3
+## O52982 16.74360 16.10502 16.47890 16.40265 16.56684 16.16356
+## P0A6A0 24.36218 24.51150 24.43618 24.42937 24.47056 24.43797
+## P0A6A3 29.99287 30.18962 30.08066 29.97738 29.96200 30.00461
+## P0A6A6 22.44795 22.44943 22.21876 22.62045 22.77727 22.69028
+## P0A6A8 30.70569 30.17817 31.10676 29.97937 29.66466 31.04504
+## P0A6B4 23.20123 23.19888 23.37827 23.41198 23.25366 23.20987</code></pre>
+<p>We now have a matrix where the each column is a protein group (the row names) and each column is that protein’s abundance in that specific sample.</p>
+</div>
+<div id="fit-the-t-test-regression-models" class="section level3 hasAnchor" number="4.2.4">
+<h3><span class="header-section-number">4.2.4</span> Fit the T-Test Regression Models<a href="prepare-the-t-test.html#fit-the-t-test-regression-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="prepare-the-t-test.html#cb185-1" tabindex="-1"></a><span class="co"># Fit the regression model</span></span>
+<span id="cb185-2"><a href="prepare-the-t-test.html#cb185-2" tabindex="-1"></a>moderated_t_test_fit <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(<span class="fu">lmFit</span>(moderated_t_test_input,</span>
+<span id="cb185-3"><a href="prepare-the-t-test.html#cb185-3" tabindex="-1"></a>                                               moderated_t_test_design))</span></code></pre></div>
+<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="prepare-the-t-test.html#cb186-1" tabindex="-1"></a><span class="co"># Create a matrix of differences</span></span>
+<span id="cb186-2"><a href="prepare-the-t-test.html#cb186-2" tabindex="-1"></a>names <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb186-3"><a href="prepare-the-t-test.html#cb186-3" tabindex="-1"></a>  <span class="st">&#39;x&#39;</span>, </span>
+<span id="cb186-4"><a href="prepare-the-t-test.html#cb186-4" tabindex="-1"></a>  <span class="fu">str_extract</span>(<span class="fu">unique</span>(<span class="fu">pull</span>(comparison_data, comparison)),</span>
+<span id="cb186-5"><a href="prepare-the-t-test.html#cb186-5" tabindex="-1"></a>              <span class="at">pattern =</span> <span class="st">&#39;.+(?=_vs_)&#39;</span>), </span>
+<span id="cb186-6"><a href="prepare-the-t-test.html#cb186-6" tabindex="-1"></a>  <span class="st">&#39;_vs_x&#39;</span>,</span>
+<span id="cb186-7"><a href="prepare-the-t-test.html#cb186-7" tabindex="-1"></a>  <span class="fu">str_extract</span>(<span class="fu">unique</span>(<span class="fu">pull</span>(comparison_data, comparison)),</span>
+<span id="cb186-8"><a href="prepare-the-t-test.html#cb186-8" tabindex="-1"></a>              <span class="at">pattern =</span> <span class="st">&#39;(?&lt;=_vs_).+&#39;</span>)</span>
+<span id="cb186-9"><a href="prepare-the-t-test.html#cb186-9" tabindex="-1"></a>  )</span>
+<span id="cb186-10"><a href="prepare-the-t-test.html#cb186-10" tabindex="-1"></a></span>
+<span id="cb186-11"><a href="prepare-the-t-test.html#cb186-11" tabindex="-1"></a>names</span></code></pre></div>
+<pre><code>## [1] &quot;xWT_vs_xbisC&quot; &quot;xWT_vs_xmsrA&quot; &quot;xWT_vs_xmsrB&quot; &quot;xWT_vs_xmsrC&quot;</code></pre>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="prepare-the-t-test.html#cb188-1" tabindex="-1"></a>comparisons <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb188-2"><a href="prepare-the-t-test.html#cb188-2" tabindex="-1"></a>  <span class="st">&#39;x&#39;</span>,</span>
+<span id="cb188-3"><a href="prepare-the-t-test.html#cb188-3" tabindex="-1"></a>  <span class="fu">str_extract</span>(<span class="fu">str_replace_all</span>(<span class="fu">unique</span>(<span class="fu">pull</span>(comparison_data, comparison)),</span>
+<span id="cb188-4"><a href="prepare-the-t-test.html#cb188-4" tabindex="-1"></a>                              <span class="at">pattern =</span> <span class="st">&#39; &#39;</span>, <span class="at">replacement =</span> <span class="st">&#39;_&#39;</span>),</span>
+<span id="cb188-5"><a href="prepare-the-t-test.html#cb188-5" tabindex="-1"></a>              <span class="at">pattern =</span> <span class="st">&#39;.+(?=_vs_)&#39;</span>),</span>
+<span id="cb188-6"><a href="prepare-the-t-test.html#cb188-6" tabindex="-1"></a>  <span class="st">&#39;-x&#39;</span>,</span>
+<span id="cb188-7"><a href="prepare-the-t-test.html#cb188-7" tabindex="-1"></a>  <span class="fu">str_extract</span>(<span class="fu">str_replace_all</span>(<span class="fu">unique</span>(<span class="fu">pull</span>(comparison_data, comparison)),</span>
+<span id="cb188-8"><a href="prepare-the-t-test.html#cb188-8" tabindex="-1"></a>                              <span class="at">pattern =</span> <span class="st">&#39; &#39;</span>, <span class="at">replacement =</span> <span class="st">&#39;_&#39;</span>),</span>
+<span id="cb188-9"><a href="prepare-the-t-test.html#cb188-9" tabindex="-1"></a>              <span class="at">pattern =</span> <span class="st">&#39;(?&lt;=_vs_).+&#39;</span>)</span>
+<span id="cb188-10"><a href="prepare-the-t-test.html#cb188-10" tabindex="-1"></a>)</span>
+<span id="cb188-11"><a href="prepare-the-t-test.html#cb188-11" tabindex="-1"></a></span>
+<span id="cb188-12"><a href="prepare-the-t-test.html#cb188-12" tabindex="-1"></a>comparisons</span></code></pre></div>
+<pre><code>## [1] &quot;xWT-xbisC&quot; &quot;xWT-xmsrA&quot; &quot;xWT-xmsrB&quot; &quot;xWT-xmsrC&quot;</code></pre>
+<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="prepare-the-t-test.html#cb190-1" tabindex="-1"></a>combinations <span class="ot">&lt;-</span> <span class="fu">map2</span>(<span class="at">.x =</span> names,</span>
+<span id="cb190-2"><a href="prepare-the-t-test.html#cb190-2" tabindex="-1"></a>                     <span class="at">.y =</span> comparisons,</span>
+<span id="cb190-3"><a href="prepare-the-t-test.html#cb190-3" tabindex="-1"></a>                     <span class="at">.f =</span> <span class="cf">function</span>(x, y) {</span>
+<span id="cb190-4"><a href="prepare-the-t-test.html#cb190-4" tabindex="-1"></a>                       <span class="fu">exprs</span>(<span class="sc">!!</span><span class="fu">as_name</span>(x) <span class="sc">:=</span> <span class="sc">!!</span>y)</span>
+<span id="cb190-5"><a href="prepare-the-t-test.html#cb190-5" tabindex="-1"></a>                     })</span>
+<span id="cb190-6"><a href="prepare-the-t-test.html#cb190-6" tabindex="-1"></a></span>
+<span id="cb190-7"><a href="prepare-the-t-test.html#cb190-7" tabindex="-1"></a>combinations</span></code></pre></div>
+<pre><code>## [[1]]
+## [[1]]$xWT_vs_xbisC
+## [1] &quot;xWT-xbisC&quot;
+## 
+## 
+## [[2]]
+## [[2]]$xWT_vs_xmsrA
+## [1] &quot;xWT-xmsrA&quot;
+## 
+## 
+## [[3]]
+## [[3]]$xWT_vs_xmsrB
+## [1] &quot;xWT-xmsrB&quot;
+## 
+## 
+## [[4]]
+## [[4]]$xWT_vs_xmsrC
+## [1] &quot;xWT-xmsrC&quot;</code></pre>
+<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="prepare-the-t-test.html#cb192-1" tabindex="-1"></a>contrast_matrix <span class="ot">&lt;-</span> <span class="fu">eval</span>(<span class="fu">expr</span>(<span class="fu">makeContrasts</span>(<span class="sc">!!!</span><span class="fu">unlist</span>(combinations), </span>
+<span id="cb192-2"><a href="prepare-the-t-test.html#cb192-2" tabindex="-1"></a>                                           <span class="at">levels =</span> moderated_t_test_design)))</span>
+<span id="cb192-3"><a href="prepare-the-t-test.html#cb192-3" tabindex="-1"></a></span>
+<span id="cb192-4"><a href="prepare-the-t-test.html#cb192-4" tabindex="-1"></a>contrast_matrix</span></code></pre></div>
+<pre><code>##        Contrasts
+## Levels  xWT_vs_xbisC xWT_vs_xmsrA xWT_vs_xmsrB xWT_vs_xmsrC
+##   xbisC           -1            0            0            0
+##   xmsrA            0           -1            0            0
+##   xmsrB            0            0           -1            0
+##   xmsrC            0            0            0           -1
+##   xWT              1            1            1            1</code></pre>
+<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="prepare-the-t-test.html#cb194-1" tabindex="-1"></a><span class="co"># Compute Contrasts From Regression Model</span></span>
+<span id="cb194-2"><a href="prepare-the-t-test.html#cb194-2" tabindex="-1"></a>moderated_t_test_fit2 <span class="ot">&lt;-</span> <span class="fu">contrasts.fit</span>(moderated_t_test_fit,</span>
+<span id="cb194-3"><a href="prepare-the-t-test.html#cb194-3" tabindex="-1"></a>                                       contrast_matrix)</span>
+<span id="cb194-4"><a href="prepare-the-t-test.html#cb194-4" tabindex="-1"></a></span>
+<span id="cb194-5"><a href="prepare-the-t-test.html#cb194-5" tabindex="-1"></a><span class="co"># Compute Empirical Bayes Statistics </span></span>
+<span id="cb194-6"><a href="prepare-the-t-test.html#cb194-6" tabindex="-1"></a>moderated_t_test_fit3 <span class="ot">&lt;-</span> <span class="fu">eBayes</span>(moderated_t_test_fit2)</span></code></pre></div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="background.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="create-a-t-test-results-table.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/lunr.js"></script>
+<script src="assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "lunr",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection",
+    "scroll_highlight": true
+  },
+  "toolbar": {
+    "position": "static"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

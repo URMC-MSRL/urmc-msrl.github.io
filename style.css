@@ -1,0 +1,91 @@
+/*--- LOGO ---*/
+.toc-logo {
+  width: 200px !important;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+}
+
+.toc-logo img {
+  max-width: 50%;
+  margin-bottom: 10px;
+}
+
+.summary > li:first-child {
+  height: auto !important; 
+}
+
+/* The next two rules make the horizontal line go straight across in top navbar */
+.summary > li:first-child {
+    height: 50px;
+    padding-top: 10px;
+    border-bottom: 4px solid #001E5F;
+}
+
+.book .book-summary ul.summary li.divider {
+    height: 0px;
+}
+
+/*____Code Chunks____*/
+.sourceCode pre {
+  margin: 0 !important; /* makes space above and below symmetrical*/
+}
+
+.sourceCode {
+  margin-bottom: 0.85em; /* adds same amount of margin as a <p> would */
+}
+
+ /*------------- Body and header text---------------- */
+.book.font-family-1 {
+  font-family: 'Inter', sans-serif;
+ }
+
+.title {
+  font-family: 'Inter', sans-serif;
+  color: #001E5F;
+  font-style: bold;
+  font-size: 3em !important;
+}
+
+h1 {
+  font-family: 'Inter', sans-serif;
+  color: #001E5F;
+  font-style: bold;
+}
+
+h2, h3 {
+  font-family: 'Inter', sans-serif;
+  color: #001E5F;
+}
+
+h4, h5 {
+  font-family: 'Inter', sans-serif;
+  color: #021BC3;
+}
+
+/*--- LOGO ---*/
+.toc-logo {
+  width: 200px !important;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+}
+
+.toc-logo img {
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+.summary > li:first-child {
+  height: auto !important; 
+}
+
+/*-----Body Links-------*/
+.book .book-body .page-wrapper .page-inner section.normal a {
+  color: #3f88ca;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal a:hover {
+color: #1f5386; /* darker color when hovering */
+text-decoration: none;
+}

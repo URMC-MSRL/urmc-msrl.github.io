@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>3.6 Prepare Data for Differential Expression Analysis (t-test) | Proteomic Data Analysis</title>
+  <meta name="description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="3.6 Prepare Data for Differential Expression Analysis (t-test) | Proteomic Data Analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/images/CART_logo_horizontal.png" />
+  <meta property="og:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="3.6 Prepare Data for Differential Expression Analysis (t-test) | Proteomic Data Analysis" />
+  
+  <meta name="twitter:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="twitter:image" content="/images/CART_logo_horizontal.png" />
+
+<meta name="author" content="Kyle Swovick" />
+
+
+<meta name="date" content="2026-07-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="images/ur_logo_favicon.png" type="image/x-icon" />
+<link rel="prev" href="filtering-dia-nn-results.html"/>
+<link rel="next" href="performing-differential-expression-statistics-t-test.html"/>
+<script src="assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="assets/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="assets/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="assets/plotly-binding-4.12.0/plotly.js"></script>
+<script src="assets/typedarray-0.1/typedarray.min.js"></script>
+<link href="assets/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="assets/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="assets/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="assets/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<script src="assets/core-js-2.5.3/shim.min.js"></script>
+<script src="assets/react-18.2.0/react.min.js"></script>
+<script src="assets/react-18.2.0/react-dom.min.js"></script>
+<script src="assets/reactwidget-2.0.0/react-tools.js"></script>
+<link href="assets/reactable-0.4.5/reactable.css" rel="stylesheet" />
+<script src="assets/reactable-binding-0.4.5/reactable.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Proteomic Data Analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="introduction-to-r-and-rstudio.html"><a href="introduction-to-r-and-rstudio.html"><i class="fa fa-check"></i><b>1</b> Introduction to R and RStudio</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="coding-basics.html"><a href="coding-basics.html"><i class="fa fa-check"></i><b>1.1</b> Coding Basics</a></li>
+<li class="chapter" data-level="1.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html"><i class="fa fa-check"></i><b>1.2</b> Creating New Objects in R</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#object-naming-conventions"><i class="fa fa-check"></i><b>1.2.1</b> Object Naming Conventions</a></li>
+<li class="chapter" data-level="1.2.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#working-with-object-assignments"><i class="fa fa-check"></i><b>1.2.2</b> Working with Object Assignments</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="calling-functions.html"><a href="calling-functions.html"><i class="fa fa-check"></i><b>1.3</b> Calling Functions</a></li>
+<li class="chapter" data-level="1.4" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html"><i class="fa fa-check"></i><b>1.4</b> Expanding R’s Functionality</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#installing-packages"><i class="fa fa-check"></i><b>1.4.1</b> Installing Packages</a></li>
+<li class="chapter" data-level="1.4.2" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#loading-packages-and-package-conflicts"><i class="fa fa-check"></i><b>1.4.2</b> Loading Packages and Package Conflicts</a></li>
+<li class="chapter" data-level="1.4.3" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#package-help-pages"><i class="fa fa-check"></i><b>1.4.3</b> Package Help Pages</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="working-with-data-in-r-and-rstudio.html"><a href="working-with-data-in-r-and-rstudio.html"><i class="fa fa-check"></i><b>2</b> Working with Data in R and RStudio</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="loading-data.html"><a href="loading-data.html"><i class="fa fa-check"></i><b>2.1</b> Loading Data</a></li>
+<li class="chapter" data-level="2.2" data-path="understanding-data-frames.html"><a href="understanding-data-frames.html"><i class="fa fa-check"></i><b>2.2</b> Understanding Data Frames</a></li>
+<li class="chapter" data-level="2.3" data-path="data-filtering.html"><a href="data-filtering.html"><i class="fa fa-check"></i><b>2.3</b> Data Filtering</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="data-filtering.html"><a href="data-filtering.html#comparison-operators"><i class="fa fa-check"></i><b>2.3.1</b> Comparison Operators</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html"><i class="fa fa-check"></i><b>2.4</b> Manipulating Data Frames (Data Transformation)</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#arrange-rows-with-arrange"><i class="fa fa-check"></i><b>2.4.1</b> Arrange Rows with <code>arrange()</code></a></li>
+<li class="chapter" data-level="2.4.2" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#select-columns-with-select"><i class="fa fa-check"></i><b>2.4.2</b> Select Columns with <code>select()</code></a></li>
+<li class="chapter" data-level="2.4.3" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#add-new-variables-with-mutate"><i class="fa fa-check"></i><b>2.4.3</b> Add New Variables with <code>mutate()</code></a></li>
+<li class="chapter" data-level="2.4.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#grouped-summaries-with-summarize"><i class="fa fa-check"></i><b>2.4.4</b> Grouped Summaries with <code>summarize()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="determining-data-quality-and-filtering.html"><a href="determining-data-quality-and-filtering.html"><i class="fa fa-check"></i><b>3</b> Determining Data Quality and Filtering</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="deciphering-dia-nn-search-result-files.html"><a href="deciphering-dia-nn-search-result-files.html"><i class="fa fa-check"></i><b>3.1</b> Deciphering DIA-NN Search Result Files</a></li>
+<li class="chapter" data-level="3.2" data-path="import-dia-nn-search-results.html"><a href="import-dia-nn-search-results.html"><i class="fa fa-check"></i><b>3.2</b> Import DIA-NN Search Results</a></li>
+<li class="chapter" data-level="3.3" data-path="evaluate-dia-nn-stats.html"><a href="evaluate-dia-nn-stats.html"><i class="fa fa-check"></i><b>3.3</b> Evaluate DIA-NN Stats</a></li>
+<li class="chapter" data-level="3.4" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html"><i class="fa fa-check"></i><b>3.4</b> Evaluate DIA-NN Results</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#explaining-the-dia-nn-report"><i class="fa fa-check"></i><b>3.4.1</b> Explaining the DIA-NN Report</a></li>
+<li class="chapter" data-level="3.4.2" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#evaluating-the-quality-of-the-runs"><i class="fa fa-check"></i><b>3.4.2</b> Evaluating the Quality of the Runs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="filtering-dia-nn-results.html"><a href="filtering-dia-nn-results.html"><i class="fa fa-check"></i><b>3.5</b> Filtering DIA-NN Results</a></li>
+<li class="chapter" data-level="3.6" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html"><i class="fa fa-check"></i><b>3.6</b> Prepare Data for Differential Expression Analysis (t-test)</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#filter-based-off-number-of-peptides-and-missing-values"><i class="fa fa-check"></i><b>3.6.1</b> Filter Based off Number of Peptides and Missing Values</a></li>
+<li class="chapter" data-level="3.6.2" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#impute-missing-values"><i class="fa fa-check"></i><b>3.6.2</b> Impute Missing Values</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="performing-differential-expression-statistics-t-test.html"><a href="performing-differential-expression-statistics-t-test.html"><i class="fa fa-check"></i><b>4</b> Performing Differential Expression Statistics (t-test)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>4.1</b> Background</a>
+<ul>
+<li class="chapter" data-level="" data-path="background.html"><a href="background.html#types-of-t-tests"><i class="fa fa-check"></i>Types of t-tests</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html"><i class="fa fa-check"></i><b>4.2</b> Prepare the t-test</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#create-the-comparison-table"><i class="fa fa-check"></i><b>4.2.1</b> Create the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#prepare-our-data-using-the-comparison-table"><i class="fa fa-check"></i><b>4.2.2</b> Prepare Our Data Using the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#define-the-t-test-input"><i class="fa fa-check"></i><b>4.2.3</b> Define the T-Test Input</a></li>
+<li class="chapter" data-level="4.2.4" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#fit-the-t-test-regression-models"><i class="fa fa-check"></i><b>4.2.4</b> Fit the T-Test Regression Models</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="create-a-t-test-results-table.html"><a href="create-a-t-test-results-table.html"><i class="fa fa-check"></i><b>4.3</b> Create a T-Test Results Table</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="visualizing-proteomic-data.html"><a href="visualizing-proteomic-data.html"><i class="fa fa-check"></i><b>5</b> Visualizing Proteomic Data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="prep-work.html"><a href="prep-work.html"><i class="fa fa-check"></i><b>5.1</b> Prep Work</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="prep-work.html"><a href="prep-work.html#make-a-common-plotting-theme"><i class="fa fa-check"></i><b>5.1.1</b> Make a Common Plotting Theme</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html"><i class="fa fa-check"></i><b>5.2</b> Replicate Comparisons</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#sample-heatmap-and-hierarchical-clustering"><i class="fa fa-check"></i><b>5.2.1</b> Sample Heatmap and Hierarchical Clustering</a></li>
+<li class="chapter" data-level="5.2.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#principal-component-analysis-pca"><i class="fa fa-check"></i><b>5.2.2</b> Principal Component Analysis (PCA)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="differential-expression.html"><a href="differential-expression.html"><i class="fa fa-check"></i><b>5.3</b> Differential Expression</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="differential-expression.html"><a href="differential-expression.html#protein-expression-heatmap"><i class="fa fa-check"></i><b>5.3.1</b> Protein Expression Heatmap</a></li>
+<li class="chapter" data-level="5.3.2" data-path="differential-expression.html"><a href="differential-expression.html#volcano-plot"><i class="fa fa-check"></i><b>5.3.2</b> Volcano Plot</a></li>
+<li class="chapter" data-level="5.3.3" data-path="differential-expression.html"><a href="differential-expression.html#gene-ontology"><i class="fa fa-check"></i><b>5.3.3</b> Gene Ontology</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Proteomic Data Analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="prepare-data-for-differential-expression-analysis-t-test" class="section level2 hasAnchor" number="3.6">
+<h2><span class="header-section-number">3.6</span> Prepare Data for Differential Expression Analysis (t-test)<a href="prepare-data-for-differential-expression-analysis-t-test.html#prepare-data-for-differential-expression-analysis-t-test" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>There are just a few more things we need to do before our data is ready for statistical analysis. More specifically, we need to:</p>
+<ol style="list-style-type: decimal">
+<li><p>Filter data based off total number of peptides and completeness</p></li>
+<li><p>Replace missing values through imputation</p></li>
+</ol>
+<div id="filter-based-off-number-of-peptides-and-missing-values" class="section level3 hasAnchor" number="3.6.1">
+<h3><span class="header-section-number">3.6.1</span> Filter Based off Number of Peptides and Missing Values<a href="prepare-data-for-differential-expression-analysis-t-test.html#filter-based-off-number-of-peptides-and-missing-values" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>When dealing with biological data, especially when dealing with gene knockouts, it would not be unexpected for some proteins to not be detected at all in some groups compared to others. This could be a result of a combination of two things:</p>
+<ol style="list-style-type: decimal">
+<li><p>The protein is either down-regulated or not even expressed in one group</p></li>
+<li><p>The level of the protein is beneath the limit of detection of our analytical method (in this case, the mass spectrometer)</p></li>
+</ol>
+<p>The main issue that arises from this is that some proteins will be detected in some samples/groups and not others. The samples the protein was not detected in will have a value like <code>0</code> of <code>NA</code> denoting that there is no value present for that protein in that sample. This is called a <strong>missing value</strong>. R does not handle <code>NA</code> very well (or any programming language for that matter), so when we try to perform any kind of statistical analysis on groups where <code>NA</code> is present, it either will not work or will look “funky”. There are several ways to circumvent this program, including:</p>
+<ul>
+<li><p>Removing any proteins with a missing value</p></li>
+<li><p>Replacing missing values with a constant number</p></li>
+<li><p><strong>Imputing</strong> the missing value using some mathematical formula</p></li>
+</ul>
+<p>The last method, imputation is usually how we go ahead with handling missing values. Specifically, a method where a random, low-value number is assigned to a missing value (at the protein level). More specifically:</p>
+<ol style="list-style-type: decimal">
+<li><p>The protein abundances are converted to log2 (to make the data normally distributed)</p></li>
+<li><p>A standard curve is made from the log2 protein abundances</p></li>
+<li><p>That standard curve is shifted by a standard deviation we determine (we default to 1.8 standard deviations)</p></li>
+<li><p>The new, shifted curve is “shrunk” to a width of the original curve that we determine (we default to 0.3 the width of the original curve)</p></li>
+<li><p>A random number from this new, shifted and shrunken curve is assigned to each missing value</p></li>
+</ol>
+<p>A key assumption to this method is that any missing values correspond to low-abundance proteins that fall below the limit of detection of our mass spectrometer.</p>
+<p>However, before we impute, we perform one more quality check to make sure what we’re imputing isn’t artificially creating biological phenomena. Specifically, we set thresholds for each protein so that each protein:</p>
+<ol style="list-style-type: decimal">
+<li><p>Has multiple peptides that map to that protein (no “one hit wonders”)</p></li>
+<li><p>There are multiple replicates within at least one group with multiple peptides</p></li>
+</ol>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-1" tabindex="-1"></a>diann_peptide_counts <span class="ot">&lt;-</span> diann_filter <span class="sc">%&gt;%</span> </span>
+<span id="cb158-2"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-2" tabindex="-1"></a>  <span class="fu">group_by</span>(Run, Protein.Group, Genes) <span class="sc">%&gt;%</span> </span>
+<span id="cb158-3"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_peptides =</span> <span class="fu">n</span>(),</span>
+<span id="cb158-4"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-4" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb158-5"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-5" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="at">y =</span> diann_filter <span class="sc">%&gt;%</span> </span>
+<span id="cb158-6"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-6" tabindex="-1"></a>              <span class="fu">distinct</span>(Run, group, Protein.Group, Genes, PG.MaxLFQ),</span>
+<span id="cb158-7"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-7" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;Run&#39;</span>, <span class="st">&#39;Protein.Group&#39;</span>, <span class="st">&#39;Genes&#39;</span>))</span>
+<span id="cb158-8"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-8" tabindex="-1"></a></span>
+<span id="cb158-9"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-9" tabindex="-1"></a>diann_peptide_filter_list <span class="ot">&lt;-</span> diann_peptide_counts <span class="sc">%&gt;%</span> </span>
+<span id="cb158-10"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-10" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb158-11"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-11" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>PG.MaxLFQ) <span class="sc">%&gt;%</span> </span>
+<span id="cb158-12"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-12" tabindex="-1"></a>  <span class="fu">filter</span>(n_peptides <span class="sc">&gt;=</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb158-13"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-13" tabindex="-1"></a>  <span class="fu">group_by</span>(group, Protein.Group, Genes) <span class="sc">%&gt;%</span> </span>
+<span id="cb158-14"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-14" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_reps =</span> <span class="fu">n</span>(),</span>
+<span id="cb158-15"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-15" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb158-16"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-16" tabindex="-1"></a>  <span class="fu">filter</span>(n_reps <span class="sc">&gt;=</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb158-17"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-17" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n_reps)</span>
+<span id="cb158-18"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-18" tabindex="-1"></a></span>
+<span id="cb158-19"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-19" tabindex="-1"></a>diann_peptide_filtered_data <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(<span class="at">x =</span> diann_peptide_counts,</span>
+<span id="cb158-20"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-20" tabindex="-1"></a>                                          <span class="at">y =</span> diann_peptide_filter_list,</span>
+<span id="cb158-21"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-21" tabindex="-1"></a>                                          <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;group&#39;</span>, <span class="st">&#39;Protein.Group&#39;</span>, <span class="st">&#39;Genes&#39;</span>))</span>
+<span id="cb158-22"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-22" tabindex="-1"></a></span>
+<span id="cb158-23"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb158-23" tabindex="-1"></a>diann_peptide_filtered_data</span></code></pre></div>
+<pre><code>## # A tibble: 41,702 × 6
+##    Run   Protein.Group Genes n_peptides group  PG.MaxLFQ
+##    &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;      &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;
+##  1 WT1   O52982        yfjS           2 WT        86634.
+##  2 WT1   P00350        gnd           43 WT    963161664 
+##  3 WT1   P00363        frdA          63 WT    650691136 
+##  4 WT1   P00370        gdhA          30 WT     40558036 
+##  5 WT1   P00393        ndh           38 WT    117415024 
+##  6 WT1   P00448        sodA          16 WT    464933792 
+##  7 WT1   P00452        nrdA          48 WT    132433664 
+##  8 WT1   P00490        malP          62 WT    201849968 
+##  9 WT1   P00509        aspC          37 WT    591304576 
+## 10 WT1   P00547        thrB           8 WT     36680244 
+## # ℹ 41,692 more rows</code></pre>
+<p>We now have a data frame with a new column containing the number of peptides that were identified for each protein in each sample. And was filtered so that every protein was quantified using 2 or more peptides. AND has at least one group with at least two replicates with that protein present. So now we are a little more confident in our dataset that the proteins that are still present were at least quantified in at least one of our groups.</p>
+<p>The last thing we need to do before imputing missing values is to make our data “wide”, which just means that instead of each run being on its own row, each row is now a single protein and each column is the protein abundance in that sample. At this point, we will now see <code>NA</code> if there is a missing value.</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb160-1" tabindex="-1"></a>diann_peptide_filtered_wide <span class="ot">&lt;-</span> diann_peptide_filtered_data <span class="sc">%&gt;%</span> </span>
+<span id="cb160-2"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb160-2" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(n_peptides, group)) <span class="sc">%&gt;%</span> </span>
+<span id="cb160-3"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb160-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PG.MaxLFQ =</span> <span class="fu">log2</span>(PG.MaxLFQ)) <span class="sc">%&gt;%</span> </span>
+<span id="cb160-4"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb160-4" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">&#39;Run&#39;</span>, </span>
+<span id="cb160-5"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb160-5" tabindex="-1"></a>              <span class="at">values_from =</span> <span class="st">&#39;PG.MaxLFQ&#39;</span>)</span>
+<span id="cb160-6"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb160-6" tabindex="-1"></a></span>
+<span id="cb160-7"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb160-7" tabindex="-1"></a>diann_peptide_filtered_wide</span></code></pre></div>
+<pre><code>## # A tibble: 3,039 × 16
+##    Protein.Group Genes   WT1   WT2   WT3 bisC1 bisC2 bisC3 msrA1 msrA2 msrA3
+##    &lt;chr&gt;         &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 O52982        yfjS   16.4  16.6  16.2  NA    NA    NA    NA    NA    NA  
+##  2 P00350        gnd    29.8  29.7  29.7  29.8  29.7  29.7  29.5  29.8  29.6
+##  3 P00363        frdA   29.3  29.2  29.2  29.2  29.1  29.1  29.1  29.3  29.2
+##  4 P00370        gdhA   25.3  25.3  25.3  25.3  25.4  25.3  25.1  25.1  25.2
+##  5 P00393        ndh    26.8  26.9  26.8  26.9  26.7  26.8  27.0  26.9  26.8
+##  6 P00448        sodA   28.8  29.7  29.7  30.1  29.7  29.5  28.8  28.3  29.4
+##  7 P00452        nrdA   27.0  27.0  26.9  27.1  27.0  27.0  26.7  26.8  26.9
+##  8 P00490        malP   27.6  27.6  27.6  27.8  27.7  27.8  27.5  27.6  27.6
+##  9 P00509        aspC   29.1  29.1  29.1  29.1  29.0  29.0  29.0  29.1  29.1
+## 10 P00547        thrB   25.1  25.1  25.2  24.6  24.3  24.3  24.9  25.4  24.8
+## # ℹ 3,029 more rows
+## # ℹ 5 more variables: msrB1 &lt;dbl&gt;, msrB2 &lt;dbl&gt;, msrB3 &lt;dbl&gt;, msrC1 &lt;dbl&gt;,
+## #   msrC3 &lt;dbl&gt;</code></pre>
+</div>
+<div id="impute-missing-values" class="section level3 hasAnchor" number="3.6.2">
+<h3><span class="header-section-number">3.6.2</span> Impute Missing Values<a href="prepare-data-for-differential-expression-analysis-t-test.html#impute-missing-values" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>With this wide data frame, we will now impute missing values.</p>
+<p>We have an internally created function to perform this imputation, it is as follows:</p>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb162-1" tabindex="-1"></a>imputed_values <span class="ot">&lt;-</span> <span class="fu">impute_normal</span>(<span class="at">df =</span> diann_peptide_filtered_wide <span class="sc">%&gt;%</span>  </span>
+<span id="cb162-2"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb162-2" tabindex="-1"></a>                                  <span class="fu">select</span>(<span class="sc">-</span>Genes) <span class="sc">%&gt;%</span> </span>
+<span id="cb162-3"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb162-3" tabindex="-1"></a>                                  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">&#39;Protein.Group&#39;</span>),</span>
+<span id="cb162-4"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb162-4" tabindex="-1"></a>                                <span class="at">width =</span> <span class="fl">0.3</span>,</span>
+<span id="cb162-5"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb162-5" tabindex="-1"></a>                                <span class="at">downshift =</span> <span class="fl">1.8</span>) </span>
+<span id="cb162-6"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb162-6" tabindex="-1"></a></span>
+<span id="cb162-7"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb162-7" tabindex="-1"></a><span class="fu">head</span>(imputed_values)</span></code></pre></div>
+<pre><code>##             WT1      WT2      WT3    bisC1    bisC2    bisC3    msrA1    msrA2
+## O52982 16.40265 16.56684 16.16356 19.29890 17.79146 19.81199 18.63035 19.50781
+## P00350 29.84320 29.72218 29.71794 29.76450 29.68652 29.66457 29.54552 29.75493
+## P00363 29.27740 29.16925 29.18393 29.21365 29.14412 29.08652 29.05862 29.29593
+## P00370 25.27348 25.34192 25.33344 25.28977 25.37404 25.31138 25.07095 25.09613
+## P00393 26.80704 26.93438 26.76167 26.86401 26.70054 26.77536 26.95400 26.86942
+## P00448 28.79245 29.66477 29.70755 30.06089 29.69404 29.52391 28.81062 28.30774
+##           msrA3    msrB1    msrB2    msrB3    msrC1    msrC3
+## O52982 18.33279 16.30386 16.35503 16.74360 16.10502 16.47890
+## P00350 29.63141 29.71828 29.76270 29.79364 29.56115 29.56833
+## P00363 29.17300 29.40907 29.53059 29.31457 29.52545 29.50605
+## P00370 25.21888 25.14552 25.12708 25.24340 24.82127 24.83112
+## P00393 26.78988 26.99481 26.94525 26.97308 26.99538 27.14346
+## P00448 29.44777 28.64801 28.70138 29.40933 27.83707 27.60847</code></pre>
+<p>Now there should be no missing values present in the data. The next thing we need to do is make this data back into a format more convenient to work with (<em>i.e.</em>, a tibble) and add back in particular columns (<em>e.g.</em> <code>Protein.Group</code> and <code>Genes</code>)</p>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-1" tabindex="-1"></a>imputed_data_wide_df <span class="ot">&lt;-</span> imputed_values <span class="sc">%&gt;%</span> </span>
+<span id="cb164-2"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-2" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb164-3"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-3" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">&#39;Protein.Group&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb164-4"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-4" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="at">y =</span> diann_peptide_filtered_wide <span class="sc">%&gt;%</span> </span>
+<span id="cb164-5"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-5" tabindex="-1"></a>              <span class="fu">select</span>(Genes)) <span class="sc">%&gt;%</span> </span>
+<span id="cb164-6"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-6" tabindex="-1"></a>  <span class="fu">relocate</span>(Genes, <span class="at">.after =</span> <span class="st">&#39;Protein.Group&#39;</span>)</span>
+<span id="cb164-7"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-7" tabindex="-1"></a></span>
+<span id="cb164-8"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-8" tabindex="-1"></a>imputed_data_df <span class="ot">&lt;-</span> imputed_data_wide_df <span class="sc">%&gt;%</span> </span>
+<span id="cb164-9"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-9" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">3</span><span class="sc">:</span><span class="fu">last_col</span>(),</span>
+<span id="cb164-10"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-10" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&#39;Run&#39;</span>,</span>
+<span id="cb164-11"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-11" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&#39;PG.MaxLFQ&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb164-12"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-12" tabindex="-1"></a>  <span class="fu">left_join</span>(diann_peptide_filtered_data <span class="sc">%&gt;%</span> </span>
+<span id="cb164-13"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-13" tabindex="-1"></a>              <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(PG.MaxLFQ, group)),</span>
+<span id="cb164-14"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-14" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;Run&#39;</span>, <span class="st">&#39;Protein.Group&#39;</span>, <span class="st">&#39;Genes&#39;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb164-15"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-15" tabindex="-1"></a>  <span class="fu">left_join</span>(diann_peptide_filtered_data <span class="sc">%&gt;%</span> </span>
+<span id="cb164-16"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-16" tabindex="-1"></a>              <span class="fu">distinct</span>(Run, group),</span>
+<span id="cb164-17"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-17" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">&#39;Run&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb164-18"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-18" tabindex="-1"></a>  <span class="fu">relocate</span>(Run, <span class="at">.before =</span> <span class="st">&#39;Protein.Group&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb164-19"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-19" tabindex="-1"></a>  <span class="fu">relocate</span>(group, <span class="at">.after =</span> <span class="st">&#39;Run&#39;</span>)</span>
+<span id="cb164-20"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-20" tabindex="-1"></a></span>
+<span id="cb164-21"><a href="prepare-data-for-differential-expression-analysis-t-test.html#cb164-21" tabindex="-1"></a>imputed_data_df</span></code></pre></div>
+<pre><code>## # A tibble: 42,546 × 6
+##    Run   group Protein.Group Genes PG.MaxLFQ n_peptides
+##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;     &lt;dbl&gt;      &lt;int&gt;
+##  1 WT1   WT    O52982        yfjS       16.4          2
+##  2 WT2   WT    O52982        yfjS       16.6          1
+##  3 WT3   WT    O52982        yfjS       16.2          2
+##  4 bisC1 bisC  O52982        yfjS       19.3         NA
+##  5 bisC2 bisC  O52982        yfjS       17.8         NA
+##  6 bisC3 bisC  O52982        yfjS       19.8         NA
+##  7 msrA1 msrA  O52982        yfjS       18.6         NA
+##  8 msrA2 msrA  O52982        yfjS       19.5         NA
+##  9 msrA3 msrA  O52982        yfjS       18.3         NA
+## 10 msrB1 msrB  O52982        yfjS       16.3          3
+## # ℹ 42,536 more rows</code></pre>
+<p>Now we have a long data frame that contains protein abundances with no missing values along with the number of peptide IDs (if applicable) for that protein. Now we can perform differential expression analysis using a t-test from <code>limma</code>, which we will be doing in the next chapter.</p>
+
+</div>
+</div>
+<!-- </div> -->
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="filtering-dia-nn-results.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="performing-differential-expression-statistics-t-test.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/lunr.js"></script>
+<script src="assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "lunr",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection",
+    "scroll_highlight": true
+  },
+  "toolbar": {
+    "position": "static"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

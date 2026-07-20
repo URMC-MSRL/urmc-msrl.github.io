@@ -1,0 +1,331 @@
+# Performing Differential Expression Statistics (t-test)
+
+In this chapter, you'll learn:
+
+- How to perform a moderated t-test on proteomic data to obtain:
+
+  - log2 fold changes in protein expression levels
+
+  - p-values and adjusted p-values for changes in protein expression levels
+
+**Pre-requisites:**
+
+- A basic understanding of R and RStudio
+
+- A set of of filtered proteomic data with no missing values
+
+- The following R packages installed from CRAN (recall, `install.packages("<package_name>"`):
+
+  - `tidyverse`
+
+  - `BiocManager`
+  
+  - `rlang`
+
+- The `limma` R package installed from Bioconductor (recall, `BiocManager::install("limma")`)
+
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(BiocManager)
+library(limma)
+library(rlang)
+```
+
+
+## Background
+
+In most global proteomic experiments, the main question being asked is: "what protein, or set of proteins, expression level(s) are changing in response to some kind of stimulus (*e.g.*, drug treatment, gene knockout, environmental stressor, etc.)?"
+
+To answer this question, we usually will collect samples (*e.g.*, cultured cells, tissue, plasma, etc.) from one group representing the background proteome (the control) and from another group that has been exposed to our stimulus of interest, measure the protein levels from both groups and compare those levels. However, biology is usually (actually, almost always) very complex and sources of variation can present themselves at every stage of the experiment. For this reason, most experiments will employ replication to try and "reduce" the variation. In other words, if we do not observe differences in protein expression levels **between different replicates of the same group,** but those same proteins have differences in expression **between the different groups**, we can be more confident the observed expression change is reflective of a true biological phenomenon.
+
+Luckily for us, statisticians have developed several methods to standardize the comparison between various groups, while controlling for inter-group variation; the one we'll be focusing on in this tutorial is called the **t-test**, specifically what's called a **moderated t-test**, as employed in the R package `limma` (<https://bioconductor.org/packages/release/bioc/html/limma.html>)
+
+### Types of t-tests {.unnumbered}
+
+Within the world of statistics, there a multiple *flavors* of t-tests, the "appropriate" one to use depending upon your data and experimental design. Those types are:
+
+- **Unpaired T-Test**: Also know as an *independent samples t-test*. Used when two completely separate and distinct groups are being compared (*e.g.*, 3 cell culture plates treated with DMSO and 3 different plates treated with a drug).
+
+  - Assesses whether the difference between the averages of these two groups is larger than you would expect by random chance.
+
+- **Paired T-Test**: Used when the observations in one group are directly linked to the observations in the other group (*e.g.*, measuring a patient's blood pressure before and after medication)
+
+  - A **paired t-test** is more "powerful" than an **unpaired t-test** and is useful when noise can vary dramatically between individuals (samples, replicates, subjects, etc.) as each individual acts as their own control.
+
+- **Moderated T-Test**: When performing thousands of t-tests simultaneously (like one would do in an omics experiment), some genes will accidentally display unusual variances simply by chance. Through use of an *empirical Bayes method*, this kind of t-test shrinks individual gene variances towards a pooled, global variance estimate.
+
+  - A **moderated t-test** prevents false positives and increases statistical power for experiments with low sample sizes.
+
+Refer to the table below for a table detailing the differences between these three t-tests:
+
+| Feature | Unpaired T-Test | Paired T-Test | Moderated T-Test |
+|--------|-------------------|---------------------|-------------------------|
+| Data Structure | Individual groups (*e.g.*, control vs. treated) | Dependent pairs (*e.g.*, same person before/after) | Thousands of simultaneous variables (*e.g.*, proteins) |
+| Question | Is the difference between the two group *means* significant? | Is the mean of the *differences* significantly different than 0? | Is the effect size (*e.g.*, fold-change in expression) for *each* variable significant? |
+| Variance Handling | Analyzes variance *between* the two independent groups | Analyzes the variances *within* each pair | Uses emperical Bayes to "squeeze" or *moderate* extreme variance estimates |
+| Optimal Use Case | A/B testing, clinical trials | Repeated measures and matched-pair experimental designs | Global proteomics, Bulk RNA-seq, gene expression microarrays |
+
+Now that we have a little understanding of what we're trying to accomplish, let's move ahead with preparing our data for a **moderated t-test**.
+
+## Prepare the t-test
+
+The first thing we need to do is design all the parameters for our t-test. In other words, declare what groups we want compared to each other. 
+
+```{r, echo=FALSE, message=FALSE}
+imputed_data_df <- read_tsv('imputed_ecoli_msr_data.tsv')
+```
+
+### Create the Comparison Table
+
+```{r}
+#Create a list of all conditions
+all_conditions <- imputed_data_df %>% 
+  distinct(group) %>% 
+  pull()
+
+all_conditions
+```
+
+We then need to create a data frame containing all possible condition comparisons
+
+```{r}
+all_combinations <- as_tibble(t(combn(all_conditions, m = 2)),
+                              .name_repair = ~ make.names(., unique = T)) %>% 
+  rename(V1 = X, V2 = X.1) %>% 
+  mutate(combinations = paste0(V1, '_vs_', V2)) %>% 
+  pivot_longer(cols = c(V1, V2),
+               names_to = 'name',
+               values_to = 'group') %>% 
+  select(-name) %>% 
+  group_by(group) %>% 
+  mutate(comparison = list(combinations)) %>% 
+  distinct(comparison, group)
+
+all_combinations
+
+all_combinations$comparison
+```
+
+This data frame is made up of two columns:
+
+- **group**: A string denoting the condition, or group (in this case, the *E. coli* genotype)
+
+- **comparison**: a list made up of all the possible group comparison for the specific group, with each group separated by "_vs_". 
+  
+  - For example, the `group` `WT` contains the following comparisons:
+  
+    - "WT_vs_bisC"
+    
+    - "WT_vs_msrA"
+    
+    - "WT_vs_msrB"
+    
+    - "WT_vs_msrC"
+    
+  - While the `group` `bisC` contains:
+  
+    - "WT_vs_bisC"
+    
+    - "bisC_vs_msrA"
+    
+    - "bisC_vs_msrB"
+    
+    - "bisC_vs_msrC"
+    
+  - And so on for the other 3 genotypes
+  
+### Prepare Our Data Using the Comparison Table
+
+We are nor almost ready to perform a t-test. 
+
+Recall that we will be using our data frame containing the imputed values. Before going any further, we need to add a new column to that data frame: a comlumn containing replicate number
+
+```{r}
+imputed_data_df <- imputed_data_df %>% 
+  mutate(rep = as.integer(str_sub(Run, -1)))
+```
+
+Now that our data frame is ready, we will move it around so it's in a form that is full ready for `limma`. 
+
+The main we need to do for this is to each each comparison we want to have evaluated. 
+
+```{r}
+ttest_data_prep <- imputed_data_df %>%
+  ungroup() %>%
+  distinct(Protein.Group, group, rep, PG.MaxLFQ) %>%
+  complete(nesting(group, rep),
+           Protein.Group) %>%
+  group_by(Protein.Group, group) %>%
+  mutate(n_detect = sum(!is.na(PG.MaxLFQ))) %>%
+  mutate(n_replicates = n()) %>%
+  ungroup() %>%
+  left_join(all_combinations, by = 'group') %>%
+  unnest(comparison) %>% 
+  unite(group:rep, col = 'Run', sep = '_', remove = FALSE)
+
+ttest_data_prep
+```
+
+Now we have a data frame with all our protein expression levels alnog with which group they belong to and what comparison we want to perform. 
+
+However, for the purposes of this tutorial, we really are only interested in WT compared to each of the knockouts, so we will get rid of all the other comparisons (*e.g.* "msrA_vs_msrB")
+
+```{r}
+ttest_data_prep_wt_comps <- ttest_data_prep %>% 
+  dplyr::filter(grepl('WT_vs', comparison))
+
+ttest_data_prep_wt_comps
+```
+
+Next, we need to count the number of replicates within each group.
+```{r}
+comparison_data <- ttest_data_prep_wt_comps %>% 
+  mutate(type = ifelse(group == str_extract(group, pattern = '(?<=_vs_).+'),
+                       'control', 
+                       'experimental')) %>% 
+  arrange(factor(Protein.Group, levels = unique(str_sort(Protein.Group,
+                                                         numeric = T)))) %>% 
+  select(-type)
+
+comparison_data
+```
+
+### Define the T-Test Input
+
+```{r}
+moderated_t_test_map <- comparison_data %>% 
+  distinct(Run, group) %>% 
+  mutate(group := paste0('x', group),
+         group = sub('WT', 'wt', group)) %>% 
+  arrange(Run) %>% 
+  arrange(group) %>% 
+  mutate(group = sub('wt', 'WT', group))
+
+moderated_t_test_map
+```
+
+**Important Note** 
+
+You might have noticed that I had to re-order our `group` column. Due to how we design the contract matrix, it is imperative that we have the groups column be in alphabetical order (regardless of case-type). Before proceeding, make sure this is done through whatever is necessary. 
+
+In this scenario, R sorts alphabetically by putting capital letters first, regardless of position in the alphabet. To get around this, we first made `WT` all lowercase, then sorted group to get `WT` last, and then replaced it again with capital letters to match the rest of our metadata. 
+
+```{r}
+moderated_t_test_design <- model.matrix(
+  ~ 0 + factor(str_replace_all(pull(moderated_t_test_map, group),
+                               pattern = ' ', replacement = '_'))
+)
+
+colnames(moderated_t_test_design) <- levels(
+  factor(str_replace_all(pull(moderated_t_test_map, group),
+                         pattern = ' ',
+                         replacement = '_'))
+)
+
+moderated_t_test_design
+```
+
+```{r}
+moderated_t_test_input <- comparison_data %>%
+  distinct(Protein.Group, Run, PG.MaxLFQ) %>%
+  drop_na(PG.MaxLFQ) %>%
+  pivot_wider(names_from = Run, values_from = PG.MaxLFQ) %>%
+  column_to_rownames(var = as_name('Protein.Group')) %>%
+  as.matrix()
+
+head(moderated_t_test_input)
+```
+
+We now have a matrix where the each column is a protein group (the row names) and each column is that protein's abundance in that specific sample. 
+
+### Fit the T-Test Regression Models
+
+```{r}
+# Fit the regression model
+moderated_t_test_fit <- suppressWarnings(lmFit(moderated_t_test_input,
+                                               moderated_t_test_design))
+```
+
+```{r}
+# Create a matrix of differences
+names <- paste0(
+  'x', 
+  str_extract(unique(pull(comparison_data, comparison)),
+              pattern = '.+(?=_vs_)'), 
+  '_vs_x',
+  str_extract(unique(pull(comparison_data, comparison)),
+              pattern = '(?<=_vs_).+')
+  )
+
+names
+```
+
+```{r}
+comparisons <- paste0(
+  'x',
+  str_extract(str_replace_all(unique(pull(comparison_data, comparison)),
+                              pattern = ' ', replacement = '_'),
+              pattern = '.+(?=_vs_)'),
+  '-x',
+  str_extract(str_replace_all(unique(pull(comparison_data, comparison)),
+                              pattern = ' ', replacement = '_'),
+              pattern = '(?<=_vs_).+')
+)
+
+comparisons
+```
+
+```{r}
+combinations <- map2(.x = names,
+                     .y = comparisons,
+                     .f = function(x, y) {
+                       exprs(!!as_name(x) := !!y)
+                     })
+
+combinations
+```
+
+```{r}
+contrast_matrix <- eval(expr(makeContrasts(!!!unlist(combinations), 
+                                           levels = moderated_t_test_design)))
+
+contrast_matrix
+```
+
+
+```{r}
+# Compute Contrasts From Regression Model
+moderated_t_test_fit2 <- contrasts.fit(moderated_t_test_fit,
+                                       contrast_matrix)
+
+# Compute Empirical Bayes Statistics 
+moderated_t_test_fit3 <- eBayes(moderated_t_test_fit2)
+```
+
+
+## Create a T-Test Results Table
+
+Now that we have performed our moderated t-test, we need to actually extract the data out of it and store it as a format easier to work with (something like a data frame). We can do this through `limma::topTable()`
+
+```{r}
+ttest_data <-  map_dfr(.x = names,
+                      .f = ~ topTable(moderated_t_test_fit3,
+                                      coef = .x,
+                                      number = Inf,
+                                      confint = T,
+                                      sort.by = 'p') %>% 
+                        rownames_to_column('Protein.Group') %>% 
+                        mutate(comparison = .x)) %>% 
+  mutate(comparison = str_replace_all(comparison, 
+                                      pattern = '^x|(?<=_vs_)x',
+                                      replacement = '')) %>% 
+  dplyr::rename(log2fc = 'logFC', 
+                ci_l = 'CI.L', 
+                ci_r = 'CI.R', 
+                pval = 'P.Value', 
+                adj_pval = 'adj.P.Val', 
+                mean_abundance = 'AveExpr') %>% 
+  dplyr::select(-c(t, B))
+```
+
+This data frame is now ready for any kind of differential expression analysis you would like to perform downstream of this, including visualization by volcano plots, heatmaps, and gene ontology enrichment, which we'll be doing in the next chapter.
