@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>5.1 Prep Work | Proteomic Data Analysis</title>
+  <meta name="description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="5.1 Prep Work | Proteomic Data Analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/images/CART_logo_horizontal.png" />
+  <meta property="og:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="5.1 Prep Work | Proteomic Data Analysis" />
+  
+  <meta name="twitter:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="twitter:image" content="/images/CART_logo_horizontal.png" />
+
+<meta name="author" content="Kyle Swovick" />
+
+
+<meta name="date" content="2026-07-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="images/ur_logo_favicon.png" type="image/x-icon" />
+<link rel="prev" href="visualizing-proteomic-data.html"/>
+<link rel="next" href="replicate-comparisons.html"/>
+<script src="assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="assets/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="assets/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="assets/plotly-binding-4.12.0/plotly.js"></script>
+<script src="assets/typedarray-0.1/typedarray.min.js"></script>
+<link href="assets/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="assets/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="assets/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="assets/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<script src="assets/core-js-2.5.3/shim.min.js"></script>
+<script src="assets/react-18.2.0/react.min.js"></script>
+<script src="assets/react-18.2.0/react-dom.min.js"></script>
+<script src="assets/reactwidget-2.0.0/react-tools.js"></script>
+<link href="assets/reactable-0.4.5/reactable.css" rel="stylesheet" />
+<script src="assets/reactable-binding-0.4.5/reactable.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Proteomic Data Analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="introduction-to-r-and-rstudio.html"><a href="introduction-to-r-and-rstudio.html"><i class="fa fa-check"></i><b>1</b> Introduction to R and RStudio</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="coding-basics.html"><a href="coding-basics.html"><i class="fa fa-check"></i><b>1.1</b> Coding Basics</a></li>
+<li class="chapter" data-level="1.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html"><i class="fa fa-check"></i><b>1.2</b> Creating New Objects in R</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#object-naming-conventions"><i class="fa fa-check"></i><b>1.2.1</b> Object Naming Conventions</a></li>
+<li class="chapter" data-level="1.2.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#working-with-object-assignments"><i class="fa fa-check"></i><b>1.2.2</b> Working with Object Assignments</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="calling-functions.html"><a href="calling-functions.html"><i class="fa fa-check"></i><b>1.3</b> Calling Functions</a></li>
+<li class="chapter" data-level="1.4" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html"><i class="fa fa-check"></i><b>1.4</b> Expanding R’s Functionality</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#installing-packages"><i class="fa fa-check"></i><b>1.4.1</b> Installing Packages</a></li>
+<li class="chapter" data-level="1.4.2" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#loading-packages-and-package-conflicts"><i class="fa fa-check"></i><b>1.4.2</b> Loading Packages and Package Conflicts</a></li>
+<li class="chapter" data-level="1.4.3" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#package-help-pages"><i class="fa fa-check"></i><b>1.4.3</b> Package Help Pages</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="working-with-data-in-r-and-rstudio.html"><a href="working-with-data-in-r-and-rstudio.html"><i class="fa fa-check"></i><b>2</b> Working with Data in R and RStudio</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="loading-data.html"><a href="loading-data.html"><i class="fa fa-check"></i><b>2.1</b> Loading Data</a></li>
+<li class="chapter" data-level="2.2" data-path="understanding-data-frames.html"><a href="understanding-data-frames.html"><i class="fa fa-check"></i><b>2.2</b> Understanding Data Frames</a></li>
+<li class="chapter" data-level="2.3" data-path="data-filtering.html"><a href="data-filtering.html"><i class="fa fa-check"></i><b>2.3</b> Data Filtering</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="data-filtering.html"><a href="data-filtering.html#comparison-operators"><i class="fa fa-check"></i><b>2.3.1</b> Comparison Operators</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html"><i class="fa fa-check"></i><b>2.4</b> Manipulating Data Frames (Data Transformation)</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#arrange-rows-with-arrange"><i class="fa fa-check"></i><b>2.4.1</b> Arrange Rows with <code>arrange()</code></a></li>
+<li class="chapter" data-level="2.4.2" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#select-columns-with-select"><i class="fa fa-check"></i><b>2.4.2</b> Select Columns with <code>select()</code></a></li>
+<li class="chapter" data-level="2.4.3" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#add-new-variables-with-mutate"><i class="fa fa-check"></i><b>2.4.3</b> Add New Variables with <code>mutate()</code></a></li>
+<li class="chapter" data-level="2.4.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#grouped-summaries-with-summarize"><i class="fa fa-check"></i><b>2.4.4</b> Grouped Summaries with <code>summarize()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="determining-data-quality-and-filtering.html"><a href="determining-data-quality-and-filtering.html"><i class="fa fa-check"></i><b>3</b> Determining Data Quality and Filtering</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="deciphering-dia-nn-search-result-files.html"><a href="deciphering-dia-nn-search-result-files.html"><i class="fa fa-check"></i><b>3.1</b> Deciphering DIA-NN Search Result Files</a></li>
+<li class="chapter" data-level="3.2" data-path="import-dia-nn-search-results.html"><a href="import-dia-nn-search-results.html"><i class="fa fa-check"></i><b>3.2</b> Import DIA-NN Search Results</a></li>
+<li class="chapter" data-level="3.3" data-path="evaluate-dia-nn-stats.html"><a href="evaluate-dia-nn-stats.html"><i class="fa fa-check"></i><b>3.3</b> Evaluate DIA-NN Stats</a></li>
+<li class="chapter" data-level="3.4" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html"><i class="fa fa-check"></i><b>3.4</b> Evaluate DIA-NN Results</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#explaining-the-dia-nn-report"><i class="fa fa-check"></i><b>3.4.1</b> Explaining the DIA-NN Report</a></li>
+<li class="chapter" data-level="3.4.2" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#evaluating-the-quality-of-the-runs"><i class="fa fa-check"></i><b>3.4.2</b> Evaluating the Quality of the Runs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="filtering-dia-nn-results.html"><a href="filtering-dia-nn-results.html"><i class="fa fa-check"></i><b>3.5</b> Filtering DIA-NN Results</a></li>
+<li class="chapter" data-level="3.6" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html"><i class="fa fa-check"></i><b>3.6</b> Prepare Data for Differential Expression Analysis (t-test)</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#filter-based-off-number-of-peptides-and-missing-values"><i class="fa fa-check"></i><b>3.6.1</b> Filter Based off Number of Peptides and Missing Values</a></li>
+<li class="chapter" data-level="3.6.2" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#impute-missing-values"><i class="fa fa-check"></i><b>3.6.2</b> Impute Missing Values</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="performing-differential-expression-statistics-t-test.html"><a href="performing-differential-expression-statistics-t-test.html"><i class="fa fa-check"></i><b>4</b> Performing Differential Expression Statistics (t-test)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>4.1</b> Background</a>
+<ul>
+<li class="chapter" data-level="" data-path="background.html"><a href="background.html#types-of-t-tests"><i class="fa fa-check"></i>Types of t-tests</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html"><i class="fa fa-check"></i><b>4.2</b> Prepare the t-test</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#create-the-comparison-table"><i class="fa fa-check"></i><b>4.2.1</b> Create the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#prepare-our-data-using-the-comparison-table"><i class="fa fa-check"></i><b>4.2.2</b> Prepare Our Data Using the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#define-the-t-test-input"><i class="fa fa-check"></i><b>4.2.3</b> Define the T-Test Input</a></li>
+<li class="chapter" data-level="4.2.4" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#fit-the-t-test-regression-models"><i class="fa fa-check"></i><b>4.2.4</b> Fit the T-Test Regression Models</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="create-a-t-test-results-table.html"><a href="create-a-t-test-results-table.html"><i class="fa fa-check"></i><b>4.3</b> Create a T-Test Results Table</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="visualizing-proteomic-data.html"><a href="visualizing-proteomic-data.html"><i class="fa fa-check"></i><b>5</b> Visualizing Proteomic Data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="prep-work.html"><a href="prep-work.html"><i class="fa fa-check"></i><b>5.1</b> Prep Work</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="prep-work.html"><a href="prep-work.html#make-a-common-plotting-theme"><i class="fa fa-check"></i><b>5.1.1</b> Make a Common Plotting Theme</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html"><i class="fa fa-check"></i><b>5.2</b> Replicate Comparisons</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#sample-heatmap-and-hierarchical-clustering"><i class="fa fa-check"></i><b>5.2.1</b> Sample Heatmap and Hierarchical Clustering</a></li>
+<li class="chapter" data-level="5.2.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#principal-component-analysis-pca"><i class="fa fa-check"></i><b>5.2.2</b> Principal Component Analysis (PCA)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="differential-expression.html"><a href="differential-expression.html"><i class="fa fa-check"></i><b>5.3</b> Differential Expression</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="differential-expression.html"><a href="differential-expression.html#protein-expression-heatmap"><i class="fa fa-check"></i><b>5.3.1</b> Protein Expression Heatmap</a></li>
+<li class="chapter" data-level="5.3.2" data-path="differential-expression.html"><a href="differential-expression.html#volcano-plot"><i class="fa fa-check"></i><b>5.3.2</b> Volcano Plot</a></li>
+<li class="chapter" data-level="5.3.3" data-path="differential-expression.html"><a href="differential-expression.html#gene-ontology"><i class="fa fa-check"></i><b>5.3.3</b> Gene Ontology</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Proteomic Data Analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="prep-work" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Prep Work<a href="prep-work.html#prep-work" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We will load in some data that may be useful at some point in our analysis:</p>
+<ol style="list-style-type: decimal">
+<li><p>Sample metadata: a description of each sample, including genotype, bio-replicate, acquisition settings, etc.</p></li>
+<li><p>Protein descriptions: a description of each protein identified in the experiment, including: protein name, gene name, amino acid sequence, etc.</p></li>
+</ol>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="prep-work.html#cb196-1" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&#39;ecoli_msr_metadata.txt&#39;</span>)</span></code></pre></div>
+<pre><code>## Rows: 15 Columns: 29
+## ── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+## Delimiter: &quot;\t&quot;
+## chr (16): File.Name, Run, Condition, Species, Strain, Digestion Method, Dige...
+## dbl (13): Run.Index, Replicate, Separation Column Length cm, HPLC Flow Rate ...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="prep-work.html#cb198-1" tabindex="-1"></a>protein_description <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&#39;report.protein_description.tsv&#39;</span>)</span></code></pre></div>
+<pre><code>## Rows: 4063 Columns: 5
+## ── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+## Delimiter: &quot;\t&quot;
+## chr (5): Protein.Id, Protein.Name, Gene, Description, Sequence
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="prep-work.html#cb200-1" tabindex="-1"></a>metadata</span></code></pre></div>
+<pre><code>## # A tibble: 15 × 29
+##    File.Name                  Run.Index Run   Condition Replicate Species Strain
+##    &lt;chr&gt;                          &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;         &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt; 
+##  1 &quot;Y:\\9- Teaching Material…         1 bisC1 BisC KO           1 E. coli W3110 
+##  2 &quot;Y:\\9- Teaching Material…         2 bisC2 BisC KO           2 E. coli W3110 
+##  3 &quot;Y:\\9- Teaching Material…         3 bisC3 BisC KO           3 E. coli W3110 
+##  4 &quot;Y:\\9- Teaching Material…         4 msrA1 MsrA KO           1 E. coli W3110 
+##  5 &quot;Y:\\9- Teaching Material…         5 msrA2 MsrA KO           2 E. coli W3110 
+##  6 &quot;Y:\\9- Teaching Material…         6 msrA3 MsrA KO           3 E. coli W3110 
+##  7 &quot;Y:\\9- Teaching Material…         7 msrB1 MsrB KO           1 E. coli W3110 
+##  8 &quot;Y:\\9- Teaching Material…         8 msrB2 MsrB KO           2 E. coli W3110 
+##  9 &quot;Y:\\9- Teaching Material…         9 msrB3 MsrB KO           3 E. coli W3110 
+## 10 &quot;Y:\\9- Teaching Material…        10 msrC1 MsrC KO           1 E. coli W3110 
+## 11 &quot;Y:\\9- Teaching Material…        11 msrC2 MsrC KO           2 E. coli W3110 
+## 12 &quot;Y:\\9- Teaching Material…        12 msrC3 MsrC KO           3 E. coli W3110 
+## 13 &quot;Y:\\9- Teaching Material…        13 WT1   WT                1 E. coli W3110 
+## 14 &quot;Y:\\9- Teaching Material…        14 WT2   WT                2 E. coli W3110 
+## 15 &quot;Y:\\9- Teaching Material…         0 WT3   WT                3 E. coli W3110 
+## # ℹ 22 more variables: `Digestion Method` &lt;chr&gt;, `Digestion Enzyme` &lt;chr&gt;,
+## #   Alkylation &lt;chr&gt;, `Mass Spectrometer` &lt;chr&gt;, HPLC &lt;chr&gt;,
+## #   `Separation Column Length cm` &lt;dbl&gt;, `HPLC Flow Rate nl_min` &lt;dbl&gt;,
+## #   `Acquisition Method` &lt;chr&gt;, `MS1 Start mz` &lt;dbl&gt;, `MS1 End mz` &lt;dbl&gt;,
+## #   `MS2 Start mz` &lt;dbl&gt;, `MS2 End mz` &lt;dbl&gt;, `MS2 Window Size Th` &lt;chr&gt;,
+## #   `MS2 Max Accumulation Time ms` &lt;dbl&gt;, `Search Engine` &lt;chr&gt;,
+## #   `Missed Cleavages` &lt;dbl&gt;, `Fixed Modifications` &lt;chr&gt;, …</code></pre>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="prep-work.html#cb202-1" tabindex="-1"></a>protein_description</span></code></pre></div>
+<pre><code>## # A tibble: 4,063 × 5
+##    Protein.Id Protein.Name     Gene  Description                        Sequence
+##    &lt;chr&gt;      &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;                              &lt;chr&gt;   
+##  1 A0A385XJ53 INSA9_ECOLI      insA9 Insertion element IS1 9 protein I… MASVSIS…
+##  2 A0A385XJK5 YPAB_ECOLI       ypaB  Protein YpaB                       MTLLQVH…
+##  3 A0A385XJN2 A0A385XJN2_ECOLI ygiA  Uncharacterized protein            MTTTGLR…
+##  4 A0A385XK32 A0A385XK32_ECOLI yzfA  Putative YjfA                      MHMVTYP…
+##  5 A5A613     YCIY_ECOLI       yciY  Uncharacterized protein YciY       MKRSRTE…
+##  6 A5A614     YCIZ_ECOLI       yciZ  UPF0509 protein YciZ               MSEFDAQ…
+##  7 A5A625     YIBV_ECOLI       yibV  Protein YibV                       MADKAIL…
+##  8 A5A627     TISB_ECOLI       tisB  Small toxic protein TisB           MNLVDIA…
+##  9 A8DYP9     LPFUR_ECOLI      uof   fur leader peptide                 MIRIISR…
+## 10 C1P5Z8     YKGR_ECOLI       ykgR  Uncharacterized membrane protein … MKENKVQ…
+## # ℹ 4,053 more rows</code></pre>
+<p>We will also make a new data frame from our imputed data frame that we will be using across all of our replicate comparison plots. This will already be in a format more amenable to plotting so we won’t need to perform all the same transformations multiple times before drawing every plot.</p>
+<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="prep-work.html#cb204-1" tabindex="-1"></a>sample_level <span class="ot">&lt;-</span> ttest_data_prep_wt_comps <span class="sc">%&gt;%</span> </span>
+<span id="cb204-2"><a href="prep-work.html#cb204-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(group, rep, n_detect, n_replicates, comparison)) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-3"><a href="prep-work.html#cb204-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Run =</span> <span class="fu">gsub</span>(<span class="st">&#39;_&#39;</span>, <span class="st">&#39;&#39;</span>, Run)) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-4"><a href="prep-work.html#cb204-4" tabindex="-1"></a>  <span class="fu">left_join</span>(metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb204-5"><a href="prep-work.html#cb204-5" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">select</span>(Run, Condition, Replicate),</span>
+<span id="cb204-6"><a href="prep-work.html#cb204-6" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">&#39;Run&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-7"><a href="prep-work.html#cb204-7" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="st">&#39;sample&#39;</span>, <span class="st">&#39;protein_group&#39;</span>, <span class="st">&#39;log2_abundance&#39;</span>, <span class="st">&#39;group&#39;</span>, <span class="st">&#39;rep&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-8"><a href="prep-work.html#cb204-8" tabindex="-1"></a>  <span class="fu">group_by</span>(protein_group, group) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-9"><a href="prep-work.html#cb204-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mean_log2_abundance =</span> <span class="fu">mean</span>(log2_abundance)) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-10"><a href="prep-work.html#cb204-10" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">abundance =</span> <span class="dv">2</span><span class="sc">^</span>log2_abundance, <span class="at">.after =</span> log2_abundance) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-11"><a href="prep-work.html#cb204-11" tabindex="-1"></a>  <span class="fu">left_join</span>(imputed_data_wide_df <span class="sc">%&gt;%</span> </span>
+<span id="cb204-12"><a href="prep-work.html#cb204-12" tabindex="-1"></a>              <span class="fu">distinct</span>(Protein.Group, Genes) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-13"><a href="prep-work.html#cb204-13" tabindex="-1"></a>              <span class="fu">set_names</span>(<span class="st">&#39;protein_group&#39;</span>, <span class="st">&#39;gene_name&#39;</span>),</span>
+<span id="cb204-14"><a href="prep-work.html#cb204-14" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">&#39;protein_group&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-15"><a href="prep-work.html#cb204-15" tabindex="-1"></a>  <span class="fu">left_join</span>(protein_description <span class="sc">%&gt;%</span> </span>
+<span id="cb204-16"><a href="prep-work.html#cb204-16" tabindex="-1"></a>              <span class="fu">distinct</span>(Gene, Description) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-17"><a href="prep-work.html#cb204-17" tabindex="-1"></a>              <span class="fu">set_names</span>(<span class="st">&#39;gene_name&#39;</span>, <span class="st">&#39;protein_name&#39;</span>),</span>
+<span id="cb204-18"><a href="prep-work.html#cb204-18" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">&#39;gene_name&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-19"><a href="prep-work.html#cb204-19" tabindex="-1"></a>  <span class="fu">relocate</span>(gene_name<span class="sc">:</span>protein_name, <span class="at">.after =</span> protein_group) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-20"><a href="prep-work.html#cb204-20" tabindex="-1"></a>  <span class="fu">relocate</span>(protein_group<span class="sc">:</span>protein_name, <span class="at">.before =</span> <span class="st">&#39;sample&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-21"><a href="prep-work.html#cb204-21" tabindex="-1"></a>  <span class="fu">relocate</span>(group<span class="sc">:</span>rep, <span class="at">.after =</span> <span class="st">&#39;sample&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb204-22"><a href="prep-work.html#cb204-22" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
+<p>We will also make a new data frame from out t-test results that we will be using across all of our differential expression plots for similar reasons as above.</p>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="prep-work.html#cb205-1" tabindex="-1"></a>diff_expression_level <span class="ot">&lt;-</span> ttest_data <span class="sc">%&gt;%</span> </span>
+<span id="cb205-2"><a href="prep-work.html#cb205-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">protein_group =</span> <span class="st">&#39;Protein.Group&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb205-3"><a href="prep-work.html#cb205-3" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="at">y =</span> sample_level <span class="sc">%&gt;%</span> </span>
+<span id="cb205-4"><a href="prep-work.html#cb205-4" tabindex="-1"></a>              <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb205-5"><a href="prep-work.html#cb205-5" tabindex="-1"></a>              <span class="fu">distinct</span>(protein_group, gene_name, protein_name),</span>
+<span id="cb205-6"><a href="prep-work.html#cb205-6" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">&#39;protein_group&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb205-7"><a href="prep-work.html#cb205-7" tabindex="-1"></a>  <span class="fu">relocate</span>(gene_name<span class="sc">:</span>protein_name, <span class="at">.after =</span> protein_group) <span class="sc">%&gt;%</span> </span>
+<span id="cb205-8"><a href="prep-work.html#cb205-8" tabindex="-1"></a>  <span class="fu">relocate</span>(comparison, <span class="at">.after =</span> protein_name) <span class="sc">%&gt;%</span> </span>
+<span id="cb205-9"><a href="prep-work.html#cb205-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comparison =</span> <span class="fu">sub</span>(<span class="st">&#39;_vs_&#39;</span>, <span class="st">&#39;/&#39;</span>, comparison))</span></code></pre></div>
+<div id="make-a-common-plotting-theme" class="section level3 hasAnchor" number="5.1.1">
+<h3><span class="header-section-number">5.1.1</span> Make a Common Plotting Theme<a href="prep-work.html#make-a-common-plotting-theme" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Lastly, we will make a common theme for our plots and saving them to a new object called <code>plot_theme</code>. We can then apply these themes to all of our plots by simply calling <code>plot_theme</code> instead of typing all these theming components for each plot.</p>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="prep-work.html#cb206-1" tabindex="-1"></a>plot_theme <span class="ot">&lt;-</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb206-2"><a href="prep-work.html#cb206-2" tabindex="-1"></a>   <span class="fu">theme</span>(<span class="at">plot.title   =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">20</span>),</span>
+<span id="cb206-3"><a href="prep-work.html#cb206-3" tabindex="-1"></a>         <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb206-4"><a href="prep-work.html#cb206-4" tabindex="-1"></a>         <span class="at">axis.text.y  =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb206-5"><a href="prep-work.html#cb206-5" tabindex="-1"></a>         <span class="at">axis.text.x  =</span> <span class="fu">element_text</span>(<span class="at">size  =</span> <span class="dv">12</span>,</span>
+<span id="cb206-6"><a href="prep-work.html#cb206-6" tabindex="-1"></a>                                     <span class="at">angle =</span> <span class="dv">75</span>,</span>
+<span id="cb206-7"><a href="prep-work.html#cb206-7" tabindex="-1"></a>                                     <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb206-8"><a href="prep-work.html#cb206-8" tabindex="-1"></a>         <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb206-9"><a href="prep-work.html#cb206-9" tabindex="-1"></a>         <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb206-10"><a href="prep-work.html#cb206-10" tabindex="-1"></a>         <span class="at">legend.text  =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>))</span></code></pre></div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="visualizing-proteomic-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="replicate-comparisons.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/lunr.js"></script>
+<script src="assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "lunr",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection",
+    "scroll_highlight": true
+  },
+  "toolbar": {
+    "position": "static"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

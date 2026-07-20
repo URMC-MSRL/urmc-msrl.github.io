@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>5.2 Replicate Comparisons | Proteomic Data Analysis</title>
+  <meta name="description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="5.2 Replicate Comparisons | Proteomic Data Analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/images/CART_logo_horizontal.png" />
+  <meta property="og:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="5.2 Replicate Comparisons | Proteomic Data Analysis" />
+  
+  <meta name="twitter:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="twitter:image" content="/images/CART_logo_horizontal.png" />
+
+<meta name="author" content="Kyle Swovick" />
+
+
+<meta name="date" content="2026-07-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="images/ur_logo_favicon.png" type="image/x-icon" />
+<link rel="prev" href="prep-work.html"/>
+<link rel="next" href="differential-expression.html"/>
+<script src="assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="assets/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="assets/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="assets/plotly-binding-4.12.0/plotly.js"></script>
+<script src="assets/typedarray-0.1/typedarray.min.js"></script>
+<link href="assets/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="assets/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="assets/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="assets/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<script src="assets/core-js-2.5.3/shim.min.js"></script>
+<script src="assets/react-18.2.0/react.min.js"></script>
+<script src="assets/react-18.2.0/react-dom.min.js"></script>
+<script src="assets/reactwidget-2.0.0/react-tools.js"></script>
+<link href="assets/reactable-0.4.5/reactable.css" rel="stylesheet" />
+<script src="assets/reactable-binding-0.4.5/reactable.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Proteomic Data Analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="introduction-to-r-and-rstudio.html"><a href="introduction-to-r-and-rstudio.html"><i class="fa fa-check"></i><b>1</b> Introduction to R and RStudio</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="coding-basics.html"><a href="coding-basics.html"><i class="fa fa-check"></i><b>1.1</b> Coding Basics</a></li>
+<li class="chapter" data-level="1.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html"><i class="fa fa-check"></i><b>1.2</b> Creating New Objects in R</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#object-naming-conventions"><i class="fa fa-check"></i><b>1.2.1</b> Object Naming Conventions</a></li>
+<li class="chapter" data-level="1.2.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#working-with-object-assignments"><i class="fa fa-check"></i><b>1.2.2</b> Working with Object Assignments</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="calling-functions.html"><a href="calling-functions.html"><i class="fa fa-check"></i><b>1.3</b> Calling Functions</a></li>
+<li class="chapter" data-level="1.4" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html"><i class="fa fa-check"></i><b>1.4</b> Expanding R’s Functionality</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#installing-packages"><i class="fa fa-check"></i><b>1.4.1</b> Installing Packages</a></li>
+<li class="chapter" data-level="1.4.2" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#loading-packages-and-package-conflicts"><i class="fa fa-check"></i><b>1.4.2</b> Loading Packages and Package Conflicts</a></li>
+<li class="chapter" data-level="1.4.3" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#package-help-pages"><i class="fa fa-check"></i><b>1.4.3</b> Package Help Pages</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="working-with-data-in-r-and-rstudio.html"><a href="working-with-data-in-r-and-rstudio.html"><i class="fa fa-check"></i><b>2</b> Working with Data in R and RStudio</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="loading-data.html"><a href="loading-data.html"><i class="fa fa-check"></i><b>2.1</b> Loading Data</a></li>
+<li class="chapter" data-level="2.2" data-path="understanding-data-frames.html"><a href="understanding-data-frames.html"><i class="fa fa-check"></i><b>2.2</b> Understanding Data Frames</a></li>
+<li class="chapter" data-level="2.3" data-path="data-filtering.html"><a href="data-filtering.html"><i class="fa fa-check"></i><b>2.3</b> Data Filtering</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="data-filtering.html"><a href="data-filtering.html#comparison-operators"><i class="fa fa-check"></i><b>2.3.1</b> Comparison Operators</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html"><i class="fa fa-check"></i><b>2.4</b> Manipulating Data Frames (Data Transformation)</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#arrange-rows-with-arrange"><i class="fa fa-check"></i><b>2.4.1</b> Arrange Rows with <code>arrange()</code></a></li>
+<li class="chapter" data-level="2.4.2" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#select-columns-with-select"><i class="fa fa-check"></i><b>2.4.2</b> Select Columns with <code>select()</code></a></li>
+<li class="chapter" data-level="2.4.3" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#add-new-variables-with-mutate"><i class="fa fa-check"></i><b>2.4.3</b> Add New Variables with <code>mutate()</code></a></li>
+<li class="chapter" data-level="2.4.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#grouped-summaries-with-summarize"><i class="fa fa-check"></i><b>2.4.4</b> Grouped Summaries with <code>summarize()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="determining-data-quality-and-filtering.html"><a href="determining-data-quality-and-filtering.html"><i class="fa fa-check"></i><b>3</b> Determining Data Quality and Filtering</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="deciphering-dia-nn-search-result-files.html"><a href="deciphering-dia-nn-search-result-files.html"><i class="fa fa-check"></i><b>3.1</b> Deciphering DIA-NN Search Result Files</a></li>
+<li class="chapter" data-level="3.2" data-path="import-dia-nn-search-results.html"><a href="import-dia-nn-search-results.html"><i class="fa fa-check"></i><b>3.2</b> Import DIA-NN Search Results</a></li>
+<li class="chapter" data-level="3.3" data-path="evaluate-dia-nn-stats.html"><a href="evaluate-dia-nn-stats.html"><i class="fa fa-check"></i><b>3.3</b> Evaluate DIA-NN Stats</a></li>
+<li class="chapter" data-level="3.4" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html"><i class="fa fa-check"></i><b>3.4</b> Evaluate DIA-NN Results</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#explaining-the-dia-nn-report"><i class="fa fa-check"></i><b>3.4.1</b> Explaining the DIA-NN Report</a></li>
+<li class="chapter" data-level="3.4.2" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#evaluating-the-quality-of-the-runs"><i class="fa fa-check"></i><b>3.4.2</b> Evaluating the Quality of the Runs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="filtering-dia-nn-results.html"><a href="filtering-dia-nn-results.html"><i class="fa fa-check"></i><b>3.5</b> Filtering DIA-NN Results</a></li>
+<li class="chapter" data-level="3.6" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html"><i class="fa fa-check"></i><b>3.6</b> Prepare Data for Differential Expression Analysis (t-test)</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#filter-based-off-number-of-peptides-and-missing-values"><i class="fa fa-check"></i><b>3.6.1</b> Filter Based off Number of Peptides and Missing Values</a></li>
+<li class="chapter" data-level="3.6.2" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#impute-missing-values"><i class="fa fa-check"></i><b>3.6.2</b> Impute Missing Values</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="performing-differential-expression-statistics-t-test.html"><a href="performing-differential-expression-statistics-t-test.html"><i class="fa fa-check"></i><b>4</b> Performing Differential Expression Statistics (t-test)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>4.1</b> Background</a>
+<ul>
+<li class="chapter" data-level="" data-path="background.html"><a href="background.html#types-of-t-tests"><i class="fa fa-check"></i>Types of t-tests</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html"><i class="fa fa-check"></i><b>4.2</b> Prepare the t-test</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#create-the-comparison-table"><i class="fa fa-check"></i><b>4.2.1</b> Create the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#prepare-our-data-using-the-comparison-table"><i class="fa fa-check"></i><b>4.2.2</b> Prepare Our Data Using the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#define-the-t-test-input"><i class="fa fa-check"></i><b>4.2.3</b> Define the T-Test Input</a></li>
+<li class="chapter" data-level="4.2.4" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#fit-the-t-test-regression-models"><i class="fa fa-check"></i><b>4.2.4</b> Fit the T-Test Regression Models</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="create-a-t-test-results-table.html"><a href="create-a-t-test-results-table.html"><i class="fa fa-check"></i><b>4.3</b> Create a T-Test Results Table</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="visualizing-proteomic-data.html"><a href="visualizing-proteomic-data.html"><i class="fa fa-check"></i><b>5</b> Visualizing Proteomic Data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="prep-work.html"><a href="prep-work.html"><i class="fa fa-check"></i><b>5.1</b> Prep Work</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="prep-work.html"><a href="prep-work.html#make-a-common-plotting-theme"><i class="fa fa-check"></i><b>5.1.1</b> Make a Common Plotting Theme</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html"><i class="fa fa-check"></i><b>5.2</b> Replicate Comparisons</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#sample-heatmap-and-hierarchical-clustering"><i class="fa fa-check"></i><b>5.2.1</b> Sample Heatmap and Hierarchical Clustering</a></li>
+<li class="chapter" data-level="5.2.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#principal-component-analysis-pca"><i class="fa fa-check"></i><b>5.2.2</b> Principal Component Analysis (PCA)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="differential-expression.html"><a href="differential-expression.html"><i class="fa fa-check"></i><b>5.3</b> Differential Expression</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="differential-expression.html"><a href="differential-expression.html#protein-expression-heatmap"><i class="fa fa-check"></i><b>5.3.1</b> Protein Expression Heatmap</a></li>
+<li class="chapter" data-level="5.3.2" data-path="differential-expression.html"><a href="differential-expression.html#volcano-plot"><i class="fa fa-check"></i><b>5.3.2</b> Volcano Plot</a></li>
+<li class="chapter" data-level="5.3.3" data-path="differential-expression.html"><a href="differential-expression.html#gene-ontology"><i class="fa fa-check"></i><b>5.3.3</b> Gene Ontology</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Proteomic Data Analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="replicate-comparisons" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Replicate Comparisons<a href="replicate-comparisons.html#replicate-comparisons" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In order to properly ensure our experimental design was well thought out, we should evaluate how all of our samples compare to each other. We will be doing this several different ways:</p>
+<ul>
+<li><p>Clustering: Cluster all our samples according to the Spearman correlation of our overall protein abundances and draw a heatmap of those correlations.</p>
+<ul>
+<li>Ideally, all of the replicates from the same group will be more clustered with the other reps from the same group than with any samples from other groups</li>
+</ul></li>
+<li><p>Principal Component Analysis (PCA): A <strong>dimensionality reduction technique</strong> that can be used for extracting information from high-dimensional space (<em>i.e.</em>, a biological experiment where variation can stem from a large number of variables) by projecting it into a lower-dimensional sub-space (<em>i.e.</em> a very few number of <strong>components</strong> that can readily be quantified and, ideally, subsequently identified). Dimensions are nothing but <strong>features</strong> that represent the data.</p>
+<ul>
+<li><p>Ideally, all of the replicates from the same group will be more clustered with the other reps from the same group than with any samples from other groups</p>
+<ul>
+<li>Indicates that the major sources of variation are coming from the biological groups than from any source of variation that was applied across all the samples (<em>e.g.</em>, sample prep or data acquisition)</li>
+</ul></li>
+</ul></li>
+</ul>
+<div id="sample-heatmap-and-hierarchical-clustering" class="section level3 hasAnchor" number="5.2.1">
+<h3><span class="header-section-number">5.2.1</span> Sample Heatmap and Hierarchical Clustering<a href="replicate-comparisons.html#sample-heatmap-and-hierarchical-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="prepare-the-heatmap-annotation" class="section level4 hasAnchor" number="5.2.1.1">
+<h4><span class="header-section-number">5.2.1.1</span> Prepare the Heatmap Annotation<a href="replicate-comparisons.html#prepare-the-heatmap-annotation" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="set-the-heatmap-annotation-scheme" class="section level5 unnumbered hasAnchor">
+<h5>Set the Heatmap Annotation Scheme<a href="replicate-comparisons.html#set-the-heatmap-annotation-scheme" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<p>To properly connect the heatmap to our samples and groups, we need to get just a list of each sample and the group it belongs too (akin to the metadata).</p>
+<p>It also needs to samples as row names (Currently is sample name in each row with the column name ‘sample’).</p>
+<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="replicate-comparisons.html#cb207-1" tabindex="-1"></a>smpl_htmp_annotation <span class="ot">&lt;-</span> sample_level <span class="sc">%&gt;%</span> </span>
+<span id="cb207-2"><a href="replicate-comparisons.html#cb207-2" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb207-3"><a href="replicate-comparisons.html#cb207-3" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">Condition =</span> <span class="st">&#39;group&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb207-4"><a href="replicate-comparisons.html#cb207-4" tabindex="-1"></a>  <span class="fu">distinct</span>(sample,</span>
+<span id="cb207-5"><a href="replicate-comparisons.html#cb207-5" tabindex="-1"></a>           Condition) <span class="sc">%&gt;%</span></span>
+<span id="cb207-6"><a href="replicate-comparisons.html#cb207-6" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">&#39;sample&#39;</span>) </span>
+<span id="cb207-7"><a href="replicate-comparisons.html#cb207-7" tabindex="-1"></a></span>
+<span id="cb207-8"><a href="replicate-comparisons.html#cb207-8" tabindex="-1"></a>smpl_htmp_annotation</span></code></pre></div>
+<pre><code>##       Condition
+## bisC1   BisC KO
+## bisC2   BisC KO
+## bisC3   BisC KO
+## msrA1   MsrA KO
+## msrA2   MsrA KO
+## msrA3   MsrA KO
+## msrB1   MsrB KO
+## msrB2   MsrB KO
+## msrB3   MsrB KO
+## msrC1   MsrC KO
+## msrC3   MsrC KO
+## WT1          WT
+## WT2          WT
+## WT3          WT</code></pre>
+</div>
+<div id="define-the-heatmap-variables" class="section level5 hasAnchor" number="5.2.1.1.1">
+<h5><span class="header-section-number">5.2.1.1.1</span> {-} Define the Heatmap Variables<a href="replicate-comparisons.html#define-the-heatmap-variables" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="replicate-comparisons.html#cb209-1" tabindex="-1"></a>smpl_htmp_conditions <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">pull</span>(smpl_htmp_annotation, Condition))</span>
+<span id="cb209-2"><a href="replicate-comparisons.html#cb209-2" tabindex="-1"></a></span>
+<span id="cb209-3"><a href="replicate-comparisons.html#cb209-3" tabindex="-1"></a>smpl_htmp_conditions</span></code></pre></div>
+<pre><code>## [1] &quot;BisC KO&quot; &quot;MsrA KO&quot; &quot;MsrB KO&quot; &quot;MsrC KO&quot; &quot;WT&quot;</code></pre>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="replicate-comparisons.html#cb211-1" tabindex="-1"></a>n_smpl_htmp_conditions <span class="ot">&lt;-</span> <span class="fu">length</span>(smpl_htmp_conditions)</span>
+<span id="cb211-2"><a href="replicate-comparisons.html#cb211-2" tabindex="-1"></a></span>
+<span id="cb211-3"><a href="replicate-comparisons.html#cb211-3" tabindex="-1"></a>n_smpl_htmp_conditions</span></code></pre></div>
+<pre><code>## [1] 5</code></pre>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="replicate-comparisons.html#cb213-1" tabindex="-1"></a>smpl_htmp_conditions_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">brewer.pal</span>(n_smpl_htmp_conditions, <span class="st">&#39;Set1&#39;</span>))</span>
+<span id="cb213-2"><a href="replicate-comparisons.html#cb213-2" tabindex="-1"></a></span>
+<span id="cb213-3"><a href="replicate-comparisons.html#cb213-3" tabindex="-1"></a>smpl_htmp_conditions_colors</span></code></pre></div>
+<pre><code>## [1] &quot;#E41A1C&quot; &quot;#377EB8&quot; &quot;#4DAF4A&quot; &quot;#984EA3&quot; &quot;#FF7F00&quot;</code></pre>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="replicate-comparisons.html#cb215-1" tabindex="-1"></a><span class="fu">names</span>(smpl_htmp_conditions_colors) <span class="ot">&lt;-</span> smpl_htmp_conditions</span>
+<span id="cb215-2"><a href="replicate-comparisons.html#cb215-2" tabindex="-1"></a></span>
+<span id="cb215-3"><a href="replicate-comparisons.html#cb215-3" tabindex="-1"></a>smpl_htmp_conditions_colors</span></code></pre></div>
+<pre><code>##   BisC KO   MsrA KO   MsrB KO   MsrC KO        WT 
+## &quot;#E41A1C&quot; &quot;#377EB8&quot; &quot;#4DAF4A&quot; &quot;#984EA3&quot; &quot;#FF7F00&quot;</code></pre>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="replicate-comparisons.html#cb217-1" tabindex="-1"></a>smpl_htmp_annotation_colors <span class="ot">&lt;-</span> <span class="fu">list</span>(smpl_htmp_conditions_colors)</span>
+<span id="cb217-2"><a href="replicate-comparisons.html#cb217-2" tabindex="-1"></a></span>
+<span id="cb217-3"><a href="replicate-comparisons.html#cb217-3" tabindex="-1"></a>smpl_htmp_annotation_colors</span></code></pre></div>
+<pre><code>## [[1]]
+##   BisC KO   MsrA KO   MsrB KO   MsrC KO        WT 
+## &quot;#E41A1C&quot; &quot;#377EB8&quot; &quot;#4DAF4A&quot; &quot;#984EA3&quot; &quot;#FF7F00&quot;</code></pre>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="replicate-comparisons.html#cb219-1" tabindex="-1"></a><span class="fu">names</span>(smpl_htmp_annotation_colors) <span class="ot">&lt;-</span> <span class="st">&#39;Condition&#39;</span></span>
+<span id="cb219-2"><a href="replicate-comparisons.html#cb219-2" tabindex="-1"></a></span>
+<span id="cb219-3"><a href="replicate-comparisons.html#cb219-3" tabindex="-1"></a>smpl_htmp_annotation_colors</span></code></pre></div>
+<pre><code>## $Condition
+##   BisC KO   MsrA KO   MsrB KO   MsrC KO        WT 
+## &quot;#E41A1C&quot; &quot;#377EB8&quot; &quot;#4DAF4A&quot; &quot;#984EA3&quot; &quot;#FF7F00&quot;</code></pre>
+</div>
+</div>
+<div id="calculate-the-spearman-rank-correlation" class="section level4 hasAnchor" number="5.2.1.2">
+<h4><span class="header-section-number">5.2.1.2</span> Calculate the Spearman Rank Correlation<a href="replicate-comparisons.html#calculate-the-spearman-rank-correlation" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="replicate-comparisons.html#cb221-1" tabindex="-1"></a>correlation <span class="ot">&lt;-</span> sample_level <span class="sc">%&gt;%</span> </span>
+<span id="cb221-2"><a href="replicate-comparisons.html#cb221-2" tabindex="-1"></a>   <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb221-3"><a href="replicate-comparisons.html#cb221-3" tabindex="-1"></a>   <span class="fu">distinct</span>(sample, protein_group, log2_abundance) <span class="sc">%&gt;%</span> </span>
+<span id="cb221-4"><a href="replicate-comparisons.html#cb221-4" tabindex="-1"></a>   <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sample, <span class="at">values_from =</span> log2_abundance) <span class="sc">%&gt;%</span> </span>
+<span id="cb221-5"><a href="replicate-comparisons.html#cb221-5" tabindex="-1"></a>   <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">&#39;protein_group&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb221-6"><a href="replicate-comparisons.html#cb221-6" tabindex="-1"></a>   <span class="fu">cor</span>(<span class="at">method =</span> <span class="st">&#39;spearman&#39;</span>, <span class="at">use =</span> <span class="st">&#39;complete.obs&#39;</span>)</span>
+<span id="cb221-7"><a href="replicate-comparisons.html#cb221-7" tabindex="-1"></a></span>
+<span id="cb221-8"><a href="replicate-comparisons.html#cb221-8" tabindex="-1"></a>correlation</span></code></pre></div>
+<pre><code>##           bisC1     bisC2     bisC3     msrA1     msrA2     msrA3     msrB1
+## bisC1 1.0000000 0.9910909 0.9964607 0.9737440 0.9675346 0.9784896 0.9822822
+## bisC2 0.9910909 1.0000000 0.9916931 0.9741294 0.9709350 0.9739331 0.9894585
+## bisC3 0.9964607 0.9916931 1.0000000 0.9760637 0.9696315 0.9797703 0.9835149
+## msrA1 0.9737440 0.9741294 0.9760637 1.0000000 0.9940061 0.9956424 0.9626272
+## msrA2 0.9675346 0.9709350 0.9696315 0.9940061 1.0000000 0.9916899 0.9626075
+## msrA3 0.9784896 0.9739331 0.9797703 0.9956424 0.9916899 1.0000000 0.9618618
+## msrB1 0.9822822 0.9894585 0.9835149 0.9626272 0.9626075 0.9618618 1.0000000
+## msrB2 0.9791197 0.9856300 0.9799972 0.9600962 0.9620811 0.9585315 0.9972736
+## msrB3 0.9880443 0.9860960 0.9878796 0.9622888 0.9603413 0.9654635 0.9947167
+## msrC1 0.9770990 0.9826499 0.9807328 0.9685816 0.9681547 0.9643686 0.9856043
+## msrC3 0.9701011 0.9708217 0.9741244 0.9570836 0.9568288 0.9526840 0.9782921
+## WT1   0.9769967 0.9806994 0.9788482 0.9912453 0.9904464 0.9895408 0.9720948
+## WT2   0.9805962 0.9803929 0.9825572 0.9902303 0.9855239 0.9920765 0.9681325
+## WT3   0.9813094 0.9758787 0.9819353 0.9901788 0.9857338 0.9930630 0.9644449
+##           msrB2     msrB3     msrC1     msrC3       WT1       WT2       WT3
+## bisC1 0.9791197 0.9880443 0.9770990 0.9701011 0.9769967 0.9805962 0.9813094
+## bisC2 0.9856300 0.9860960 0.9826499 0.9708217 0.9806994 0.9803929 0.9758787
+## bisC3 0.9799972 0.9878796 0.9807328 0.9741244 0.9788482 0.9825572 0.9819353
+## msrA1 0.9600962 0.9622888 0.9685816 0.9570836 0.9912453 0.9902303 0.9901788
+## msrA2 0.9620811 0.9603413 0.9681547 0.9568288 0.9904464 0.9855239 0.9857338
+## msrA3 0.9585315 0.9654635 0.9643686 0.9526840 0.9895408 0.9920765 0.9930630
+## msrB1 0.9972736 0.9947167 0.9856043 0.9782921 0.9720948 0.9681325 0.9644449
+## msrB2 1.0000000 0.9941917 0.9856884 0.9823789 0.9700537 0.9631506 0.9617701
+## msrB3 0.9941917 1.0000000 0.9815702 0.9780538 0.9705371 0.9699939 0.9695057
+## msrC1 0.9856884 0.9815702 1.0000000 0.9929894 0.9730951 0.9674360 0.9656391
+## msrC3 0.9823789 0.9780538 0.9929894 1.0000000 0.9614495 0.9531208 0.9553865
+## WT1   0.9700537 0.9705371 0.9730951 0.9614495 1.0000000 0.9950594 0.9944189
+## WT2   0.9631506 0.9699939 0.9674360 0.9531208 0.9950594 1.0000000 0.9967624
+## WT3   0.9617701 0.9695057 0.9656391 0.9553865 0.9944189 0.9967624 1.0000000</code></pre>
+</div>
+<div id="create-dendrograms-for-the-heatmap" class="section level4 hasAnchor" number="5.2.1.3">
+<h4><span class="header-section-number">5.2.1.3</span> Create Dendrograms for the Heatmap<a href="replicate-comparisons.html#create-dendrograms-for-the-heatmap" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="replicate-comparisons.html#cb223-1" tabindex="-1"></a>distance <span class="ot">&lt;-</span> <span class="fu">dist</span>(correlation)</span>
+<span id="cb223-2"><a href="replicate-comparisons.html#cb223-2" tabindex="-1"></a>hierachical_clustering <span class="ot">&lt;-</span> <span class="fu">hclust</span>(distance)</span>
+<span id="cb223-3"><a href="replicate-comparisons.html#cb223-3" tabindex="-1"></a>dendrogram <span class="ot">&lt;-</span> <span class="fu">as.dendrogram</span>(hierachical_clustering)</span>
+<span id="cb223-4"><a href="replicate-comparisons.html#cb223-4" tabindex="-1"></a>dendrogram_row <span class="ot">&lt;-</span> <span class="fu">seriate_dendrogram</span>(dendrogram, distance, <span class="at">method =</span> <span class="st">&quot;OLO&quot;</span>)</span>
+<span id="cb223-5"><a href="replicate-comparisons.html#cb223-5" tabindex="-1"></a>dendrogram_column <span class="ot">&lt;-</span> <span class="fu">rotate</span>(</span>
+<span id="cb223-6"><a href="replicate-comparisons.html#cb223-6" tabindex="-1"></a>  dendrogram_row,</span>
+<span id="cb223-7"><a href="replicate-comparisons.html#cb223-7" tabindex="-1"></a>  <span class="at">order =</span> <span class="fu">rev</span>(<span class="fu">labels</span>(distance)[<span class="fu">get_order</span>(<span class="fu">as.hclust</span>(dendrogram_row))])</span>
+<span id="cb223-8"><a href="replicate-comparisons.html#cb223-8" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="create-the-heatmap" class="section level4 hasAnchor" number="5.2.1.4">
+<h4><span class="header-section-number">5.2.1.4</span> Create the Heatmap<a href="replicate-comparisons.html#create-the-heatmap" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="create-the-annotation-labels-for-the-heatmap" class="section level5 unnumbered hasAnchor">
+<h5>Create the Annotation Labels for the Heatmap<a href="replicate-comparisons.html#create-the-annotation-labels-for-the-heatmap" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="replicate-comparisons.html#cb224-1" tabindex="-1"></a>smpl_htmp_complex_annotation <span class="ot">=</span> <span class="fu">HeatmapAnnotation</span>(</span>
+<span id="cb224-2"><a href="replicate-comparisons.html#cb224-2" tabindex="-1"></a>  <span class="at">Condition =</span> smpl_htmp_annotation<span class="sc">$</span>Condition,</span>
+<span id="cb224-3"><a href="replicate-comparisons.html#cb224-3" tabindex="-1"></a>  <span class="at">col =</span> smpl_htmp_annotation_colors,</span>
+<span id="cb224-4"><a href="replicate-comparisons.html#cb224-4" tabindex="-1"></a>  <span class="at">height =</span> <span class="fu">unit</span>(<span class="dv">6</span>, <span class="st">&#39;cm&#39;</span>)</span>
+<span id="cb224-5"><a href="replicate-comparisons.html#cb224-5" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="create-the-heatmap-1" class="section level5 unnumbered hasAnchor">
+<h5>Create the Heatmap<a href="replicate-comparisons.html#create-the-heatmap-1" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="replicate-comparisons.html#cb225-1" tabindex="-1"></a>smpl_htmp_list <span class="ot">&lt;-</span> <span class="fu">Heatmap</span>(</span>
+<span id="cb225-2"><a href="replicate-comparisons.html#cb225-2" tabindex="-1"></a>  correlation,</span>
+<span id="cb225-3"><a href="replicate-comparisons.html#cb225-3" tabindex="-1"></a>  <span class="at">cluster_rows =</span> <span class="fu">as.hclust</span>(dendrogram_row),</span>
+<span id="cb225-4"><a href="replicate-comparisons.html#cb225-4" tabindex="-1"></a>  <span class="at">cluster_columns =</span> <span class="fu">as.hclust</span>(dendrogram_column),</span>
+<span id="cb225-5"><a href="replicate-comparisons.html#cb225-5" tabindex="-1"></a>  <span class="at">show_row_dend =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb225-6"><a href="replicate-comparisons.html#cb225-6" tabindex="-1"></a>  <span class="at">top_annotation =</span> smpl_htmp_complex_annotation,</span>
+<span id="cb225-7"><a href="replicate-comparisons.html#cb225-7" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">&#39;Spearman&#39;</span>,</span>
+<span id="cb225-8"><a href="replicate-comparisons.html#cb225-8" tabindex="-1"></a>  <span class="at">column_title =</span> <span class="st">&quot;Correlation-based Hierachical Clustering&quot;</span>,</span>
+<span id="cb225-9"><a href="replicate-comparisons.html#cb225-9" tabindex="-1"></a>  <span class="at">column_title_gp =</span> <span class="fu">gpar</span>(<span class="at">fontsize =</span> <span class="dv">15</span>, </span>
+<span id="cb225-10"><a href="replicate-comparisons.html#cb225-10" tabindex="-1"></a>                         <span class="at">fontface =</span> <span class="st">&#39;bold&#39;</span>),</span>
+<span id="cb225-11"><a href="replicate-comparisons.html#cb225-11" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">brewer.pal</span>(<span class="dv">9</span>, <span class="st">&#39;YlGnBu&#39;</span>),</span>
+<span id="cb225-12"><a href="replicate-comparisons.html#cb225-12" tabindex="-1"></a>  <span class="at">rect_gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">&#39;grey&#39;</span>, </span>
+<span id="cb225-13"><a href="replicate-comparisons.html#cb225-13" tabindex="-1"></a>                 <span class="at">lwd =</span> <span class="fl">0.25</span>),</span>
+<span id="cb225-14"><a href="replicate-comparisons.html#cb225-14" tabindex="-1"></a>  <span class="at">heatmap_legend_param =</span> <span class="fu">list</span>(<span class="at">legend_height =</span> <span class="fu">unit</span>(<span class="dv">10</span>, <span class="st">&#39;cm&#39;</span>),</span>
+<span id="cb225-15"><a href="replicate-comparisons.html#cb225-15" tabindex="-1"></a>                              <span class="at">legend_gp =</span> <span class="fu">gpar</span>(<span class="at">fontsize =</span> <span class="dv">11</span>),</span>
+<span id="cb225-16"><a href="replicate-comparisons.html#cb225-16" tabindex="-1"></a>                              <span class="at">title =</span> </span>
+<span id="cb225-17"><a href="replicate-comparisons.html#cb225-17" tabindex="-1"></a>                                <span class="st">&#39;Spearman </span></span>
+<span id="cb225-18"><a href="replicate-comparisons.html#cb225-18" tabindex="-1"></a><span class="st">Correlation&#39;</span>),</span>
+<span id="cb225-19"><a href="replicate-comparisons.html#cb225-19" tabindex="-1"></a><span class="at">column_names_gp =</span> <span class="fu">gpar</span>(<span class="at">fontsize =</span> <span class="dv">10</span>),</span>
+<span id="cb225-20"><a href="replicate-comparisons.html#cb225-20" tabindex="-1"></a><span class="at">row_names_gp =</span> <span class="fu">gpar</span>(<span class="at">fontsize =</span> <span class="dv">10</span>),</span>
+<span id="cb225-21"><a href="replicate-comparisons.html#cb225-21" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="render-the-heatmap" class="section level5 unnumbered hasAnchor">
+<h5>Render the Heatmap<a href="replicate-comparisons.html#render-the-heatmap" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="replicate-comparisons.html#cb226-1" tabindex="-1"></a><span class="fu">draw</span>(smpl_htmp_list, <span class="at">merge_legend =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-124-1.png" alt="" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="principal-component-analysis-pca" class="section level3 hasAnchor" number="5.2.2">
+<h3><span class="header-section-number">5.2.2</span> Principal Component Analysis (PCA)<a href="replicate-comparisons.html#principal-component-analysis-pca" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>How does a PCA work?</p>
+<ol style="list-style-type: decimal">
+<li><p>We calculate a matrix that summarizes how all of our variables (<em>i.e.</em>, the abundance of each protein in each sample) relate to one another.</p></li>
+<li><p>Break this matrix down into two separate aspects: <strong>direction</strong> and <strong>magnitude</strong> (Vectorman would be so proud). We can then understand the <strong>directions</strong> (the <em>components</em>) of our data and its <strong>magnitude</strong> (<em>i.e.</em>, how “important” each <strong>direction</strong> is).</p></li>
+</ol>
+<div id="prepare-the-pca-data" class="section level4 hasAnchor" number="5.2.2.1">
+<h4><span class="header-section-number">5.2.2.1</span> Prepare the PCA Data<a href="replicate-comparisons.html#prepare-the-pca-data" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>As the description above implies, we need to make a matrix of the <strong>magnitude</strong> of each <strong>direction</strong> (component). To do this, we first just need to make a matrix of our protein abundances, which we’ll be using our sample comparison data frame we made at the beginning of this chapter.</p>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="replicate-comparisons.html#cb227-1" tabindex="-1"></a>pca_input <span class="ot">&lt;-</span> sample_level <span class="sc">%&gt;%</span> </span>
+<span id="cb227-2"><a href="replicate-comparisons.html#cb227-2" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb227-3"><a href="replicate-comparisons.html#cb227-3" tabindex="-1"></a>  <span class="fu">distinct</span>(sample, protein_group, log2_abundance) <span class="sc">%&gt;%</span> </span>
+<span id="cb227-4"><a href="replicate-comparisons.html#cb227-4" tabindex="-1"></a>  <span class="fu">group_by</span>(sample, protein_group) <span class="sc">%&gt;%</span> </span>
+<span id="cb227-5"><a href="replicate-comparisons.html#cb227-5" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">intensity =</span> <span class="fu">sum</span>(log2_abundance),</span>
+<span id="cb227-6"><a href="replicate-comparisons.html#cb227-6" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span>) <span class="sc">%&gt;%</span> <span class="co">#If we have multiple protein_groups per sample, we are simply going to add them together</span></span>
+<span id="cb227-7"><a href="replicate-comparisons.html#cb227-7" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sample, <span class="at">values_from =</span> intensity) <span class="sc">%&gt;%</span> </span>
+<span id="cb227-8"><a href="replicate-comparisons.html#cb227-8" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb227-9"><a href="replicate-comparisons.html#cb227-9" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>protein_group) <span class="sc">%&gt;%</span> </span>
+<span id="cb227-10"><a href="replicate-comparisons.html#cb227-10" tabindex="-1"></a>  <span class="fu">t</span>() <span class="co">#Make the data into a matrix</span></span>
+<span id="cb227-11"><a href="replicate-comparisons.html#cb227-11" tabindex="-1"></a> </span>
+<span id="cb227-12"><a href="replicate-comparisons.html#cb227-12" tabindex="-1"></a>pca_input[,<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
+<pre><code>##           [,1]     [,2]     [,3]     [,4]     [,5]     [,6]
+## WT1   16.40265 29.84320 29.27740 25.27348 26.80704 28.79245
+## WT2   16.56684 29.72218 29.16925 25.34192 26.93438 29.66477
+## WT3   16.16356 29.71794 29.18393 25.33344 26.76167 29.70755
+## bisC1 19.29890 29.76450 29.21365 25.28977 26.86401 30.06089
+## bisC2 17.79146 29.68652 29.14412 25.37404 26.70054 29.69404
+## bisC3 19.81199 29.66457 29.08652 25.31138 26.77536 29.52391
+## msrA1 18.63035 29.54552 29.05862 25.07095 26.95400 28.81062
+## msrA2 19.50781 29.75493 29.29593 25.09613 26.86942 28.30774
+## msrA3 18.33279 29.63141 29.17300 25.21888 26.78988 29.44777
+## msrB1 16.30386 29.71828 29.40907 25.14552 26.99481 28.64801
+## msrB2 16.35503 29.76270 29.53059 25.12708 26.94525 28.70138
+## msrB3 16.74360 29.79364 29.31457 25.24340 26.97308 29.40933
+## msrC1 16.10502 29.56115 29.52545 24.82127 26.99538 27.83707
+## msrC3 16.47890 29.56833 29.50605 24.83112 27.14346 27.60847</code></pre>
+<p>We are then going to make a data frame containing our metadata (<em>i.e.</em>, the group name of each sample) so that we can more easily modify the plots we plan to make in a little bit.</p>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="replicate-comparisons.html#cb229-1" tabindex="-1"></a>pca_annotation <span class="ot">&lt;-</span> sample_level <span class="sc">%&gt;%</span> </span>
+<span id="cb229-2"><a href="replicate-comparisons.html#cb229-2" tabindex="-1"></a>  <span class="fu">distinct</span>(sample, group)</span></code></pre></div>
+</div>
+<div id="perform-the-principal-component-analysis" class="section level4 hasAnchor" number="5.2.2.2">
+<h4><span class="header-section-number">5.2.2.2</span> Perform the Principal Component Analysis<a href="replicate-comparisons.html#perform-the-principal-component-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>We are now going to use a function from the <code>stats</code> package (<code>prcomp()</code>) to perform the PCA and obtain the values for each component.</p>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="replicate-comparisons.html#cb230-1" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(pca_input, </span>
+<span id="cb230-2"><a href="replicate-comparisons.html#cb230-2" tabindex="-1"></a>              <span class="at">center =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+</div>
+<div id="extract-the-pca-results" class="section level4 hasAnchor" number="5.2.2.3">
+<h4><span class="header-section-number">5.2.2.3</span> Extract the PCA Results<a href="replicate-comparisons.html#extract-the-pca-results" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p><code>prcomp()</code> outputs a matrix. To make the data more amenable to downstream transformations and plotting, we are going to make it into a data frame and then add back in our metadata (genotypes).</p>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="replicate-comparisons.html#cb231-1" tabindex="-1"></a>pca_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(pca<span class="sc">$</span>x) <span class="sc">%&gt;%</span> </span>
+<span id="cb231-2"><a href="replicate-comparisons.html#cb231-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sample :=</span> <span class="fu">factor</span>(<span class="fu">row.names</span>(.))) <span class="sc">%&gt;%</span> </span>
+<span id="cb231-3"><a href="replicate-comparisons.html#cb231-3" tabindex="-1"></a>  <span class="fu">left_join</span>(pca_annotation, <span class="at">by =</span> <span class="st">&#39;sample&#39;</span>)</span>
+<span id="cb231-4"><a href="replicate-comparisons.html#cb231-4" tabindex="-1"></a></span>
+<span id="cb231-5"><a href="replicate-comparisons.html#cb231-5" tabindex="-1"></a>pca_df</span></code></pre></div>
+<pre><code>##           PC1          PC2        PC3         PC4         PC5       PC6
+## 1  -16.906548   3.32325409   2.921688  14.3547587  5.47129923 -4.941773
+## 2  -20.382015  -6.44630690  -1.108488  13.1113053  1.77930938  5.384817
+## 3  -20.753275  -5.16049381  -2.901976  13.5532112 -6.30585041 -2.818930
+## 4    7.185818 -17.80859098 -12.721980  -6.4402290 -4.59836119 -4.761486
+## 5    8.580646 -10.49952635  -6.697135  -3.9019845 17.84250500  1.308918
+## 6    7.444187 -13.92762818 -15.021720  -5.6244054 -2.26444733 -1.938879
+## 7  -23.940167   6.91877000   2.303276  -9.6850737  0.03459036  6.478160
+## 8  -23.278212  13.18804051   9.030241 -12.0353785  2.79281477 -9.527258
+## 9  -24.971915  -0.15296697   2.160799 -10.2680016 -6.33314364  5.614090
+## 10  21.208217  -4.32798924  14.564041   0.2130081  3.64888688  2.794445
+## 11  24.642181  -0.07563843  17.817416   0.5245061  0.16852276 -2.925507
+## 12  21.041171  -9.40628499  11.880274   1.2809917 -9.46829242  2.376445
+## 13  17.316435  20.47152182 -10.140553   2.2168077  3.05305924  4.731719
+## 14  22.813478  23.90383943 -12.085883   2.7004840 -5.82089262 -1.774762
+##           PC7         PC8         PC9        PC10       PC11       PC12
+## 1   3.9204485  2.90998892  3.20435698  2.46450615  1.5517162 -4.9930635
+## 2  -3.6983410 -2.81856497  0.17300450 -3.15242438 -2.8520878  4.4808846
+## 3  -0.3313035  0.00873258 -3.41741573  0.03136909  1.3818902  0.8728621
+## 4  -2.4130813  5.83610914 -2.82241670  3.40684823  2.1090912  2.5206465
+## 5   2.0884419 -4.61416490 -2.09579615  3.63250853 -1.3633704  0.2452268
+## 6   1.7786139 -1.13655432  4.59112323 -7.15875471 -1.4214928 -3.2738581
+## 7   7.6426492  7.44061276 -0.12696757 -0.49853740 -2.0627800  1.8421085
+## 8  -4.9354411 -1.73084386  2.47106119 -0.35141192 -1.9841062  2.2275335
+## 9  -1.6392495 -6.19588492 -2.41865950  1.39992877  4.1101380 -4.2941663
+## 10 -0.9537047  1.25647761  4.33233974 -1.77072498  7.4072867  2.9197293
+## 11  1.6955614  0.54108120 -7.54750911 -4.28199476 -1.8527727 -1.8872387
+## 12 -0.5804971 -1.20873058  4.16348249  5.37247244 -5.3185011 -0.8195961
+## 13 -8.5010728  4.87703043 -0.54722689  0.01754260 -0.8574769 -2.9298609
+## 14  5.9269760 -5.16528907  0.04062353  0.88867234  1.1524657  3.0887924
+##          PC13         PC14 sample   group
+## 1  -2.9799665 1.597845e-13    WT1      WT
+## 2  -3.9353719 1.601280e-13    WT2      WT
+## 3   6.4930274 1.593465e-13    WT3      WT
+## 4  -3.1467344 1.588115e-13  bisC1 BisC KO
+## 5   1.9698425 1.595299e-13  bisC2 BisC KO
+## 6   0.9271069 1.591619e-13  bisC3 BisC KO
+## 7   0.9133519 1.583047e-13  msrA1 MsrA KO
+## 8   0.5871943 1.609948e-13  msrA2 MsrA KO
+## 9  -1.4559231 1.589025e-13  msrA3 MsrA KO
+## 10  1.1680879 1.587458e-13  msrB1 MsrB KO
+## 11 -1.3797664 1.598288e-13  msrB2 MsrB KO
+## 12  0.8987704 1.590826e-13  msrB3 MsrB KO
+## 13  1.1239894 1.576568e-13  msrC1 MsrC KO
+## 14 -1.1836086 1.587354e-13  msrC3 MsrC KO</code></pre>
+<p>One other important piece of data <code>prcomp()</code> provides us is the standard deviation of the total experiment “explained” by each <strong>component</strong>. By adding up enough of our <strong>components</strong>, the variation of our experiment should eventually be completely explained.</p>
+<p>This information is stored in <code>pca$sdev</code>, which we will extract and again make into a data frame.</p>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="replicate-comparisons.html#cb233-1" tabindex="-1"></a>pca_sdev_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(pca<span class="sc">$</span>sdev)</span>
+<span id="cb233-2"><a href="replicate-comparisons.html#cb233-2" tabindex="-1"></a></span>
+<span id="cb233-3"><a href="replicate-comparisons.html#cb233-3" tabindex="-1"></a>pca_sdev_df</span></code></pre></div>
+<pre><code>##        pca$sdev
+## 1  2.032677e+01
+## 2  1.246566e+01
+## 3  1.060359e+01
+## 4  8.806650e+00
+## 5  6.859006e+00
+## 6  4.814363e+00
+## 7  4.292032e+00
+## 8  4.147293e+00
+## 9  3.516503e+00
+## 10 3.345701e+00
+## 11 3.216724e+00
+## 12 3.045563e+00
+## 13 2.648766e+00
+## 14 1.653466e-13</code></pre>
+<p>We will then measure the <strong>percent variace</strong> each component captures from our dataset:</p>
+<p>1- Retrieve the standard deviation of each component</p>
+<p>2- Square the standard deviation to calculate the <strong>eigenvalues</strong> (the variance of <strong>each component</strong>, <code>pca$sdev^2</code>)</p>
+<p>3- Calculate the total variance across <strong>all components</strong> combined (`sum(pca$sdev^2))</p>
+<p>4- Divide each component’s variance by the totalo variance to get a proportion (<code>/</code>)</p>
+<p>5- Convert the proporation into a percentage (<code>*100</code>)</p>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="replicate-comparisons.html#cb235-1" tabindex="-1"></a>pca_sdev_df <span class="ot">&lt;-</span> pca_sdev_df <span class="sc">%&gt;%</span> </span>
+<span id="cb235-2"><a href="replicate-comparisons.html#cb235-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">percent_variance =</span> (pca<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span><span class="fu">sum</span>(pca<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span>)<span class="sc">*</span><span class="dv">100</span>),</span>
+<span id="cb235-3"><a href="replicate-comparisons.html#cb235-3" tabindex="-1"></a>         <span class="at">dimension =</span> <span class="fu">row.names</span>(.)) <span class="sc">%&gt;%</span> </span>
+<span id="cb235-4"><a href="replicate-comparisons.html#cb235-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dimension =</span> <span class="fu">factor</span>(.data<span class="sc">$</span>dimension,</span>
+<span id="cb235-5"><a href="replicate-comparisons.html#cb235-5" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">unique</span>(<span class="fu">str_sort</span>(.data<span class="sc">$</span>dimension, </span>
+<span id="cb235-6"><a href="replicate-comparisons.html#cb235-6" tabindex="-1"></a>                                                     <span class="at">numeric =</span> <span class="cn">TRUE</span>))))</span>
+<span id="cb235-7"><a href="replicate-comparisons.html#cb235-7" tabindex="-1"></a></span>
+<span id="cb235-8"><a href="replicate-comparisons.html#cb235-8" tabindex="-1"></a>pca_sdev_df</span></code></pre></div>
+<pre><code>##        pca$sdev percent_variance dimension
+## 1  2.032677e+01     4.517541e+01         1
+## 2  1.246566e+01     1.699009e+01         2
+## 3  1.060359e+01     1.229338e+01         3
+## 4  8.806650e+00     8.479823e+00         4
+## 5  6.859006e+00     5.143842e+00         5
+## 6  4.814363e+00     2.534212e+00         6
+## 7  4.292032e+00     2.014147e+00         7
+## 8  4.147293e+00     1.880593e+00         8
+## 9  3.516503e+00     1.352033e+00         9
+## 10 3.345701e+00     1.223882e+00        10
+## 11 3.216724e+00     1.131339e+00        11
+## 12 3.045563e+00     1.014146e+00        12
+## 13 2.648766e+00     7.671008e-01        13
+## 14 1.653466e-13     2.989205e-27        14</code></pre>
+</div>
+<div id="plot-the-pca-results" class="section level4 hasAnchor" number="5.2.2.4">
+<h4><span class="header-section-number">5.2.2.4</span> Plot the PCA Results<a href="replicate-comparisons.html#plot-the-pca-results" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Now that we have the components measures and total variance, we can make our PCA plots.</p>
+<p>We will be making three total plots.</p>
+<p>1- A static PCA plot each with the first component (PC1) as the x-axis and the second component (PC2) as the y-axis, with each genotype having a different color</p>
+<p>2- A dynamic PCA plot each with the first component (PC1) as the x-axis and the second component (PC2) as the y-axis, again with each genotype having a different color.</p>
+<ul>
+<li>Now when you hover over each point, a pop-up box will appear, showing the sample matching to that point. This can be used to see which specific samples might be considered an outlier of the rest of the group, if there are any.</li>
+</ul>
+<p>3- A Scree plot: a simple line segment plot that show the eigenvalues for each individual <strong>principal component</strong>. The individual components are the x-axis eigenvalues are the y-axis.</p>
+<ul>
+<li>The main purpose of a scree plot is to determine the number of principal components to retain in downstream statistical analyses. Generally speaking, if you need more than 3 or 4 principal components to describe ~80% of your variance, a PCA might not be the best method to visualize your data, instead you might want to look into a more advanced dimensionality reduction technique (<em>e.g.</em>, t-SNE or UMAP).</li>
+</ul>
+<div id="static-pca-plot" class="section level5 unnumbered hasAnchor">
+<h5>Static PCA Plot<a href="replicate-comparisons.html#static-pca-plot" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="replicate-comparisons.html#cb237-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> pca_df,</span>
+<span id="cb237-2"><a href="replicate-comparisons.html#cb237-2" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span>rlang<span class="sc">::</span><span class="fu">sym</span>(<span class="st">&#39;PC1&#39;</span>), <span class="at">y =</span> <span class="sc">!!</span>rlang<span class="sc">::</span><span class="fu">sym</span>(<span class="st">&#39;PC2&#39;</span>),</span>
+<span id="cb237-3"><a href="replicate-comparisons.html#cb237-3" tabindex="-1"></a>                     <span class="at">col =</span> group, <span class="at">label =</span> sample)) <span class="sc">+</span></span>
+<span id="cb237-4"><a href="replicate-comparisons.html#cb237-4" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb237-5"><a href="replicate-comparisons.html#cb237-5" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb237-6"><a href="replicate-comparisons.html#cb237-6" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Principal Component Analysis&quot;</span>,</span>
+<span id="cb237-7"><a href="replicate-comparisons.html#cb237-7" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">paste</span>(</span>
+<span id="cb237-8"><a href="replicate-comparisons.html#cb237-8" tabindex="-1"></a>      <span class="st">&#39;PC1&#39;</span>, <span class="st">&quot;(&quot;</span>,</span>
+<span id="cb237-9"><a href="replicate-comparisons.html#cb237-9" tabindex="-1"></a>      <span class="fu">round</span>(</span>
+<span id="cb237-10"><a href="replicate-comparisons.html#cb237-10" tabindex="-1"></a>        pca_sdev_df<span class="sc">$</span>percent_variance[pca_sdev_df<span class="sc">$</span>dimension<span class="sc">==</span><span class="fu">str_extract</span>(<span class="st">&#39;PC1&#39;</span>,</span>
+<span id="cb237-11"><a href="replicate-comparisons.html#cb237-11" tabindex="-1"></a>                                                                        <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d&quot;</span>)], </span>
+<span id="cb237-12"><a href="replicate-comparisons.html#cb237-12" tabindex="-1"></a>        <span class="dv">1</span>), <span class="st">&quot;%)&quot;</span></span>
+<span id="cb237-13"><a href="replicate-comparisons.html#cb237-13" tabindex="-1"></a>    ),</span>
+<span id="cb237-14"><a href="replicate-comparisons.html#cb237-14" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">paste</span>(</span>
+<span id="cb237-15"><a href="replicate-comparisons.html#cb237-15" tabindex="-1"></a>      <span class="st">&#39;PC2&#39;</span>, <span class="st">&quot;(&quot;</span>,</span>
+<span id="cb237-16"><a href="replicate-comparisons.html#cb237-16" tabindex="-1"></a>      <span class="fu">round</span>(</span>
+<span id="cb237-17"><a href="replicate-comparisons.html#cb237-17" tabindex="-1"></a>        pca_sdev_df<span class="sc">$</span>percent_variance[pca_sdev_df<span class="sc">$</span>dimension<span class="sc">==</span><span class="fu">str_extract</span>(<span class="st">&#39;PC2&#39;</span>, </span>
+<span id="cb237-18"><a href="replicate-comparisons.html#cb237-18" tabindex="-1"></a>                                                                        <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d&quot;</span>)], </span>
+<span id="cb237-19"><a href="replicate-comparisons.html#cb237-19" tabindex="-1"></a>        <span class="dv">1</span>), <span class="st">&quot;%)&quot;</span></span>
+<span id="cb237-20"><a href="replicate-comparisons.html#cb237-20" tabindex="-1"></a>    ),</span>
+<span id="cb237-21"><a href="replicate-comparisons.html#cb237-21" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Condition&quot;</span></span>
+<span id="cb237-22"><a href="replicate-comparisons.html#cb237-22" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb237-23"><a href="replicate-comparisons.html#cb237-23" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">brewer.pal</span>(<span class="fu">n_distinct</span>(pca_annotation<span class="sc">$</span>group), </span>
+<span id="cb237-24"><a href="replicate-comparisons.html#cb237-24" tabindex="-1"></a>                                         <span class="st">&#39;Set1&#39;</span>)) <span class="sc">+</span></span>
+<span id="cb237-25"><a href="replicate-comparisons.html#cb237-25" tabindex="-1"></a>  plot_theme</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-131-1.png" alt="" width="672" /></p>
+</div>
+<div id="interactive-pca-plot" class="section level5 unnumbered hasAnchor">
+<h5>Interactive PCA Plot<a href="replicate-comparisons.html#interactive-pca-plot" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="replicate-comparisons.html#cb238-1" tabindex="-1"></a><span class="fu">ggplotly</span>(<span class="fu">ggplot</span>(<span class="at">data =</span> pca_df,</span>
+<span id="cb238-2"><a href="replicate-comparisons.html#cb238-2" tabindex="-1"></a>                <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span>rlang<span class="sc">::</span><span class="fu">sym</span>(<span class="st">&#39;PC1&#39;</span>), <span class="at">y =</span> <span class="sc">!!</span>rlang<span class="sc">::</span><span class="fu">sym</span>(<span class="st">&#39;PC2&#39;</span>),</span>
+<span id="cb238-3"><a href="replicate-comparisons.html#cb238-3" tabindex="-1"></a>                              <span class="at">col =</span> group, <span class="at">label =</span> sample)) <span class="sc">+</span></span>
+<span id="cb238-4"><a href="replicate-comparisons.html#cb238-4" tabindex="-1"></a>           <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb238-5"><a href="replicate-comparisons.html#cb238-5" tabindex="-1"></a>           <span class="fu">labs</span>(</span>
+<span id="cb238-6"><a href="replicate-comparisons.html#cb238-6" tabindex="-1"></a>             <span class="at">title =</span> <span class="st">&quot;Principal Component Analysis&quot;</span>,</span>
+<span id="cb238-7"><a href="replicate-comparisons.html#cb238-7" tabindex="-1"></a>             <span class="at">x =</span> <span class="fu">paste</span>(</span>
+<span id="cb238-8"><a href="replicate-comparisons.html#cb238-8" tabindex="-1"></a>               <span class="st">&#39;PC1&#39;</span>, <span class="st">&quot;(&quot;</span>,</span>
+<span id="cb238-9"><a href="replicate-comparisons.html#cb238-9" tabindex="-1"></a>               <span class="fu">round</span>(</span>
+<span id="cb238-10"><a href="replicate-comparisons.html#cb238-10" tabindex="-1"></a>                 pca_sdev_df<span class="sc">$</span>percent_variance[pca_sdev_df<span class="sc">$</span>dimension<span class="sc">==</span><span class="fu">str_extract</span>(<span class="st">&#39;PC1&#39;</span>,</span>
+<span id="cb238-11"><a href="replicate-comparisons.html#cb238-11" tabindex="-1"></a>                                                                                 <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d&quot;</span>)], </span>
+<span id="cb238-12"><a href="replicate-comparisons.html#cb238-12" tabindex="-1"></a>                 <span class="dv">1</span>), <span class="st">&quot;%)&quot;</span></span>
+<span id="cb238-13"><a href="replicate-comparisons.html#cb238-13" tabindex="-1"></a>             ),</span>
+<span id="cb238-14"><a href="replicate-comparisons.html#cb238-14" tabindex="-1"></a>             <span class="at">y =</span> <span class="fu">paste</span>(</span>
+<span id="cb238-15"><a href="replicate-comparisons.html#cb238-15" tabindex="-1"></a>               <span class="st">&#39;PC2&#39;</span>, <span class="st">&quot;(&quot;</span>,</span>
+<span id="cb238-16"><a href="replicate-comparisons.html#cb238-16" tabindex="-1"></a>               <span class="fu">round</span>(</span>
+<span id="cb238-17"><a href="replicate-comparisons.html#cb238-17" tabindex="-1"></a>                 pca_sdev_df<span class="sc">$</span>percent_variance[pca_sdev_df<span class="sc">$</span>dimension<span class="sc">==</span><span class="fu">str_extract</span>(<span class="st">&#39;PC2&#39;</span>, </span>
+<span id="cb238-18"><a href="replicate-comparisons.html#cb238-18" tabindex="-1"></a>                                                                                 <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d&quot;</span>)], </span>
+<span id="cb238-19"><a href="replicate-comparisons.html#cb238-19" tabindex="-1"></a>                 <span class="dv">1</span>), <span class="st">&quot;%)&quot;</span></span>
+<span id="cb238-20"><a href="replicate-comparisons.html#cb238-20" tabindex="-1"></a>             ),</span>
+<span id="cb238-21"><a href="replicate-comparisons.html#cb238-21" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">&quot;Condition&quot;</span></span>
+<span id="cb238-22"><a href="replicate-comparisons.html#cb238-22" tabindex="-1"></a>           ) <span class="sc">+</span></span>
+<span id="cb238-23"><a href="replicate-comparisons.html#cb238-23" tabindex="-1"></a>           <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">brewer.pal</span>(<span class="fu">n_distinct</span>(pca_annotation<span class="sc">$</span>group), </span>
+<span id="cb238-24"><a href="replicate-comparisons.html#cb238-24" tabindex="-1"></a>                                                  <span class="st">&#39;Set1&#39;</span>)) <span class="sc">+</span></span>
+<span id="cb238-25"><a href="replicate-comparisons.html#cb238-25" tabindex="-1"></a>           plot_theme)</span></code></pre></div>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-39daa2b83a257fadd00d" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-39daa2b83a257fadd00d">{"x":{"data":[{"x":[7.1858176850917088,8.58064589478772,7.4441867815089644],"y":[-17.808590976804844,-10.499526347992969,-13.927628177866787],"text":["PC1:   7.185818<br />PC2: -17.80859098<br />group: BisC KO<br />sample: bisC1","PC1:   8.580646<br />PC2: -10.49952635<br />group: BisC KO<br />sample: bisC2","PC1:   7.444187<br />PC2: -13.92762818<br />group: BisC KO<br />sample: bisC3"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(228,26,28,1)","opacity":1,"size":11.338582677165356,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(228,26,28,1)"}},"hoveron":"points","name":"BisC KO","legendgroup":"BisC KO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-23.940166869871746,-23.278212017319841,-24.971914812327835],"y":[6.9187699954551301,13.188040505157023,-0.15296697314589985],"text":["PC1: -23.940167<br />PC2:   6.91877000<br />group: MsrA KO<br />sample: msrA1","PC1: -23.278212<br />PC2:  13.18804051<br />group: MsrA KO<br />sample: msrA2","PC1: -24.971915<br />PC2:  -0.15296697<br />group: MsrA KO<br />sample: msrA3"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(55,126,184,1)","opacity":1,"size":11.338582677165356,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(55,126,184,1)"}},"hoveron":"points","name":"MsrA KO","legendgroup":"MsrA KO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[21.208217010827724,24.642180828757748,21.041170661388488],"y":[-4.3279892363134351,-0.075638432078091511,-9.4062849871050247],"text":["PC1:  21.208217<br />PC2:  -4.32798924<br />group: MsrB KO<br />sample: msrB1","PC1:  24.642181<br />PC2:  -0.07563843<br />group: MsrB KO<br />sample: msrB2","PC1:  21.041171<br />PC2:  -9.40628499<br />group: MsrB KO<br />sample: msrB3"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(77,175,74,1)","opacity":1,"size":11.338582677165356,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(77,175,74,1)"}},"hoveron":"points","name":"MsrB KO","legendgroup":"MsrB KO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17.316434526753092,22.813477516851535],"y":[20.471521821625931,23.903839426989272],"text":["PC1:  17.316435<br />PC2:  20.47152182<br />group: MsrC KO<br />sample: msrC1","PC1:  22.813478<br />PC2:  23.90383943<br />group: MsrC KO<br />sample: msrC3"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(152,78,163,1)","opacity":1,"size":11.338582677165356,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(152,78,163,1)"}},"hoveron":"points","name":"MsrC KO","legendgroup":"MsrC KO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-16.906547944894221,-20.38201460420634,-20.753274657346886],"y":[3.323254091569591,-6.4463068951262867,-5.1604938143635595],"text":["PC1: -16.906548<br />PC2:   3.32325409<br />group: WT<br />sample: WT1","PC1: -20.382015<br />PC2:  -6.44630690<br />group: WT<br />sample: WT2","PC1: -20.753275<br />PC2:  -5.16049381<br />group: WT<br />sample: WT3"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,127,0,1)","opacity":1,"size":11.338582677165356,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,127,0,1)"}},"hoveron":"points","name":"WT","legendgroup":"WT","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":49.872976338729771,"r":7.3059360730593621,"b":46.824408468244087,"l":60.772104607721062},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Principal Component Analysis","font":{"color":"rgba(0,0,0,1)","family":"","size":26.567040265670411},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-27.452619594382114,27.122885610812027],"tickmode":"array","ticktext":["-20","-10","0","10","20"],"tickvals":[-20,-10,-3.5527136788005009e-15,10,20],"categoryorder":"array","categoryarray":["-20","-10","0","10","20"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":15.940224159402241},"tickangle":-75,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"PC1 ( 45.2 %)","font":{"color":"rgba(0,0,0,1)","family":"","size":19.925280199252807}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-19.894212496994548,25.989460947178976],"tickmode":"array","ticktext":["-10","0","10","20"],"tickvals":[-10,0,10,20],"categoryorder":"array","categoryarray":["-10","0","10","20"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":19.925280199252807},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"PC2 ( 17 %)","font":{"color":"rgba(0,0,0,1)","family":"","size":19.925280199252807}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"rgba(255,255,255,1)","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176002,"linetype":"solid"},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":19.925280199252807},"title":{"text":"Condition","font":{"color":"rgba(0,0,0,1)","family":"","size":19.925280199252807}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"748b2b4991db":{"x":{},"y":{},"colour":{},"label":{},"type":"scatter"}},"cur_data":"748b2b4991db","visdat":{"748b2b4991db":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="scree-plot" class="section level5 unnumbered hasAnchor">
+<h5>Scree Plot<a href="replicate-comparisons.html#scree-plot" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="replicate-comparisons.html#cb239-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> pca_sdev_df <span class="sc">%&gt;%</span> </span>
+<span id="cb239-2"><a href="replicate-comparisons.html#cb239-2" tabindex="-1"></a>         <span class="fu">add_row</span>(<span class="st">`</span><span class="at">pca$sdev</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.double</span>(<span class="dv">0</span>),</span>
+<span id="cb239-3"><a href="replicate-comparisons.html#cb239-3" tabindex="-1"></a>                 <span class="at">percent_variance =</span> <span class="fu">as.double</span>(<span class="dv">0</span>),</span>
+<span id="cb239-4"><a href="replicate-comparisons.html#cb239-4" tabindex="-1"></a>                 <span class="at">dimension =</span> <span class="fu">as.factor</span>(<span class="dv">0</span>),</span>
+<span id="cb239-5"><a href="replicate-comparisons.html#cb239-5" tabindex="-1"></a>                 <span class="at">.before =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb239-6"><a href="replicate-comparisons.html#cb239-6" tabindex="-1"></a>         <span class="fu">mutate</span>(<span class="at">cumulative_variance =</span> <span class="fu">cumsum</span>(percent_variance),</span>
+<span id="cb239-7"><a href="replicate-comparisons.html#cb239-7" tabindex="-1"></a>                <span class="at">dimension =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(dimension))), </span>
+<span id="cb239-8"><a href="replicate-comparisons.html#cb239-8" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> dimension, </span>
+<span id="cb239-9"><a href="replicate-comparisons.html#cb239-9" tabindex="-1"></a>                     <span class="at">y =</span> cumulative_variance,</span>
+<span id="cb239-10"><a href="replicate-comparisons.html#cb239-10" tabindex="-1"></a>                     <span class="at">group =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb239-11"><a href="replicate-comparisons.html#cb239-11" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb239-12"><a href="replicate-comparisons.html#cb239-12" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb239-13"><a href="replicate-comparisons.html#cb239-13" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">80</span>, <span class="at">color =</span> <span class="st">&#39;red&#39;</span>) <span class="sc">+</span></span>
+<span id="cb239-14"><a href="replicate-comparisons.html#cb239-14" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of Features&quot;</span>,</span>
+<span id="cb239-15"><a href="replicate-comparisons.html#cb239-15" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Cumulative Variance Explained (%)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb239-16"><a href="replicate-comparisons.html#cb239-16" tabindex="-1"></a>  plot_theme</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-133-1.png" alt="" width="672" /></p>
+<p>From all of the above plots, we can pretty confidently say our experiment is pretty sound and all the reps for each of our genotypes accurately represent each genotype.</p>
+<p>With this confidence, we can now move ahead and see if there are any proteins, or groups of proteins that are differentially expressed between the different genotypes.</p>
+</div>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="prep-work.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="differential-expression.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/lunr.js"></script>
+<script src="assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "lunr",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection",
+    "scroll_highlight": true
+  },
+  "toolbar": {
+    "position": "static"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

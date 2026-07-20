@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>3.4 Evaluate DIA-NN Results | Proteomic Data Analysis</title>
+  <meta name="description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="3.4 Evaluate DIA-NN Results | Proteomic Data Analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/images/CART_logo_horizontal.png" />
+  <meta property="og:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="3.4 Evaluate DIA-NN Results | Proteomic Data Analysis" />
+  
+  <meta name="twitter:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="twitter:image" content="/images/CART_logo_horizontal.png" />
+
+<meta name="author" content="Kyle Swovick" />
+
+
+<meta name="date" content="2026-07-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="images/ur_logo_favicon.png" type="image/x-icon" />
+<link rel="prev" href="evaluate-dia-nn-stats.html"/>
+<link rel="next" href="filtering-dia-nn-results.html"/>
+<script src="assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="assets/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="assets/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="assets/plotly-binding-4.12.0/plotly.js"></script>
+<script src="assets/typedarray-0.1/typedarray.min.js"></script>
+<link href="assets/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="assets/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="assets/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="assets/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<script src="assets/core-js-2.5.3/shim.min.js"></script>
+<script src="assets/react-18.2.0/react.min.js"></script>
+<script src="assets/react-18.2.0/react-dom.min.js"></script>
+<script src="assets/reactwidget-2.0.0/react-tools.js"></script>
+<link href="assets/reactable-0.4.5/reactable.css" rel="stylesheet" />
+<script src="assets/reactable-binding-0.4.5/reactable.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Proteomic Data Analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="introduction-to-r-and-rstudio.html"><a href="introduction-to-r-and-rstudio.html"><i class="fa fa-check"></i><b>1</b> Introduction to R and RStudio</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="coding-basics.html"><a href="coding-basics.html"><i class="fa fa-check"></i><b>1.1</b> Coding Basics</a></li>
+<li class="chapter" data-level="1.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html"><i class="fa fa-check"></i><b>1.2</b> Creating New Objects in R</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#object-naming-conventions"><i class="fa fa-check"></i><b>1.2.1</b> Object Naming Conventions</a></li>
+<li class="chapter" data-level="1.2.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#working-with-object-assignments"><i class="fa fa-check"></i><b>1.2.2</b> Working with Object Assignments</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="calling-functions.html"><a href="calling-functions.html"><i class="fa fa-check"></i><b>1.3</b> Calling Functions</a></li>
+<li class="chapter" data-level="1.4" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html"><i class="fa fa-check"></i><b>1.4</b> Expanding R’s Functionality</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#installing-packages"><i class="fa fa-check"></i><b>1.4.1</b> Installing Packages</a></li>
+<li class="chapter" data-level="1.4.2" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#loading-packages-and-package-conflicts"><i class="fa fa-check"></i><b>1.4.2</b> Loading Packages and Package Conflicts</a></li>
+<li class="chapter" data-level="1.4.3" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#package-help-pages"><i class="fa fa-check"></i><b>1.4.3</b> Package Help Pages</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="working-with-data-in-r-and-rstudio.html"><a href="working-with-data-in-r-and-rstudio.html"><i class="fa fa-check"></i><b>2</b> Working with Data in R and RStudio</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="loading-data.html"><a href="loading-data.html"><i class="fa fa-check"></i><b>2.1</b> Loading Data</a></li>
+<li class="chapter" data-level="2.2" data-path="understanding-data-frames.html"><a href="understanding-data-frames.html"><i class="fa fa-check"></i><b>2.2</b> Understanding Data Frames</a></li>
+<li class="chapter" data-level="2.3" data-path="data-filtering.html"><a href="data-filtering.html"><i class="fa fa-check"></i><b>2.3</b> Data Filtering</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="data-filtering.html"><a href="data-filtering.html#comparison-operators"><i class="fa fa-check"></i><b>2.3.1</b> Comparison Operators</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html"><i class="fa fa-check"></i><b>2.4</b> Manipulating Data Frames (Data Transformation)</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#arrange-rows-with-arrange"><i class="fa fa-check"></i><b>2.4.1</b> Arrange Rows with <code>arrange()</code></a></li>
+<li class="chapter" data-level="2.4.2" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#select-columns-with-select"><i class="fa fa-check"></i><b>2.4.2</b> Select Columns with <code>select()</code></a></li>
+<li class="chapter" data-level="2.4.3" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#add-new-variables-with-mutate"><i class="fa fa-check"></i><b>2.4.3</b> Add New Variables with <code>mutate()</code></a></li>
+<li class="chapter" data-level="2.4.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#grouped-summaries-with-summarize"><i class="fa fa-check"></i><b>2.4.4</b> Grouped Summaries with <code>summarize()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="determining-data-quality-and-filtering.html"><a href="determining-data-quality-and-filtering.html"><i class="fa fa-check"></i><b>3</b> Determining Data Quality and Filtering</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="deciphering-dia-nn-search-result-files.html"><a href="deciphering-dia-nn-search-result-files.html"><i class="fa fa-check"></i><b>3.1</b> Deciphering DIA-NN Search Result Files</a></li>
+<li class="chapter" data-level="3.2" data-path="import-dia-nn-search-results.html"><a href="import-dia-nn-search-results.html"><i class="fa fa-check"></i><b>3.2</b> Import DIA-NN Search Results</a></li>
+<li class="chapter" data-level="3.3" data-path="evaluate-dia-nn-stats.html"><a href="evaluate-dia-nn-stats.html"><i class="fa fa-check"></i><b>3.3</b> Evaluate DIA-NN Stats</a></li>
+<li class="chapter" data-level="3.4" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html"><i class="fa fa-check"></i><b>3.4</b> Evaluate DIA-NN Results</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#explaining-the-dia-nn-report"><i class="fa fa-check"></i><b>3.4.1</b> Explaining the DIA-NN Report</a></li>
+<li class="chapter" data-level="3.4.2" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#evaluating-the-quality-of-the-runs"><i class="fa fa-check"></i><b>3.4.2</b> Evaluating the Quality of the Runs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="filtering-dia-nn-results.html"><a href="filtering-dia-nn-results.html"><i class="fa fa-check"></i><b>3.5</b> Filtering DIA-NN Results</a></li>
+<li class="chapter" data-level="3.6" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html"><i class="fa fa-check"></i><b>3.6</b> Prepare Data for Differential Expression Analysis (t-test)</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#filter-based-off-number-of-peptides-and-missing-values"><i class="fa fa-check"></i><b>3.6.1</b> Filter Based off Number of Peptides and Missing Values</a></li>
+<li class="chapter" data-level="3.6.2" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#impute-missing-values"><i class="fa fa-check"></i><b>3.6.2</b> Impute Missing Values</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="performing-differential-expression-statistics-t-test.html"><a href="performing-differential-expression-statistics-t-test.html"><i class="fa fa-check"></i><b>4</b> Performing Differential Expression Statistics (t-test)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>4.1</b> Background</a>
+<ul>
+<li class="chapter" data-level="" data-path="background.html"><a href="background.html#types-of-t-tests"><i class="fa fa-check"></i>Types of t-tests</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html"><i class="fa fa-check"></i><b>4.2</b> Prepare the t-test</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#create-the-comparison-table"><i class="fa fa-check"></i><b>4.2.1</b> Create the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#prepare-our-data-using-the-comparison-table"><i class="fa fa-check"></i><b>4.2.2</b> Prepare Our Data Using the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#define-the-t-test-input"><i class="fa fa-check"></i><b>4.2.3</b> Define the T-Test Input</a></li>
+<li class="chapter" data-level="4.2.4" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#fit-the-t-test-regression-models"><i class="fa fa-check"></i><b>4.2.4</b> Fit the T-Test Regression Models</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="create-a-t-test-results-table.html"><a href="create-a-t-test-results-table.html"><i class="fa fa-check"></i><b>4.3</b> Create a T-Test Results Table</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="visualizing-proteomic-data.html"><a href="visualizing-proteomic-data.html"><i class="fa fa-check"></i><b>5</b> Visualizing Proteomic Data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="prep-work.html"><a href="prep-work.html"><i class="fa fa-check"></i><b>5.1</b> Prep Work</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="prep-work.html"><a href="prep-work.html#make-a-common-plotting-theme"><i class="fa fa-check"></i><b>5.1.1</b> Make a Common Plotting Theme</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html"><i class="fa fa-check"></i><b>5.2</b> Replicate Comparisons</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#sample-heatmap-and-hierarchical-clustering"><i class="fa fa-check"></i><b>5.2.1</b> Sample Heatmap and Hierarchical Clustering</a></li>
+<li class="chapter" data-level="5.2.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#principal-component-analysis-pca"><i class="fa fa-check"></i><b>5.2.2</b> Principal Component Analysis (PCA)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="differential-expression.html"><a href="differential-expression.html"><i class="fa fa-check"></i><b>5.3</b> Differential Expression</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="differential-expression.html"><a href="differential-expression.html#protein-expression-heatmap"><i class="fa fa-check"></i><b>5.3.1</b> Protein Expression Heatmap</a></li>
+<li class="chapter" data-level="5.3.2" data-path="differential-expression.html"><a href="differential-expression.html#volcano-plot"><i class="fa fa-check"></i><b>5.3.2</b> Volcano Plot</a></li>
+<li class="chapter" data-level="5.3.3" data-path="differential-expression.html"><a href="differential-expression.html#gene-ontology"><i class="fa fa-check"></i><b>5.3.3</b> Gene Ontology</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Proteomic Data Analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="evaluate-dia-nn-results" class="section level2 hasAnchor" number="3.4">
+<h2><span class="header-section-number">3.4</span> Evaluate DIA-NN Results<a href="evaluate-dia-nn-results.html#evaluate-dia-nn-results" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Let’s look at the data in this file. To do so, we’ll use <code>head()</code> to look at the first five rows of the data frame.</p>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="evaluate-dia-nn-results.html#cb141-1" tabindex="-1"></a><span class="fu">head</span>(diann_results)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 71
+##   Run.Index Run         Channel Precursor.Id Modified.Sequence Stripped.Sequence
+##       &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;        &lt;chr&gt;             &lt;chr&gt;            
+## 1         0 Ahmed_WT3_… &quot;&quot;      AAAAEIAVK2   AAAAEIAVK         AAAAEIAVK        
+## 2         1 Ahmed_bisC… &quot;&quot;      AAAAEIAVK2   AAAAEIAVK         AAAAEIAVK        
+## 3         2 Ahmed_bisC… &quot;&quot;      AAAAEIAVK2   AAAAEIAVK         AAAAEIAVK        
+## 4         3 Ahmed_bisC… &quot;&quot;      AAAAEIAVK2   AAAAEIAVK         AAAAEIAVK        
+## 5         4 Ahmed_msrA… &quot;&quot;      AAAAEIAVK2   AAAAEIAVK         AAAAEIAVK        
+## 6         5 Ahmed_msrA… &quot;&quot;      AAAAEIAVK2   AAAAEIAVK         AAAAEIAVK        
+## # ℹ 65 more variables: Precursor.Charge &lt;int&gt;, Precursor.Lib.Index &lt;int&gt;,
+## #   Decoy &lt;int&gt;, Proteotypic &lt;int&gt;, Precursor.Mz &lt;dbl&gt;, Protein.Ids &lt;chr&gt;,
+## #   Protein.Group &lt;chr&gt;, Protein.Names &lt;chr&gt;, Genes &lt;chr&gt;, RT &lt;dbl&gt;, iRT &lt;dbl&gt;,
+## #   Predicted.RT &lt;dbl&gt;, Predicted.iRT &lt;dbl&gt;, IM &lt;dbl&gt;, iIM &lt;dbl&gt;,
+## #   Predicted.IM &lt;dbl&gt;, Predicted.iIM &lt;dbl&gt;, Precursor.Quantity &lt;dbl&gt;,
+## #   Precursor.Normalised &lt;dbl&gt;, Ms1.Area &lt;dbl&gt;, Ms1.Normalised &lt;dbl&gt;,
+## #   Ms1.Apex.Area &lt;dbl&gt;, Ms1.Apex.Mz.Delta &lt;dbl&gt;, Normalisation.Factor &lt;dbl&gt;, …</code></pre>
+<div id="explaining-the-dia-nn-report" class="section level3 hasAnchor" number="3.4.1">
+<h3><span class="header-section-number">3.4.1</span> Explaining the DIA-NN Report<a href="evaluate-dia-nn-results.html#explaining-the-dia-nn-report" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Each row is a <strong>precursor</strong> ID (<em>i.e.</em>, a charged peptide…remember you can have multiple precursors for a peptide) and each row is data specific to that precursor. A brief description of some of the important rows are below:</p>
+<ul>
+<li><p><strong>Run</strong>: the run name the precursor was identified from</p></li>
+<li><p><strong>Precursor.Id</strong>: the amino acid sequence followed by charge state of the precursor. Note that if the precursor is modified, the UniMod number will be here as well</p></li>
+<li><p><strong>Modified.Sequence</strong>: the amino acid sequence of the precursor. Note that is the that if the precursor is modified, the UniMod number will be here as well</p>
+<ul>
+<li><em>Note</em>: it is possible to have multiple Precursor.Ids for the same Modified.Sequence (<em>e.g.</em>, the modified peptide was identified in both the +2 and +3 form)</li>
+</ul></li>
+<li><p><strong>Stripped.Sequence</strong>: the amino acid sequence of the precursor. Note that if the precursor is modified, the UniMod number will <strong>NOT</strong> be here.</p>
+<ul>
+<li><em>Note</em>: it is possible to have multiple Modified.Sequences for the same Stripped.Sequence (<em>e.g.</em>, the peptide was identified in both the modified and un-modified form)</li>
+</ul></li>
+<li><p><strong>Precursor.Charge</strong>: the charge state of the precursor</p></li>
+<li><p><strong>Proteotypic</strong>: the precursor sequence matches to a single protein in the FASTA file. (1 = TRUE, 0 = FALSE)</p></li>
+<li><p><strong>Precursor.mz</strong>: the <em>m/z</em> of the identified precursor</p></li>
+<li><p><strong>Protein.Ids</strong>: The UniProt accession number(s) of all possible proteins the precursor matched to (<em>i.e.</em>, every protein this precursor could have come from)</p></li>
+<li><p><strong>Protein.Group</strong>: DIA-NN’s best attempt at resolving which minimal set of proteins can explain the identified precursor (<em>i.e.</em>, what DIA-NN <strong>thinks</strong> the precursor most likely came from)</p></li>
+<li><p><strong>Genes</strong>: The name of the gene that produces the “Protein.Group”</p></li>
+<li><p><strong>RT</strong>: The retention time, in minutes, of the apex for the precursor</p></li>
+<li><p><strong>IM</strong>: The ion mobility (if the instrument has it) of the precursor</p></li>
+<li><p><strong>Precursor.Quantity</strong>: The un-normalized abundance of the precursor</p></li>
+<li><p><strong>Precursor.Normalised</strong>: The normalized abundance of the precursor. Note that if normalization is disabled. the column ios simply the same value as “Precursor.Quantity”</p></li>
+<li><p><strong>Quantity.Quality</strong>: The quality of the precursor quantification (higher value = higher confidence)</p></li>
+<li><p><strong>RT.Start</strong>: The retention time, in minutes, of the first scan the precursor was detected</p></li>
+<li><p><strong>RT.Stop</strong>: The retention time, in minutes, of the last scan the precursor was detected</p></li>
+<li><p><strong>FWHM</strong>: The “Full-width, half-maximum” of the precursor, in minutes. This gives a measurement for how wide the precursor extracted ion chromatogram (XIC)</p></li>
+<li><p><strong>PG.MaxLFQ</strong>: The abundance of the entire protein group that precursor matched to. This is calculated by using “MaxLFQ”, which tries to use all the possible precursor abundances across all the runs to find the most representative abundance that describes that protein group’s abundance for each sample.</p>
+<ul>
+<li><em>Note</em>: this value will be the same for all precursors that match to the same protein group within each sample</li>
+</ul></li>
+<li><p><strong>PG.MaxLFQ.Quality</strong>: The quality of the MaxLFQ quantification (high value = higher confidence)</p></li>
+<li><p><strong>Q.Value</strong>: The confidence that the precursor identification within each run was a true identification (lower value = higher confidence)</p></li>
+<li><p><strong>PEP</strong>: “Posterior Error Probability” (lower value = higher confidence)</p></li>
+<li><p><strong>Global.Q.Value</strong>: The confidence that the precursor identification across all runs in the experiment was a true identification (lower value = higher confidence)</p></li>
+<li><p><strong>Lib.Q.Value</strong>: The confidence that the precursor identification was matched to a precursor from the spectral library (lower value = higher confidence)</p>
+<ul>
+<li><em>Note</em>: this only populate if MBR was enabled</li>
+</ul></li>
+<li><p><strong>PG.Q.Value</strong>: The confidence that the protein group identification within each run was a true identification (lower value = higher confidence)</p></li>
+<li><p><strong>Global.PG.Q.Value</strong>: The confidence that the protein group identification across all runs in the experiment was a true identification (lower value = higher confidence)</p></li>
+<li><p><strong>Lib.PG.Q.Value</strong>: The confidence that the protein group identification was matched to a protein group from the spectral library (lower value = higher confidence)</p>
+<ul>
+<li><em>Note</em>: this only populate if MBR was enabled</li>
+</ul></li>
+<li><p><strong>Best.Fr.Mz</strong>: The <em>m/z</em> of the best fragment ion for this precursor. This isn’t always used, but will be necessary if you wish to use <code>MSStats</code></p></li>
+</ul>
+</div>
+<div id="evaluating-the-quality-of-the-runs" class="section level3 hasAnchor" number="3.4.2">
+<h3><span class="header-section-number">3.4.2</span> Evaluating the Quality of the Runs<a href="evaluate-dia-nn-results.html#evaluating-the-quality-of-the-runs" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Using some of the columns mentioned above, we are going to look at the quality of each of the precursors, and filter to only retain high quality IDs, and then re-check those same metrics.</p>
+<p>But first, we’re going to modify the <code>diann_results</code> data frame slightly:</p>
+<ul>
+<li><p>We will rename each <code>Run</code> so that we remove any common strings (“Ahmed_” and “_25-023”). This will make visualization slightly easier</p></li>
+<li><p>We will remove any unwanted columns so that we only have the ones mentioned above. The makes the data frame considerably smaller, making each subsequent step just a bit faster</p></li>
+<li><p>We will also be adding an extra column denoting the group of each sample. This will make it slightly easier to comprehend the graphs later on</p></li>
+</ul>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="evaluate-dia-nn-results.html#cb143-1" tabindex="-1"></a>diann_results <span class="ot">&lt;-</span> diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb143-2"><a href="evaluate-dia-nn-results.html#cb143-2" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(Run, Precursor.Id<span class="sc">:</span>Precursor.Charge, Proteotypic<span class="sc">:</span>Protein.Group,</span>
+<span id="cb143-3"><a href="evaluate-dia-nn-results.html#cb143-3" tabindex="-1"></a>           Genes<span class="sc">:</span>RT, Precursor.Quantity, Precursor.Normalised, Quantity.Quality, </span>
+<span id="cb143-4"><a href="evaluate-dia-nn-results.html#cb143-4" tabindex="-1"></a>           RT.Stop<span class="sc">:</span>FWHM, PG.MaxLFQ, PG.MaxLFQ.Quality, Q.Value<span class="sc">:</span>Lib.Q.Value,</span>
+<span id="cb143-5"><a href="evaluate-dia-nn-results.html#cb143-5" tabindex="-1"></a>           PG.Q.Value, Global.PG.Q.Value, Lib.PG.Q.Value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb143-6"><a href="evaluate-dia-nn-results.html#cb143-6" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Run =</span> <span class="fu">gsub</span>(<span class="st">&#39;Ahmed_&#39;</span>, <span class="st">&#39;&#39;</span>, Run),</span>
+<span id="cb143-7"><a href="evaluate-dia-nn-results.html#cb143-7" tabindex="-1"></a>         <span class="at">Run =</span> <span class="fu">gsub</span>(<span class="st">&#39;_25-023&#39;</span>, <span class="st">&#39;&#39;</span>, Run)) <span class="sc">%&gt;%</span> </span>
+<span id="cb143-8"><a href="evaluate-dia-nn-results.html#cb143-8" tabindex="-1"></a>  <span class="co"># We are going to add &quot;metadata&quot; to our runs, which includes information such as the group that sample belongs to, the replicate, etc. We can make this beforehand, or simply make a new tibble that contains all the information, which we&#39;re doing here. So we will be making a new tibble where one column is all of the run names in our experiment (&quot;Runs&quot;) and then another column that has the genotype of that samples (&quot;group&quot;)</span></span>
+<span id="cb143-9"><a href="evaluate-dia-nn-results.html#cb143-9" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="at">y =</span> <span class="fu">tibble</span>(<span class="at">Run =</span> <span class="fu">c</span>( <span class="st">&#39;bisC1&#39;</span>, <span class="st">&#39;bisC2&#39;</span>, <span class="st">&#39;bisC3&#39;</span>, </span>
+<span id="cb143-10"><a href="evaluate-dia-nn-results.html#cb143-10" tabindex="-1"></a>                                <span class="st">&#39;msrA1&#39;</span>, <span class="st">&#39;msrA2&#39;</span>, <span class="st">&#39;msrA3&#39;</span>,</span>
+<span id="cb143-11"><a href="evaluate-dia-nn-results.html#cb143-11" tabindex="-1"></a>                                <span class="st">&#39;msrB1&#39;</span>, <span class="st">&#39;msrB2&#39;</span>, <span class="st">&#39;msrB3&#39;</span>,</span>
+<span id="cb143-12"><a href="evaluate-dia-nn-results.html#cb143-12" tabindex="-1"></a>                                <span class="st">&#39;msrC1&#39;</span>, <span class="st">&#39;msrC2&#39;</span>, <span class="st">&#39;msrC3&#39;</span>, </span>
+<span id="cb143-13"><a href="evaluate-dia-nn-results.html#cb143-13" tabindex="-1"></a>                                <span class="st">&#39;WT1&#39;</span>, <span class="st">&#39;WT2&#39;</span>, <span class="st">&#39;WT3&#39;</span>),</span>
+<span id="cb143-14"><a href="evaluate-dia-nn-results.html#cb143-14" tabindex="-1"></a>                       <span class="at">group =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&#39;bisC&#39;</span>, <span class="dv">3</span>),</span>
+<span id="cb143-15"><a href="evaluate-dia-nn-results.html#cb143-15" tabindex="-1"></a>                                 <span class="fu">rep</span>(<span class="st">&#39;msrA&#39;</span>, <span class="dv">3</span>),</span>
+<span id="cb143-16"><a href="evaluate-dia-nn-results.html#cb143-16" tabindex="-1"></a>                                 <span class="fu">rep</span>(<span class="st">&#39;msrB&#39;</span>, <span class="dv">3</span>),</span>
+<span id="cb143-17"><a href="evaluate-dia-nn-results.html#cb143-17" tabindex="-1"></a>                                 <span class="fu">rep</span>(<span class="st">&#39;msrC&#39;</span>, <span class="dv">3</span>),</span>
+<span id="cb143-18"><a href="evaluate-dia-nn-results.html#cb143-18" tabindex="-1"></a>                                 <span class="fu">rep</span>(<span class="st">&#39;WT&#39;</span>, <span class="dv">3</span>))),</span>
+<span id="cb143-19"><a href="evaluate-dia-nn-results.html#cb143-19" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">&#39;Run&#39;</span>)</span></code></pre></div>
+<div id="proteome-coverage" class="section level4 hasAnchor" number="3.4.2.1">
+<h4><span class="header-section-number">3.4.2.1</span> Proteome Coverage<a href="evaluate-dia-nn-results.html#proteome-coverage" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Now let’s look to see how many precursors, modified peptides, and protein groups were identified in each experiment. Ideally, they should be pretty similar, or at least each biological group should be similar among each other.</p>
+<p>First, we will look at the number of precursors identified in each sample. While it would be nice to have all samples have a similar number, sometimes biology gets in the way. At the very least, we should expect each replicate from the same group to have a similar number of IDs. We’ll do this by looking at three different ID “levels”: precursors, peptides, and proteins.</p>
+<div id="precursor-ids" class="section level5 unnumbered hasAnchor">
+<h5>Precursor IDs<a href="evaluate-dia-nn-results.html#precursor-ids" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="evaluate-dia-nn-results.html#cb144-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb144-2"><a href="evaluate-dia-nn-results.html#cb144-2" tabindex="-1"></a>  <span class="co"># We want only the columns &quot;Run&quot;, &quot;group&quot;, and &quot;Precursor.Id&quot;. More specifically, only rows where all three of these columns are unique</span></span>
+<span id="cb144-3"><a href="evaluate-dia-nn-results.html#cb144-3" tabindex="-1"></a>  <span class="fu">distinct</span>(Run,</span>
+<span id="cb144-4"><a href="evaluate-dia-nn-results.html#cb144-4" tabindex="-1"></a>           group,</span>
+<span id="cb144-5"><a href="evaluate-dia-nn-results.html#cb144-5" tabindex="-1"></a>           Precursor.Id) <span class="sc">%&gt;%</span> </span>
+<span id="cb144-6"><a href="evaluate-dia-nn-results.html#cb144-6" tabindex="-1"></a>  <span class="fu">group_by</span>(Run,</span>
+<span id="cb144-7"><a href="evaluate-dia-nn-results.html#cb144-7" tabindex="-1"></a>           group) <span class="sc">%&gt;%</span> </span>
+<span id="cb144-8"><a href="evaluate-dia-nn-results.html#cb144-8" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_precursor_ids =</span> <span class="fu">n</span>(), <span class="co">#counts the number of precursor IDs in each group (run and group)</span></span>
+<span id="cb144-9"><a href="evaluate-dia-nn-results.html#cb144-9" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb144-10"><a href="evaluate-dia-nn-results.html#cb144-10" tabindex="-1"></a>  <span class="co"># We want to plot the number of unique precursors in each sample, grouping them by genotype</span></span>
+<span id="cb144-11"><a href="evaluate-dia-nn-results.html#cb144-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Run, <span class="co"># x-axis will be the run</span></span>
+<span id="cb144-12"><a href="evaluate-dia-nn-results.html#cb144-12" tabindex="-1"></a>                       <span class="at">y =</span> n_precursor_ids, <span class="co"># y-axis will be the number of precursor IDs</span></span>
+<span id="cb144-13"><a href="evaluate-dia-nn-results.html#cb144-13" tabindex="-1"></a>                       <span class="at">fill =</span> group)) <span class="sc">+</span> <span class="co"># we want each genotype to be a different color</span></span>
+<span id="cb144-14"><a href="evaluate-dia-nn-results.html#cb144-14" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> <span class="co"># Draw a bar graph</span></span>
+<span id="cb144-15"><a href="evaluate-dia-nn-results.html#cb144-15" tabindex="-1"></a>  <span class="co"># Add labels to the plot</span></span>
+<span id="cb144-16"><a href="evaluate-dia-nn-results.html#cb144-16" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&#39;Sample&#39;</span>, <span class="co"># x-axis title</span></span>
+<span id="cb144-17"><a href="evaluate-dia-nn-results.html#cb144-17" tabindex="-1"></a>       <span class="at">y =</span><span class="st">&#39;Number of Precursor IDs&#39;</span>, <span class="co"># y-axis title</span></span>
+<span id="cb144-18"><a href="evaluate-dia-nn-results.html#cb144-18" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&#39;Number of Precursor IDs per Run&#39;</span>) <span class="co">#Title of the plot</span></span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-72-1.png" alt="" width="672" /></p>
+</div>
+<div id="peptide-ids" class="section level5 unnumbered hasAnchor">
+<h5>Peptide IDs<a href="evaluate-dia-nn-results.html#peptide-ids" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="evaluate-dia-nn-results.html#cb145-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb145-2"><a href="evaluate-dia-nn-results.html#cb145-2" tabindex="-1"></a>  <span class="fu">distinct</span>(Run,</span>
+<span id="cb145-3"><a href="evaluate-dia-nn-results.html#cb145-3" tabindex="-1"></a>           group,</span>
+<span id="cb145-4"><a href="evaluate-dia-nn-results.html#cb145-4" tabindex="-1"></a>           Modified.Sequence) <span class="sc">%&gt;%</span> </span>
+<span id="cb145-5"><a href="evaluate-dia-nn-results.html#cb145-5" tabindex="-1"></a>  <span class="fu">group_by</span>(Run,</span>
+<span id="cb145-6"><a href="evaluate-dia-nn-results.html#cb145-6" tabindex="-1"></a>           group) <span class="sc">%&gt;%</span> </span>
+<span id="cb145-7"><a href="evaluate-dia-nn-results.html#cb145-7" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_modified_peptides =</span> <span class="fu">n</span>(),</span>
+<span id="cb145-8"><a href="evaluate-dia-nn-results.html#cb145-8" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb145-9"><a href="evaluate-dia-nn-results.html#cb145-9" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Run,</span>
+<span id="cb145-10"><a href="evaluate-dia-nn-results.html#cb145-10" tabindex="-1"></a>                       <span class="at">y =</span> n_modified_peptides,</span>
+<span id="cb145-11"><a href="evaluate-dia-nn-results.html#cb145-11" tabindex="-1"></a>                       <span class="at">fill =</span> group)) <span class="sc">+</span></span>
+<span id="cb145-12"><a href="evaluate-dia-nn-results.html#cb145-12" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb145-13"><a href="evaluate-dia-nn-results.html#cb145-13" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&#39;Sample&#39;</span>,</span>
+<span id="cb145-14"><a href="evaluate-dia-nn-results.html#cb145-14" tabindex="-1"></a>       <span class="at">y =</span><span class="st">&#39;Number of Modified Peptide IDs&#39;</span>,</span>
+<span id="cb145-15"><a href="evaluate-dia-nn-results.html#cb145-15" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&#39;Number of Modified Peptide IDs per Run&#39;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-73-1.png" alt="" width="672" /></p>
+</div>
+<div id="protein-ids" class="section level5 unnumbered hasAnchor">
+<h5>Protein IDs<a href="evaluate-dia-nn-results.html#protein-ids" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="evaluate-dia-nn-results.html#cb146-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb146-2"><a href="evaluate-dia-nn-results.html#cb146-2" tabindex="-1"></a>  <span class="fu">distinct</span>(Run,</span>
+<span id="cb146-3"><a href="evaluate-dia-nn-results.html#cb146-3" tabindex="-1"></a>           group,</span>
+<span id="cb146-4"><a href="evaluate-dia-nn-results.html#cb146-4" tabindex="-1"></a>           Stripped.Sequence) <span class="sc">%&gt;%</span> </span>
+<span id="cb146-5"><a href="evaluate-dia-nn-results.html#cb146-5" tabindex="-1"></a>  <span class="fu">group_by</span>(Run,</span>
+<span id="cb146-6"><a href="evaluate-dia-nn-results.html#cb146-6" tabindex="-1"></a>           group) <span class="sc">%&gt;%</span> </span>
+<span id="cb146-7"><a href="evaluate-dia-nn-results.html#cb146-7" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_peptides =</span> <span class="fu">n</span>(),</span>
+<span id="cb146-8"><a href="evaluate-dia-nn-results.html#cb146-8" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb146-9"><a href="evaluate-dia-nn-results.html#cb146-9" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Run,</span>
+<span id="cb146-10"><a href="evaluate-dia-nn-results.html#cb146-10" tabindex="-1"></a>                       <span class="at">y =</span> n_peptides,</span>
+<span id="cb146-11"><a href="evaluate-dia-nn-results.html#cb146-11" tabindex="-1"></a>                       <span class="at">fill =</span> group)) <span class="sc">+</span></span>
+<span id="cb146-12"><a href="evaluate-dia-nn-results.html#cb146-12" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb146-13"><a href="evaluate-dia-nn-results.html#cb146-13" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&#39;Sample&#39;</span>,</span>
+<span id="cb146-14"><a href="evaluate-dia-nn-results.html#cb146-14" tabindex="-1"></a>       <span class="at">y =</span><span class="st">&#39;Number of Peptide IDs&#39;</span>,</span>
+<span id="cb146-15"><a href="evaluate-dia-nn-results.html#cb146-15" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&#39;Number of Unique Peptide IDs per Run&#39;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-74-1.png" alt="" width="672" /></p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="evaluate-dia-nn-results.html#cb147-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb147-2"><a href="evaluate-dia-nn-results.html#cb147-2" tabindex="-1"></a>  <span class="fu">distinct</span>(Run,</span>
+<span id="cb147-3"><a href="evaluate-dia-nn-results.html#cb147-3" tabindex="-1"></a>           group,</span>
+<span id="cb147-4"><a href="evaluate-dia-nn-results.html#cb147-4" tabindex="-1"></a>           Protein.Group) <span class="sc">%&gt;%</span> </span>
+<span id="cb147-5"><a href="evaluate-dia-nn-results.html#cb147-5" tabindex="-1"></a>  <span class="fu">group_by</span>(Run,</span>
+<span id="cb147-6"><a href="evaluate-dia-nn-results.html#cb147-6" tabindex="-1"></a>           group) <span class="sc">%&gt;%</span> </span>
+<span id="cb147-7"><a href="evaluate-dia-nn-results.html#cb147-7" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_protein_groups =</span> <span class="fu">n</span>(),</span>
+<span id="cb147-8"><a href="evaluate-dia-nn-results.html#cb147-8" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb147-9"><a href="evaluate-dia-nn-results.html#cb147-9" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Run,</span>
+<span id="cb147-10"><a href="evaluate-dia-nn-results.html#cb147-10" tabindex="-1"></a>                       <span class="at">y =</span> n_protein_groups,</span>
+<span id="cb147-11"><a href="evaluate-dia-nn-results.html#cb147-11" tabindex="-1"></a>                       <span class="at">fill =</span> group)) <span class="sc">+</span></span>
+<span id="cb147-12"><a href="evaluate-dia-nn-results.html#cb147-12" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb147-13"><a href="evaluate-dia-nn-results.html#cb147-13" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&#39;Sample&#39;</span>,</span>
+<span id="cb147-14"><a href="evaluate-dia-nn-results.html#cb147-14" tabindex="-1"></a>       <span class="at">y =</span><span class="st">&#39;Number of Protein Groups&#39;</span>,</span>
+<span id="cb147-15"><a href="evaluate-dia-nn-results.html#cb147-15" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&#39;Number of Protein Group IDs per Run&#39;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-74-2.png" alt="" width="672" /></p>
+<p>This series of plots show us a few things:</p>
+<ol style="list-style-type: decimal">
+<li><p>The number of IDs decreases as we go up in “biological level” (<em>i.e.</em>, precursor -&gt; modified peptide -&gt; stripped peptide -&gt; protein). This inherently makes sense since multiple precursors can be produced from a single modified peptide, if there is a variable modification site, a peptide can exist as both modified and unmodified, and lastly multiple peptides can be produced from a single protein</p></li>
+<li><p>There seems to be one run, msrC2, that is an outlier in terms of IDs as compared to the rest of the runs, especially the rest of the runs from the group.</p></li>
+</ol>
+<p>However, based just off the total number of IDs, we can’t tell if we should remove this run or not from our analysis. Let’s look at some other metrics, specifically:</p>
+<ul>
+<li><p>Charge state distribution</p></li>
+<li><p>Intensity distribution</p></li>
+<li><p>CV distribution at each “biological level” (precursor, peptide, protein group)</p></li>
+</ul>
+</div>
+</div>
+<div id="charge-state-distribution" class="section level4 hasAnchor" number="3.4.2.2">
+<h4><span class="header-section-number">3.4.2.2</span> Charge State Distribution<a href="evaluate-dia-nn-results.html#charge-state-distribution" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="evaluate-dia-nn-results.html#cb148-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb148-2"><a href="evaluate-dia-nn-results.html#cb148-2" tabindex="-1"></a>  <span class="fu">select</span>(Run, </span>
+<span id="cb148-3"><a href="evaluate-dia-nn-results.html#cb148-3" tabindex="-1"></a>         group,</span>
+<span id="cb148-4"><a href="evaluate-dia-nn-results.html#cb148-4" tabindex="-1"></a>         Precursor.Id,</span>
+<span id="cb148-5"><a href="evaluate-dia-nn-results.html#cb148-5" tabindex="-1"></a>         Precursor.Charge) <span class="sc">%&gt;%</span> </span>
+<span id="cb148-6"><a href="evaluate-dia-nn-results.html#cb148-6" tabindex="-1"></a>  <span class="fu">count</span>(Run,</span>
+<span id="cb148-7"><a href="evaluate-dia-nn-results.html#cb148-7" tabindex="-1"></a>        group,</span>
+<span id="cb148-8"><a href="evaluate-dia-nn-results.html#cb148-8" tabindex="-1"></a>        Precursor.Charge) <span class="sc">%&gt;%</span> </span>
+<span id="cb148-9"><a href="evaluate-dia-nn-results.html#cb148-9" tabindex="-1"></a>  <span class="fu">group_by</span>(Run, group) <span class="sc">%&gt;%</span> </span>
+<span id="cb148-10"><a href="evaluate-dia-nn-results.html#cb148-10" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_precursors =</span> <span class="fu">sum</span>(n)) <span class="sc">%&gt;%</span> </span>
+<span id="cb148-11"><a href="evaluate-dia-nn-results.html#cb148-11" tabindex="-1"></a>  <span class="fu">group_by</span>(Run, group, Precursor.Charge) <span class="sc">%&gt;%</span> </span>
+<span id="cb148-12"><a href="evaluate-dia-nn-results.html#cb148-12" tabindex="-1"></a>  <span class="fu">reframe</span>(<span class="at">charge_per =</span> n<span class="sc">/</span>total_precursors <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb148-13"><a href="evaluate-dia-nn-results.html#cb148-13" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Precursor.Charge :=</span> <span class="fu">fct_inorder</span>(<span class="fu">factor</span>(Precursor.Charge)),</span>
+<span id="cb148-14"><a href="evaluate-dia-nn-results.html#cb148-14" tabindex="-1"></a>         <span class="at">Run :=</span> <span class="fu">factor</span>(Run,</span>
+<span id="cb148-15"><a href="evaluate-dia-nn-results.html#cb148-15" tabindex="-1"></a>                       <span class="at">levels =</span> <span class="fu">unique</span>(<span class="fu">str_sort</span>(Run, <span class="at">numeric =</span> T)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb148-16"><a href="evaluate-dia-nn-results.html#cb148-16" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Run,</span>
+<span id="cb148-17"><a href="evaluate-dia-nn-results.html#cb148-17" tabindex="-1"></a>             <span class="at">y =</span> charge_per,</span>
+<span id="cb148-18"><a href="evaluate-dia-nn-results.html#cb148-18" tabindex="-1"></a>             <span class="at">fill =</span> Precursor.Charge)) <span class="sc">+</span></span>
+<span id="cb148-19"><a href="evaluate-dia-nn-results.html#cb148-19" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">color =</span> <span class="st">&#39;black&#39;</span>,</span>
+<span id="cb148-20"><a href="evaluate-dia-nn-results.html#cb148-20" tabindex="-1"></a>           <span class="at">linewidth =</span> <span class="fl">0.75</span>) <span class="sc">+</span></span>
+<span id="cb148-21"><a href="evaluate-dia-nn-results.html#cb148-21" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">cols =</span> <span class="fu">vars</span>(group),</span>
+<span id="cb148-22"><a href="evaluate-dia-nn-results.html#cb148-22" tabindex="-1"></a>             <span class="at">scales =</span> <span class="st">&#39;free&#39;</span>) <span class="sc">+</span></span>
+<span id="cb148-23"><a href="evaluate-dia-nn-results.html#cb148-23" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&#39;Percentage of Precursors&#39;</span>,</span>
+<span id="cb148-24"><a href="evaluate-dia-nn-results.html#cb148-24" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&#39;Percentage of Precursors at Specific Charge Among All IDs&#39;</span>) <span class="sc">+</span></span>
+<span id="cb148-25"><a href="evaluate-dia-nn-results.html#cb148-25" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">75</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-75-1.png" alt="" width="672" /></p>
+<p>All runs follow a similar pattern of charge distribution, indicating ionization was consistent across the experiment</p>
+</div>
+<div id="intensity-distribution" class="section level4 unnumbered hasAnchor">
+<h4>Intensity Distribution<a href="evaluate-dia-nn-results.html#intensity-distribution" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="un-normalized-intensity" class="section level5 unnumbered hasAnchor">
+<h5>Un-normalized Intensity<a href="evaluate-dia-nn-results.html#un-normalized-intensity" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="evaluate-dia-nn-results.html#cb149-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb149-2"><a href="evaluate-dia-nn-results.html#cb149-2" tabindex="-1"></a>  <span class="fu">select</span>(Run, </span>
+<span id="cb149-3"><a href="evaluate-dia-nn-results.html#cb149-3" tabindex="-1"></a>         group,</span>
+<span id="cb149-4"><a href="evaluate-dia-nn-results.html#cb149-4" tabindex="-1"></a>         Precursor.Id,</span>
+<span id="cb149-5"><a href="evaluate-dia-nn-results.html#cb149-5" tabindex="-1"></a>         Precursor.Quantity) <span class="sc">%&gt;%</span></span>
+<span id="cb149-6"><a href="evaluate-dia-nn-results.html#cb149-6" tabindex="-1"></a>  <span class="fu">filter</span>(Precursor.Quantity <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb149-7"><a href="evaluate-dia-nn-results.html#cb149-7" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Precursor.Quantity =</span> <span class="fu">log2</span>(Precursor.Quantity)) <span class="sc">%&gt;%</span> </span>
+<span id="cb149-8"><a href="evaluate-dia-nn-results.html#cb149-8" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Precursor.Quantity,</span>
+<span id="cb149-9"><a href="evaluate-dia-nn-results.html#cb149-9" tabindex="-1"></a>             <span class="at">color =</span> Run)) <span class="sc">+</span></span>
+<span id="cb149-10"><a href="evaluate-dia-nn-results.html#cb149-10" tabindex="-1"></a>  <span class="fu">geom_freqpoly</span>(<span class="at">linewidth =</span> <span class="fl">0.75</span>,</span>
+<span id="cb149-11"><a href="evaluate-dia-nn-results.html#cb149-11" tabindex="-1"></a>                <span class="at">bins =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb149-12"><a href="evaluate-dia-nn-results.html#cb149-12" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">cols =</span> <span class="fu">vars</span>(group),</span>
+<span id="cb149-13"><a href="evaluate-dia-nn-results.html#cb149-13" tabindex="-1"></a>             <span class="at">scales =</span> <span class="st">&#39;free&#39;</span>) <span class="sc">+</span></span>
+<span id="cb149-14"><a href="evaluate-dia-nn-results.html#cb149-14" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&#39;Un-normalized Precursor Abundance (log2)&#39;</span>,</span>
+<span id="cb149-15"><a href="evaluate-dia-nn-results.html#cb149-15" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&#39;Distribution of Un-normalized Precursor Abundances&#39;</span>) </span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-76-1.png" alt="" width="672" /></p>
+<p>It would appear that the <code>msrC2</code> sample might have had lower coverage due to a decrease in the total amount of peptide loaded onto the HPLC column, which would in turn lead to a decrease in overall abundances. Luckily, normalization can sometimes make up for differences like these. Let’s look to see if DIA-NN normalization helped.</p>
+</div>
+<div id="normalized-intensity" class="section level5 hasAnchor" number="3.4.2.2.1">
+<h5><span class="header-section-number">3.4.2.2.1</span> Normalized Intensity<a href="evaluate-dia-nn-results.html#normalized-intensity" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="evaluate-dia-nn-results.html#cb150-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb150-2"><a href="evaluate-dia-nn-results.html#cb150-2" tabindex="-1"></a>  <span class="fu">select</span>(Run, </span>
+<span id="cb150-3"><a href="evaluate-dia-nn-results.html#cb150-3" tabindex="-1"></a>         group,</span>
+<span id="cb150-4"><a href="evaluate-dia-nn-results.html#cb150-4" tabindex="-1"></a>         Precursor.Id,</span>
+<span id="cb150-5"><a href="evaluate-dia-nn-results.html#cb150-5" tabindex="-1"></a>         Precursor.Normalised) <span class="sc">%&gt;%</span></span>
+<span id="cb150-6"><a href="evaluate-dia-nn-results.html#cb150-6" tabindex="-1"></a>  <span class="fu">filter</span>(Precursor.Normalised <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb150-7"><a href="evaluate-dia-nn-results.html#cb150-7" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Precursor.Normalised =</span> <span class="fu">log2</span>(Precursor.Normalised)) <span class="sc">%&gt;%</span> </span>
+<span id="cb150-8"><a href="evaluate-dia-nn-results.html#cb150-8" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Precursor.Normalised,</span>
+<span id="cb150-9"><a href="evaluate-dia-nn-results.html#cb150-9" tabindex="-1"></a>             <span class="at">color =</span> Run)) <span class="sc">+</span></span>
+<span id="cb150-10"><a href="evaluate-dia-nn-results.html#cb150-10" tabindex="-1"></a>  <span class="fu">geom_freqpoly</span>(<span class="at">linewidth =</span> <span class="fl">0.75</span>,</span>
+<span id="cb150-11"><a href="evaluate-dia-nn-results.html#cb150-11" tabindex="-1"></a>                <span class="at">bins =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb150-12"><a href="evaluate-dia-nn-results.html#cb150-12" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">cols =</span> <span class="fu">vars</span>(group),</span>
+<span id="cb150-13"><a href="evaluate-dia-nn-results.html#cb150-13" tabindex="-1"></a>             <span class="at">scales =</span> <span class="st">&#39;free&#39;</span>) <span class="sc">+</span></span>
+<span id="cb150-14"><a href="evaluate-dia-nn-results.html#cb150-14" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&#39;Normalized Precursor Abundance (log2)&#39;</span>,</span>
+<span id="cb150-15"><a href="evaluate-dia-nn-results.html#cb150-15" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&#39;Distribution of Normalized Precursor Abundances&#39;</span>) </span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-77-1.png" alt="" width="672" /></p>
+<p>While the left edge of the curve is narrower, <code>msrC2</code> now mostly agrees with the rest of the group. This would imply that by using the normalized precursor quantities, we shouldn’t see too much effect from the decreased material loaded in <code>msrC2</code> on the downstream analyses. Just to be sure, let’s check the protein abudances, which is calculated using the normalized precursor abundances.</p>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="evaluate-dia-nn-results.html#cb151-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb151-2"><a href="evaluate-dia-nn-results.html#cb151-2" tabindex="-1"></a>  <span class="fu">distinct</span>(Run, </span>
+<span id="cb151-3"><a href="evaluate-dia-nn-results.html#cb151-3" tabindex="-1"></a>           group,</span>
+<span id="cb151-4"><a href="evaluate-dia-nn-results.html#cb151-4" tabindex="-1"></a>           Protein.Group,</span>
+<span id="cb151-5"><a href="evaluate-dia-nn-results.html#cb151-5" tabindex="-1"></a>           PG.MaxLFQ) <span class="sc">%&gt;%</span></span>
+<span id="cb151-6"><a href="evaluate-dia-nn-results.html#cb151-6" tabindex="-1"></a>  <span class="fu">filter</span>(PG.MaxLFQ <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb151-7"><a href="evaluate-dia-nn-results.html#cb151-7" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PG.MaxLFQ =</span> <span class="fu">log2</span>(PG.MaxLFQ)) <span class="sc">%&gt;%</span> </span>
+<span id="cb151-8"><a href="evaluate-dia-nn-results.html#cb151-8" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> PG.MaxLFQ,</span>
+<span id="cb151-9"><a href="evaluate-dia-nn-results.html#cb151-9" tabindex="-1"></a>             <span class="at">color =</span> Run)) <span class="sc">+</span></span>
+<span id="cb151-10"><a href="evaluate-dia-nn-results.html#cb151-10" tabindex="-1"></a>  <span class="fu">geom_freqpoly</span>(<span class="at">linewidth =</span> <span class="fl">0.75</span>,</span>
+<span id="cb151-11"><a href="evaluate-dia-nn-results.html#cb151-11" tabindex="-1"></a>                <span class="at">bins =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb151-12"><a href="evaluate-dia-nn-results.html#cb151-12" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">cols =</span> <span class="fu">vars</span>(group),</span>
+<span id="cb151-13"><a href="evaluate-dia-nn-results.html#cb151-13" tabindex="-1"></a>             <span class="at">scales =</span> <span class="st">&#39;free&#39;</span>) <span class="sc">+</span></span>
+<span id="cb151-14"><a href="evaluate-dia-nn-results.html#cb151-14" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&#39;Protein Abundance (log2)&#39;</span>,</span>
+<span id="cb151-15"><a href="evaluate-dia-nn-results.html#cb151-15" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&#39;Distribution of Protein Abundances&#39;</span>) </span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-78-1.png" alt="" width="672" /></p>
+<p>Once “wrapping up” to the protein level, any differences in abundances is now even smaller. Therefore, we can be a little more confident that we can use all our data in downstream analyses. But just to be sure, we’re going to look at one more metric.</p>
+</div>
+</div>
+<div id="cv-distribution" class="section level4 unnumbered hasAnchor">
+<h4>CV Distribution<a href="evaluate-dia-nn-results.html#cv-distribution" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>We are also going to measure the coefficient of variation (CV, standard deviation divided by the mean) across each “biological level” to see if there are any groups what have inconsistent quantification across all reps of that group.</p>
+<p>We will also be measuring the CV across all 15 samples, regardless of biological group. This is a good sanity check to always perform; if your experiment was properly designed, the CV between replicates within the same group should be lower than the CV between all the samples.</p>
+<div id="precursor-level" class="section level5 unnumbered hasAnchor">
+<h5>Precursor Level<a href="evaluate-dia-nn-results.html#precursor-level" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="evaluate-dia-nn-results.html#cb152-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb152-2"><a href="evaluate-dia-nn-results.html#cb152-2" tabindex="-1"></a>  <span class="fu">distinct</span>(Precursor.Id,</span>
+<span id="cb152-3"><a href="evaluate-dia-nn-results.html#cb152-3" tabindex="-1"></a>           Run,</span>
+<span id="cb152-4"><a href="evaluate-dia-nn-results.html#cb152-4" tabindex="-1"></a>           group,</span>
+<span id="cb152-5"><a href="evaluate-dia-nn-results.html#cb152-5" tabindex="-1"></a>           Precursor.Normalised) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-6"><a href="evaluate-dia-nn-results.html#cb152-6" tabindex="-1"></a>  <span class="fu">filter</span>(Precursor.Normalised <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-7"><a href="evaluate-dia-nn-results.html#cb152-7" tabindex="-1"></a>  <span class="fu">group_by</span>(Precursor.Id) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-8"><a href="evaluate-dia-nn-results.html#cb152-8" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cv_combined =</span> <span class="fu">sd</span>(Precursor.Normalised,</span>
+<span id="cb152-9"><a href="evaluate-dia-nn-results.html#cb152-9" tabindex="-1"></a>                          <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="fu">mean</span>(Precursor.Normalised,</span>
+<span id="cb152-10"><a href="evaluate-dia-nn-results.html#cb152-10" tabindex="-1"></a>                                          <span class="at">na.rm =</span> T) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-11"><a href="evaluate-dia-nn-results.html#cb152-11" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb152-12"><a href="evaluate-dia-nn-results.html#cb152-12" tabindex="-1"></a>  <span class="fu">group_by</span>(group,</span>
+<span id="cb152-13"><a href="evaluate-dia-nn-results.html#cb152-13" tabindex="-1"></a>           Precursor.Id) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-14"><a href="evaluate-dia-nn-results.html#cb152-14" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cv =</span> <span class="fu">sd</span>(Precursor.Normalised,</span>
+<span id="cb152-15"><a href="evaluate-dia-nn-results.html#cb152-15" tabindex="-1"></a>                 <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="fu">mean</span>(Precursor.Normalised,</span>
+<span id="cb152-16"><a href="evaluate-dia-nn-results.html#cb152-16" tabindex="-1"></a>                                 <span class="at">na.rm =</span> T) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-17"><a href="evaluate-dia-nn-results.html#cb152-17" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb152-18"><a href="evaluate-dia-nn-results.html#cb152-18" tabindex="-1"></a>  <span class="fu">distinct</span>(group,</span>
+<span id="cb152-19"><a href="evaluate-dia-nn-results.html#cb152-19" tabindex="-1"></a>           Precursor.Normalised,</span>
+<span id="cb152-20"><a href="evaluate-dia-nn-results.html#cb152-20" tabindex="-1"></a>           cv_combined,</span>
+<span id="cb152-21"><a href="evaluate-dia-nn-results.html#cb152-21" tabindex="-1"></a>           cv) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-22"><a href="evaluate-dia-nn-results.html#cb152-22" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb152-23"><a href="evaluate-dia-nn-results.html#cb152-23" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">&#39;cv&#39;</span>),</span>
+<span id="cb152-24"><a href="evaluate-dia-nn-results.html#cb152-24" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&#39;type&#39;</span>,</span>
+<span id="cb152-25"><a href="evaluate-dia-nn-results.html#cb152-25" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&#39;cv&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-26"><a href="evaluate-dia-nn-results.html#cb152-26" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">ifelse</span>(type <span class="sc">==</span> <span class="st">&#39;cv&#39;</span>,</span>
+<span id="cb152-27"><a href="evaluate-dia-nn-results.html#cb152-27" tabindex="-1"></a>                       group,</span>
+<span id="cb152-28"><a href="evaluate-dia-nn-results.html#cb152-28" tabindex="-1"></a>                       <span class="st">&#39;All Groups Combined&#39;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-29"><a href="evaluate-dia-nn-results.html#cb152-29" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">fct_relevel</span>(<span class="fu">as.factor</span>(type),</span>
+<span id="cb152-30"><a href="evaluate-dia-nn-results.html#cb152-30" tabindex="-1"></a>                            <span class="st">&#39;All Groups Combined&#39;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb152-31"><a href="evaluate-dia-nn-results.html#cb152-31" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> type,</span>
+<span id="cb152-32"><a href="evaluate-dia-nn-results.html#cb152-32" tabindex="-1"></a>             <span class="at">y =</span> cv)) <span class="sc">+</span></span>
+<span id="cb152-33"><a href="evaluate-dia-nn-results.html#cb152-33" tabindex="-1"></a>  <span class="fu">geom_violin</span>(<span class="fu">aes</span>(<span class="at">fill =</span> type),</span>
+<span id="cb152-34"><a href="evaluate-dia-nn-results.html#cb152-34" tabindex="-1"></a>             <span class="at">na.rm =</span> T) <span class="sc">+</span></span>
+<span id="cb152-35"><a href="evaluate-dia-nn-results.html#cb152-35" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">na.rm =</span> T,</span>
+<span id="cb152-36"><a href="evaluate-dia-nn-results.html#cb152-36" tabindex="-1"></a>               <span class="at">width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb152-37"><a href="evaluate-dia-nn-results.html#cb152-37" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Distribution of Coefficient of Variation: Precursor-level&#39;</span>,</span>
+<span id="cb152-38"><a href="evaluate-dia-nn-results.html#cb152-38" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&#39;&#39;</span>,</span>
+<span id="cb152-39"><a href="evaluate-dia-nn-results.html#cb152-39" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&#39;Coefficient of Variation (%)&#39;</span>,</span>
+<span id="cb152-40"><a href="evaluate-dia-nn-results.html#cb152-40" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">&#39;Group&#39;</span>) <span class="sc">+</span></span>
+<span id="cb152-41"><a href="evaluate-dia-nn-results.html#cb152-41" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">200</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-79-1.png" alt="" width="672" /></p>
+<p>For all groups, the CV of the normalized precursors are all below the intra-group CV, including the msrC group, which had the one outlier. However, based on our earlier graphs, we should expect the CV of that group to decrease as we “go up” in biological level to the protein level.</p>
+</div>
+<div id="protein-level" class="section level5 unnumbered hasAnchor">
+<h5>Protein Level<a href="evaluate-dia-nn-results.html#protein-level" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="evaluate-dia-nn-results.html#cb153-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb153-2"><a href="evaluate-dia-nn-results.html#cb153-2" tabindex="-1"></a>  <span class="fu">distinct</span>(Protein.Group,</span>
+<span id="cb153-3"><a href="evaluate-dia-nn-results.html#cb153-3" tabindex="-1"></a>           Run,</span>
+<span id="cb153-4"><a href="evaluate-dia-nn-results.html#cb153-4" tabindex="-1"></a>           group,</span>
+<span id="cb153-5"><a href="evaluate-dia-nn-results.html#cb153-5" tabindex="-1"></a>           PG.MaxLFQ) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-6"><a href="evaluate-dia-nn-results.html#cb153-6" tabindex="-1"></a>  <span class="fu">filter</span>(PG.MaxLFQ <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-7"><a href="evaluate-dia-nn-results.html#cb153-7" tabindex="-1"></a>  <span class="fu">group_by</span>(Protein.Group) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-8"><a href="evaluate-dia-nn-results.html#cb153-8" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cv_combined =</span> <span class="fu">sd</span>(PG.MaxLFQ,</span>
+<span id="cb153-9"><a href="evaluate-dia-nn-results.html#cb153-9" tabindex="-1"></a>                          <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="fu">mean</span>(PG.MaxLFQ,</span>
+<span id="cb153-10"><a href="evaluate-dia-nn-results.html#cb153-10" tabindex="-1"></a>                                          <span class="at">na.rm =</span> T) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-11"><a href="evaluate-dia-nn-results.html#cb153-11" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb153-12"><a href="evaluate-dia-nn-results.html#cb153-12" tabindex="-1"></a>  <span class="fu">group_by</span>(group,</span>
+<span id="cb153-13"><a href="evaluate-dia-nn-results.html#cb153-13" tabindex="-1"></a>           Protein.Group) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-14"><a href="evaluate-dia-nn-results.html#cb153-14" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cv =</span> <span class="fu">sd</span>(PG.MaxLFQ,</span>
+<span id="cb153-15"><a href="evaluate-dia-nn-results.html#cb153-15" tabindex="-1"></a>                 <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="fu">mean</span>(PG.MaxLFQ,</span>
+<span id="cb153-16"><a href="evaluate-dia-nn-results.html#cb153-16" tabindex="-1"></a>                                 <span class="at">na.rm =</span> T) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-17"><a href="evaluate-dia-nn-results.html#cb153-17" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb153-18"><a href="evaluate-dia-nn-results.html#cb153-18" tabindex="-1"></a>  <span class="fu">distinct</span>(group,</span>
+<span id="cb153-19"><a href="evaluate-dia-nn-results.html#cb153-19" tabindex="-1"></a>           PG.MaxLFQ,</span>
+<span id="cb153-20"><a href="evaluate-dia-nn-results.html#cb153-20" tabindex="-1"></a>           cv_combined,</span>
+<span id="cb153-21"><a href="evaluate-dia-nn-results.html#cb153-21" tabindex="-1"></a>           cv) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-22"><a href="evaluate-dia-nn-results.html#cb153-22" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb153-23"><a href="evaluate-dia-nn-results.html#cb153-23" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">&#39;cv&#39;</span>),</span>
+<span id="cb153-24"><a href="evaluate-dia-nn-results.html#cb153-24" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&#39;type&#39;</span>,</span>
+<span id="cb153-25"><a href="evaluate-dia-nn-results.html#cb153-25" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&#39;cv&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-26"><a href="evaluate-dia-nn-results.html#cb153-26" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">ifelse</span>(type <span class="sc">==</span> <span class="st">&#39;cv&#39;</span>,</span>
+<span id="cb153-27"><a href="evaluate-dia-nn-results.html#cb153-27" tabindex="-1"></a>                       group,</span>
+<span id="cb153-28"><a href="evaluate-dia-nn-results.html#cb153-28" tabindex="-1"></a>                       <span class="st">&#39;All Groups Combined&#39;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-29"><a href="evaluate-dia-nn-results.html#cb153-29" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">fct_relevel</span>(<span class="fu">as.factor</span>(type),</span>
+<span id="cb153-30"><a href="evaluate-dia-nn-results.html#cb153-30" tabindex="-1"></a>                            <span class="st">&#39;All Groups Combined&#39;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb153-31"><a href="evaluate-dia-nn-results.html#cb153-31" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> type,</span>
+<span id="cb153-32"><a href="evaluate-dia-nn-results.html#cb153-32" tabindex="-1"></a>             <span class="at">y =</span> cv)) <span class="sc">+</span></span>
+<span id="cb153-33"><a href="evaluate-dia-nn-results.html#cb153-33" tabindex="-1"></a>  <span class="fu">geom_violin</span>(<span class="fu">aes</span>(<span class="at">fill =</span> type),</span>
+<span id="cb153-34"><a href="evaluate-dia-nn-results.html#cb153-34" tabindex="-1"></a>              <span class="at">na.rm =</span> T) <span class="sc">+</span></span>
+<span id="cb153-35"><a href="evaluate-dia-nn-results.html#cb153-35" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">na.rm =</span> T, </span>
+<span id="cb153-36"><a href="evaluate-dia-nn-results.html#cb153-36" tabindex="-1"></a>               <span class="at">width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb153-37"><a href="evaluate-dia-nn-results.html#cb153-37" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Distribution of Coefficient of Variation: Protein-level&#39;</span>,</span>
+<span id="cb153-38"><a href="evaluate-dia-nn-results.html#cb153-38" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&#39;&#39;</span>,</span>
+<span id="cb153-39"><a href="evaluate-dia-nn-results.html#cb153-39" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&#39;Coefficient of Variation (%)&#39;</span>,</span>
+<span id="cb153-40"><a href="evaluate-dia-nn-results.html#cb153-40" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">&#39;Group&#39;</span>) <span class="sc">+</span></span>
+<span id="cb153-41"><a href="evaluate-dia-nn-results.html#cb153-41" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">200</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-80-1.png" alt="" width="672" /></p>
+<p>While the CV of the msrC group did go down, so did the intra-group CV. So much so that it is now lower than the msrC CV. This means that the msrC group has too much variability to reliably compare to other groups.</p>
+<p>However, we know that one run in particular is causing this variability. So what would have if we were to remove that run (msrC2)?</p>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="evaluate-dia-nn-results.html#cb154-1" tabindex="-1"></a>diann_results <span class="sc">%&gt;%</span> </span>
+<span id="cb154-2"><a href="evaluate-dia-nn-results.html#cb154-2" tabindex="-1"></a>  <span class="fu">distinct</span>(Protein.Group,</span>
+<span id="cb154-3"><a href="evaluate-dia-nn-results.html#cb154-3" tabindex="-1"></a>           Run,</span>
+<span id="cb154-4"><a href="evaluate-dia-nn-results.html#cb154-4" tabindex="-1"></a>           group,</span>
+<span id="cb154-5"><a href="evaluate-dia-nn-results.html#cb154-5" tabindex="-1"></a>           PG.MaxLFQ) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-6"><a href="evaluate-dia-nn-results.html#cb154-6" tabindex="-1"></a>  <span class="fu">filter</span>(Run <span class="sc">!=</span> <span class="st">&#39;msrC2&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-7"><a href="evaluate-dia-nn-results.html#cb154-7" tabindex="-1"></a>  <span class="fu">filter</span>(PG.MaxLFQ <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-8"><a href="evaluate-dia-nn-results.html#cb154-8" tabindex="-1"></a>  <span class="fu">group_by</span>(Protein.Group) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-9"><a href="evaluate-dia-nn-results.html#cb154-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cv_combined =</span> <span class="fu">sd</span>(PG.MaxLFQ,</span>
+<span id="cb154-10"><a href="evaluate-dia-nn-results.html#cb154-10" tabindex="-1"></a>                          <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="fu">mean</span>(PG.MaxLFQ,</span>
+<span id="cb154-11"><a href="evaluate-dia-nn-results.html#cb154-11" tabindex="-1"></a>                                          <span class="at">na.rm =</span> T) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-12"><a href="evaluate-dia-nn-results.html#cb154-12" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb154-13"><a href="evaluate-dia-nn-results.html#cb154-13" tabindex="-1"></a>  <span class="fu">group_by</span>(group,</span>
+<span id="cb154-14"><a href="evaluate-dia-nn-results.html#cb154-14" tabindex="-1"></a>           Protein.Group) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-15"><a href="evaluate-dia-nn-results.html#cb154-15" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cv =</span> <span class="fu">sd</span>(PG.MaxLFQ,</span>
+<span id="cb154-16"><a href="evaluate-dia-nn-results.html#cb154-16" tabindex="-1"></a>                 <span class="at">na.rm =</span> T)<span class="sc">/</span><span class="fu">mean</span>(PG.MaxLFQ,</span>
+<span id="cb154-17"><a href="evaluate-dia-nn-results.html#cb154-17" tabindex="-1"></a>                                 <span class="at">na.rm =</span> T) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-18"><a href="evaluate-dia-nn-results.html#cb154-18" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb154-19"><a href="evaluate-dia-nn-results.html#cb154-19" tabindex="-1"></a>  <span class="fu">distinct</span>(group,</span>
+<span id="cb154-20"><a href="evaluate-dia-nn-results.html#cb154-20" tabindex="-1"></a>           PG.MaxLFQ,</span>
+<span id="cb154-21"><a href="evaluate-dia-nn-results.html#cb154-21" tabindex="-1"></a>           cv_combined,</span>
+<span id="cb154-22"><a href="evaluate-dia-nn-results.html#cb154-22" tabindex="-1"></a>           cv) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-23"><a href="evaluate-dia-nn-results.html#cb154-23" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb154-24"><a href="evaluate-dia-nn-results.html#cb154-24" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">&#39;cv&#39;</span>),</span>
+<span id="cb154-25"><a href="evaluate-dia-nn-results.html#cb154-25" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&#39;type&#39;</span>,</span>
+<span id="cb154-26"><a href="evaluate-dia-nn-results.html#cb154-26" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&#39;cv&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-27"><a href="evaluate-dia-nn-results.html#cb154-27" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">ifelse</span>(type <span class="sc">==</span> <span class="st">&#39;cv&#39;</span>,</span>
+<span id="cb154-28"><a href="evaluate-dia-nn-results.html#cb154-28" tabindex="-1"></a>                       group,</span>
+<span id="cb154-29"><a href="evaluate-dia-nn-results.html#cb154-29" tabindex="-1"></a>                       <span class="st">&#39;All Groups Combined&#39;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-30"><a href="evaluate-dia-nn-results.html#cb154-30" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">fct_relevel</span>(<span class="fu">as.factor</span>(type),</span>
+<span id="cb154-31"><a href="evaluate-dia-nn-results.html#cb154-31" tabindex="-1"></a>                            <span class="st">&#39;All Groups Combined&#39;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-32"><a href="evaluate-dia-nn-results.html#cb154-32" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> type,</span>
+<span id="cb154-33"><a href="evaluate-dia-nn-results.html#cb154-33" tabindex="-1"></a>             <span class="at">y =</span> cv)) <span class="sc">+</span></span>
+<span id="cb154-34"><a href="evaluate-dia-nn-results.html#cb154-34" tabindex="-1"></a>  <span class="fu">geom_violin</span>(<span class="fu">aes</span>(<span class="at">fill =</span> type),</span>
+<span id="cb154-35"><a href="evaluate-dia-nn-results.html#cb154-35" tabindex="-1"></a>              <span class="at">na.rm =</span> T) <span class="sc">+</span></span>
+<span id="cb154-36"><a href="evaluate-dia-nn-results.html#cb154-36" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">na.rm =</span> T, </span>
+<span id="cb154-37"><a href="evaluate-dia-nn-results.html#cb154-37" tabindex="-1"></a>               <span class="at">width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb154-38"><a href="evaluate-dia-nn-results.html#cb154-38" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Distribution of Coefficient of Variation: Protein-level&#39;</span>,</span>
+<span id="cb154-39"><a href="evaluate-dia-nn-results.html#cb154-39" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&#39;&#39;</span>,</span>
+<span id="cb154-40"><a href="evaluate-dia-nn-results.html#cb154-40" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&#39;Coefficient of Variation (%)&#39;</span>,</span>
+<span id="cb154-41"><a href="evaluate-dia-nn-results.html#cb154-41" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">&#39;Group&#39;</span>) <span class="sc">+</span></span>
+<span id="cb154-42"><a href="evaluate-dia-nn-results.html#cb154-42" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">200</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-81-1.png" alt="" width="672" /></p>
+<p>Our msrC group now has really low CVs, similar to the other runs. Therefore in downstream analyses, we have to remember to remove that run before doing anything else.</p>
+</div>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="evaluate-dia-nn-stats.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="filtering-dia-nn-results.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/lunr.js"></script>
+<script src="assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "lunr",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection",
+    "scroll_highlight": true
+  },
+  "toolbar": {
+    "position": "static"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

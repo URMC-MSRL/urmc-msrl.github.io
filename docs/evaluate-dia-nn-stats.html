@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>3.3 Evaluate DIA-NN Stats | Proteomic Data Analysis</title>
+  <meta name="description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="3.3 Evaluate DIA-NN Stats | Proteomic Data Analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/images/CART_logo_horizontal.png" />
+  <meta property="og:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="3.3 Evaluate DIA-NN Stats | Proteomic Data Analysis" />
+  
+  <meta name="twitter:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="twitter:image" content="/images/CART_logo_horizontal.png" />
+
+<meta name="author" content="Kyle Swovick" />
+
+
+<meta name="date" content="2026-07-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="images/ur_logo_favicon.png" type="image/x-icon" />
+<link rel="prev" href="import-dia-nn-search-results.html"/>
+<link rel="next" href="evaluate-dia-nn-results.html"/>
+<script src="assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="assets/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="assets/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="assets/plotly-binding-4.12.0/plotly.js"></script>
+<script src="assets/typedarray-0.1/typedarray.min.js"></script>
+<link href="assets/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="assets/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="assets/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="assets/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<script src="assets/core-js-2.5.3/shim.min.js"></script>
+<script src="assets/react-18.2.0/react.min.js"></script>
+<script src="assets/react-18.2.0/react-dom.min.js"></script>
+<script src="assets/reactwidget-2.0.0/react-tools.js"></script>
+<link href="assets/reactable-0.4.5/reactable.css" rel="stylesheet" />
+<script src="assets/reactable-binding-0.4.5/reactable.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Proteomic Data Analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="introduction-to-r-and-rstudio.html"><a href="introduction-to-r-and-rstudio.html"><i class="fa fa-check"></i><b>1</b> Introduction to R and RStudio</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="coding-basics.html"><a href="coding-basics.html"><i class="fa fa-check"></i><b>1.1</b> Coding Basics</a></li>
+<li class="chapter" data-level="1.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html"><i class="fa fa-check"></i><b>1.2</b> Creating New Objects in R</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#object-naming-conventions"><i class="fa fa-check"></i><b>1.2.1</b> Object Naming Conventions</a></li>
+<li class="chapter" data-level="1.2.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#working-with-object-assignments"><i class="fa fa-check"></i><b>1.2.2</b> Working with Object Assignments</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="calling-functions.html"><a href="calling-functions.html"><i class="fa fa-check"></i><b>1.3</b> Calling Functions</a></li>
+<li class="chapter" data-level="1.4" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html"><i class="fa fa-check"></i><b>1.4</b> Expanding R’s Functionality</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#installing-packages"><i class="fa fa-check"></i><b>1.4.1</b> Installing Packages</a></li>
+<li class="chapter" data-level="1.4.2" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#loading-packages-and-package-conflicts"><i class="fa fa-check"></i><b>1.4.2</b> Loading Packages and Package Conflicts</a></li>
+<li class="chapter" data-level="1.4.3" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#package-help-pages"><i class="fa fa-check"></i><b>1.4.3</b> Package Help Pages</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="working-with-data-in-r-and-rstudio.html"><a href="working-with-data-in-r-and-rstudio.html"><i class="fa fa-check"></i><b>2</b> Working with Data in R and RStudio</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="loading-data.html"><a href="loading-data.html"><i class="fa fa-check"></i><b>2.1</b> Loading Data</a></li>
+<li class="chapter" data-level="2.2" data-path="understanding-data-frames.html"><a href="understanding-data-frames.html"><i class="fa fa-check"></i><b>2.2</b> Understanding Data Frames</a></li>
+<li class="chapter" data-level="2.3" data-path="data-filtering.html"><a href="data-filtering.html"><i class="fa fa-check"></i><b>2.3</b> Data Filtering</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="data-filtering.html"><a href="data-filtering.html#comparison-operators"><i class="fa fa-check"></i><b>2.3.1</b> Comparison Operators</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html"><i class="fa fa-check"></i><b>2.4</b> Manipulating Data Frames (Data Transformation)</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#arrange-rows-with-arrange"><i class="fa fa-check"></i><b>2.4.1</b> Arrange Rows with <code>arrange()</code></a></li>
+<li class="chapter" data-level="2.4.2" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#select-columns-with-select"><i class="fa fa-check"></i><b>2.4.2</b> Select Columns with <code>select()</code></a></li>
+<li class="chapter" data-level="2.4.3" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#add-new-variables-with-mutate"><i class="fa fa-check"></i><b>2.4.3</b> Add New Variables with <code>mutate()</code></a></li>
+<li class="chapter" data-level="2.4.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#grouped-summaries-with-summarize"><i class="fa fa-check"></i><b>2.4.4</b> Grouped Summaries with <code>summarize()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="determining-data-quality-and-filtering.html"><a href="determining-data-quality-and-filtering.html"><i class="fa fa-check"></i><b>3</b> Determining Data Quality and Filtering</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="deciphering-dia-nn-search-result-files.html"><a href="deciphering-dia-nn-search-result-files.html"><i class="fa fa-check"></i><b>3.1</b> Deciphering DIA-NN Search Result Files</a></li>
+<li class="chapter" data-level="3.2" data-path="import-dia-nn-search-results.html"><a href="import-dia-nn-search-results.html"><i class="fa fa-check"></i><b>3.2</b> Import DIA-NN Search Results</a></li>
+<li class="chapter" data-level="3.3" data-path="evaluate-dia-nn-stats.html"><a href="evaluate-dia-nn-stats.html"><i class="fa fa-check"></i><b>3.3</b> Evaluate DIA-NN Stats</a></li>
+<li class="chapter" data-level="3.4" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html"><i class="fa fa-check"></i><b>3.4</b> Evaluate DIA-NN Results</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#explaining-the-dia-nn-report"><i class="fa fa-check"></i><b>3.4.1</b> Explaining the DIA-NN Report</a></li>
+<li class="chapter" data-level="3.4.2" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#evaluating-the-quality-of-the-runs"><i class="fa fa-check"></i><b>3.4.2</b> Evaluating the Quality of the Runs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="filtering-dia-nn-results.html"><a href="filtering-dia-nn-results.html"><i class="fa fa-check"></i><b>3.5</b> Filtering DIA-NN Results</a></li>
+<li class="chapter" data-level="3.6" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html"><i class="fa fa-check"></i><b>3.6</b> Prepare Data for Differential Expression Analysis (t-test)</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#filter-based-off-number-of-peptides-and-missing-values"><i class="fa fa-check"></i><b>3.6.1</b> Filter Based off Number of Peptides and Missing Values</a></li>
+<li class="chapter" data-level="3.6.2" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#impute-missing-values"><i class="fa fa-check"></i><b>3.6.2</b> Impute Missing Values</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="performing-differential-expression-statistics-t-test.html"><a href="performing-differential-expression-statistics-t-test.html"><i class="fa fa-check"></i><b>4</b> Performing Differential Expression Statistics (t-test)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>4.1</b> Background</a>
+<ul>
+<li class="chapter" data-level="" data-path="background.html"><a href="background.html#types-of-t-tests"><i class="fa fa-check"></i>Types of t-tests</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html"><i class="fa fa-check"></i><b>4.2</b> Prepare the t-test</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#create-the-comparison-table"><i class="fa fa-check"></i><b>4.2.1</b> Create the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#prepare-our-data-using-the-comparison-table"><i class="fa fa-check"></i><b>4.2.2</b> Prepare Our Data Using the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#define-the-t-test-input"><i class="fa fa-check"></i><b>4.2.3</b> Define the T-Test Input</a></li>
+<li class="chapter" data-level="4.2.4" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#fit-the-t-test-regression-models"><i class="fa fa-check"></i><b>4.2.4</b> Fit the T-Test Regression Models</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="create-a-t-test-results-table.html"><a href="create-a-t-test-results-table.html"><i class="fa fa-check"></i><b>4.3</b> Create a T-Test Results Table</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="visualizing-proteomic-data.html"><a href="visualizing-proteomic-data.html"><i class="fa fa-check"></i><b>5</b> Visualizing Proteomic Data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="prep-work.html"><a href="prep-work.html"><i class="fa fa-check"></i><b>5.1</b> Prep Work</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="prep-work.html"><a href="prep-work.html#make-a-common-plotting-theme"><i class="fa fa-check"></i><b>5.1.1</b> Make a Common Plotting Theme</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html"><i class="fa fa-check"></i><b>5.2</b> Replicate Comparisons</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#sample-heatmap-and-hierarchical-clustering"><i class="fa fa-check"></i><b>5.2.1</b> Sample Heatmap and Hierarchical Clustering</a></li>
+<li class="chapter" data-level="5.2.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#principal-component-analysis-pca"><i class="fa fa-check"></i><b>5.2.2</b> Principal Component Analysis (PCA)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="differential-expression.html"><a href="differential-expression.html"><i class="fa fa-check"></i><b>5.3</b> Differential Expression</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="differential-expression.html"><a href="differential-expression.html#protein-expression-heatmap"><i class="fa fa-check"></i><b>5.3.1</b> Protein Expression Heatmap</a></li>
+<li class="chapter" data-level="5.3.2" data-path="differential-expression.html"><a href="differential-expression.html#volcano-plot"><i class="fa fa-check"></i><b>5.3.2</b> Volcano Plot</a></li>
+<li class="chapter" data-level="5.3.3" data-path="differential-expression.html"><a href="differential-expression.html#gene-ontology"><i class="fa fa-check"></i><b>5.3.3</b> Gene Ontology</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Proteomic Data Analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="evaluate-dia-nn-stats" class="section level2 hasAnchor" number="3.3">
+<h2><span class="header-section-number">3.3</span> Evaluate DIA-NN Stats<a href="evaluate-dia-nn-stats.html#evaluate-dia-nn-stats" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Before we go too far, let’s look at our stats report file to see if anything the experiment looks “off”.</p>
+<p>To look at the data in this file, use <code>View()</code>.</p>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="evaluate-dia-nn-stats.html#cb137-1" tabindex="-1"></a><span class="fu">View</span>(diann_stats)</span></code></pre></div>
+<pre><code>## # A tibble: 15 × 17
+##    File.Name Precursors.Identified Proteins.Identified Total.Quantity MS1.Signal
+##    &lt;chr&gt;                     &lt;dbl&gt;               &lt;dbl&gt;          &lt;dbl&gt;      &lt;dbl&gt;
+##  1 &quot;Y:\\9- …                 45848                3257    72507200000    7.84e12
+##  2 &quot;Y:\\9- …                 43815                3239    36351200000    3.67e12
+##  3 &quot;Y:\\9- …                 44528                3238    57911600000    6.81e12
+##  4 &quot;Y:\\9- …                 47524                3279    79770100000    9.31e12
+##  5 &quot;Y:\\9- …                 46409                3284   103834000000    1.23e13
+##  6 &quot;Y:\\9- …                 44548                3195    64012000000    6.95e12
+##  7 &quot;Y:\\9- …                 46173                3269    67866900000    7.31e12
+##  8 &quot;Y:\\9- …                 46362                3238    53989400000    5.55e12
+##  9 &quot;Y:\\9- …                 44156                3235    46543800000    4.95e12
+## 10 &quot;Y:\\9- …                 45642                3254    45750700000    4.50e12
+## 11 &quot;Y:\\9- …                 46778                3274    59778600000    6.47e12
+## 12 &quot;Y:\\9- …                 33052                2873     3803540000    4.83e11
+## 13 &quot;Y:\\9- …                 47577                3291    79500000000    9.20e12
+## 14 &quot;Y:\\9- …                 44709                3262    61014000000    6.52e12
+## 15 &quot;Y:\\9- …                 45822                3221    77518700000    8.32e12
+## # ℹ 12 more variables: MS2.Signal &lt;dbl&gt;, FWHM.Scans &lt;dbl&gt;, FWHM.RT &lt;dbl&gt;,
+## #   Median.Mass.Acc.MS1 &lt;dbl&gt;, Median.Mass.Acc.MS1.Corrected &lt;dbl&gt;,
+## #   Median.Mass.Acc.MS2 &lt;dbl&gt;, Median.Mass.Acc.MS2.Corrected &lt;dbl&gt;,
+## #   Normalisation.Instability &lt;dbl&gt;, Median.RT.Prediction.Acc &lt;dbl&gt;,
+## #   Average.Peptide.Length &lt;dbl&gt;, Average.Peptide.Charge &lt;dbl&gt;,
+## #   Average.Missed.Tryptic.Cleavages &lt;dbl&gt;</code></pre>
+<p>What you’ll see is each run as it’s own row and then 16 different “measurements” of each run. The columns you are going to use most of the time are:</p>
+<ul>
+<li><p><strong>Precursors.Identified</strong>- The number of <em>precursors</em> identified in that run. It is important to note that a precursor is simply a charged peptide, so a single peptide sequence can have multiple precursors (<em>i.e.</em>, if peptide <em>x</em> was both doubly and triply charges, that would count as 2 precursor IDs)</p></li>
+<li><p><strong>Proteins.Identified</strong>- The number of <em>proteins</em> identified in that run.</p></li>
+<li><p><strong>Average.Missed.Tryptic.Cleavages</strong>- The average number of missed cleavages by trypsin in that run. A lower number indicates a more efficient digestion.</p></li>
+<li><p>Some typical numbers for various experiments might be:</p>
+<ul>
+<li><p>Global experiment of mammalian cell lysate:</p>
+<ul>
+<li><p>90,000-140,000 Precursor IDs</p></li>
+<li><p>9,000-10,000 Protein IDs</p></li>
+<li><p>5-15% Missed Cleavages</p></li>
+</ul></li>
+<li><p>Global experiment of <em>E. coli</em> lysate:</p>
+<ul>
+<li><p>35,000-45,000 Precursor IDs</p></li>
+<li><p>3,000-3,300 Protein IDs</p></li>
+<li><p>10-20% Missed Cleavages</p></li>
+</ul></li>
+<li><p>Phospho experiment (varies greatly on type of material and amount enriched; assuming 100ug of cultured cells):</p>
+<ul>
+<li><p>30,000-40,000 Precursor IDs</p></li>
+<li><p>4,000-5,500 Protein IDs</p></li>
+<li><p>40-60% Missed Cleavages</p></li>
+</ul></li>
+<li><p>Single-cell experiment:</p>
+<ul>
+<li><p>2,000-10,000 Precursor IDs (varies greatly depending on cell type and size)</p></li>
+<li><p>500-2,500 Protein IDs (varies greatly depending on cell type and size)</p></li>
+<li><p>10-20% Missed Cleavages</p></li>
+</ul></li>
+</ul></li>
+</ul>
+<p>Since the stats report has a lot of information that isn’t necessarily important for a majority of users, let’s look at the columns we’re interesting in using <code>dplyr::select()</code>.</p>
+<p>Additionally, the file name unfortunately includes the entire file path of the raw file, making it harder to see and understand what each file is. We’re also going to <em>pipe</em> in a <code>dplyr::mutate()</code> to change the <code>File.Name</code> column to remove the common text in all the rows using the <code>gsub</code> function. This function looks for all strings that match the one entered in and then replaces those strings with one you tell it to (in this case it will be nothing or <code>""</code>). And within this <code>gsub()</code>, you’ll also be seeing out first example of a <strong>regular expression</strong> or <strong>regex</strong>. <strong>Regex</strong> commands can be useful when working with lnong strings following a standardized “formula”. In this scenario, all files use the following string <code>Y:\\9- Teaching Materials and Presentations\\Proteomics Summer Course\\2026\\Datasets\\E Coli Ahmed\\Raw Files\\Ahmed_</code> followed by the sample name. Instead of type out the first part, which is the same in every sample, we’re going to type <code>Y.*Ahmed_</code>, which simply means “Any string that starts with <em>Y</em> followed by <em>any character</em> (<code>.</code>) for an <em>unlimited number of times</em> (<code>*</code>), until we reach the string”Ahmed_“, at which point, we stop. And then that entire string will be replaced with <code>""</code>, which is nothing.
+(
+We are also going to remove the ending string from each run since those are also the same for every one;”_25-023.raw” (the work order number used by the MSRL assigned to each project, followed by the file type of that run).</p>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="evaluate-dia-nn-stats.html#cb139-1" tabindex="-1"></a>diann_stats <span class="sc">%&gt;%</span> </span>
+<span id="cb139-2"><a href="evaluate-dia-nn-stats.html#cb139-2" tabindex="-1"></a>  <span class="co"># We only want some specific columns</span></span>
+<span id="cb139-3"><a href="evaluate-dia-nn-stats.html#cb139-3" tabindex="-1"></a>  <span class="fu">select</span>(File.Name, <span class="co"># Name of the run</span></span>
+<span id="cb139-4"><a href="evaluate-dia-nn-stats.html#cb139-4" tabindex="-1"></a>         Precursors.Identified, <span class="co"># The number of Precursor IDs</span></span>
+<span id="cb139-5"><a href="evaluate-dia-nn-stats.html#cb139-5" tabindex="-1"></a>         Proteins.Identified, <span class="co"># The number of Protein IDs</span></span>
+<span id="cb139-6"><a href="evaluate-dia-nn-stats.html#cb139-6" tabindex="-1"></a>         Average.Missed.Tryptic.Cleavages) <span class="sc">%&gt;%</span> <span class="co"># The average number of missed cleavages in that run</span></span>
+<span id="cb139-7"><a href="evaluate-dia-nn-stats.html#cb139-7" tabindex="-1"></a>  <span class="co"># We are going to the common sample monikers the MSRL uses. Specifically, each run starts with &quot;&lt;Researcher name&gt;_&quot; and ends with &quot;_&lt;Work order number&gt;&quot;. For the dataw e will be using in this tutorial, the researcher name is &quot;Ahmed&quot; and the work order number is &quot;25-023&quot;.</span></span>
+<span id="cb139-8"><a href="evaluate-dia-nn-stats.html#cb139-8" tabindex="-1"></a>  <span class="co"># We are going to combine the &#39;mutate()&#39; dplyr function with the &#39;sub()&#39; base R function to change the contents of the &quot;File.Name&quot; column. Specifically, we are going to find all times either &quot;Amhed_&quot; or &quot;_25-023&quot; appear in the the column &quot;File.Name&quot; and replace those strings with &quot;&quot; (ie, nothing)</span></span>
+<span id="cb139-9"><a href="evaluate-dia-nn-stats.html#cb139-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">File.Name =</span> <span class="fu">sub</span>(<span class="st">&#39;Y.*Ahmed_&#39;</span>, <span class="co">#</span></span>
+<span id="cb139-10"><a href="evaluate-dia-nn-stats.html#cb139-10" tabindex="-1"></a>                         <span class="st">&#39;&#39;</span>,</span>
+<span id="cb139-11"><a href="evaluate-dia-nn-stats.html#cb139-11" tabindex="-1"></a>                         File.Name),</span>
+<span id="cb139-12"><a href="evaluate-dia-nn-stats.html#cb139-12" tabindex="-1"></a>         <span class="at">File.Name =</span> <span class="fu">sub</span>(<span class="st">&#39;_25-023.raw&#39;</span>,</span>
+<span id="cb139-13"><a href="evaluate-dia-nn-stats.html#cb139-13" tabindex="-1"></a>                         <span class="st">&#39;&#39;</span>,</span>
+<span id="cb139-14"><a href="evaluate-dia-nn-stats.html#cb139-14" tabindex="-1"></a>                         File.Name))</span></code></pre></div>
+<pre><code>## # A tibble: 15 × 4
+##    File.Name Precursors.Identified Proteins.Identified Average.Missed.Tryptic.…¹
+##    &lt;chr&gt;                     &lt;dbl&gt;               &lt;dbl&gt;                     &lt;dbl&gt;
+##  1 WT3                       45848                3257                     0.16 
+##  2 bisC1                     43815                3239                     0.156
+##  3 bisC2                     44528                3238                     0.157
+##  4 bisC3                     47524                3279                     0.177
+##  5 msrA1                     46409                3284                     0.158
+##  6 msrA2                     44548                3195                     0.157
+##  7 msrA3                     46173                3269                     0.166
+##  8 msrB1                     46362                3238                     0.167
+##  9 msrB2                     44156                3235                     0.153
+## 10 msrB3                     45642                3254                     0.168
+## 11 msrC1                     46778                3274                     0.164
+## 12 msrC2                     33052                2873                     0.161
+## 13 msrC3                     47577                3291                     0.168
+## 14 WT1                       44709                3262                     0.158
+## 15 WT2                       45822                3221                     0.164
+## # ℹ abbreviated name: ¹​Average.Missed.Tryptic.Cleavages</code></pre>
+<p>Just by looking at these numbers, it appears as if the data are all relatively consistent (with the exception of 1 file), at least from a very wide lens. What this is not helpful with though, is determining if there are any micro-trends within the samples to indicate how well the experiment performed.</p>
+<p>But we can be confident the runs all performed well compared to each other and that there are no major outliers or nothing concerning at first glance.</p>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="import-dia-nn-search-results.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="evaluate-dia-nn-results.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/lunr.js"></script>
+<script src="assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "lunr",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection",
+    "scroll_highlight": true
+  },
+  "toolbar": {
+    "position": "static"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

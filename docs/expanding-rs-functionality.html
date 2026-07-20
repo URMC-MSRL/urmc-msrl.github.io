@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>1.4 Expanding R’s Functionality | Proteomic Data Analysis</title>
+  <meta name="description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="1.4 Expanding R’s Functionality | Proteomic Data Analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/images/CART_logo_horizontal.png" />
+  <meta property="og:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="1.4 Expanding R’s Functionality | Proteomic Data Analysis" />
+  
+  <meta name="twitter:description" content="This is a guide on how to work with R and analyze LC-MS/MS proteomic data." />
+  <meta name="twitter:image" content="/images/CART_logo_horizontal.png" />
+
+<meta name="author" content="Kyle Swovick" />
+
+
+<meta name="date" content="2026-07-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="images/ur_logo_favicon.png" type="image/x-icon" />
+<link rel="prev" href="calling-functions.html"/>
+<link rel="next" href="working-with-data-in-r-and-rstudio.html"/>
+<script src="assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="assets/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="assets/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="assets/plotly-binding-4.12.0/plotly.js"></script>
+<script src="assets/typedarray-0.1/typedarray.min.js"></script>
+<link href="assets/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="assets/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="assets/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="assets/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<script src="assets/core-js-2.5.3/shim.min.js"></script>
+<script src="assets/react-18.2.0/react.min.js"></script>
+<script src="assets/react-18.2.0/react-dom.min.js"></script>
+<script src="assets/reactwidget-2.0.0/react-tools.js"></script>
+<link href="assets/reactable-0.4.5/reactable.css" rel="stylesheet" />
+<script src="assets/reactable-binding-0.4.5/reactable.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Proteomic Data Analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="introduction-to-r-and-rstudio.html"><a href="introduction-to-r-and-rstudio.html"><i class="fa fa-check"></i><b>1</b> Introduction to R and RStudio</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="coding-basics.html"><a href="coding-basics.html"><i class="fa fa-check"></i><b>1.1</b> Coding Basics</a></li>
+<li class="chapter" data-level="1.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html"><i class="fa fa-check"></i><b>1.2</b> Creating New Objects in R</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#object-naming-conventions"><i class="fa fa-check"></i><b>1.2.1</b> Object Naming Conventions</a></li>
+<li class="chapter" data-level="1.2.2" data-path="creating-new-objects-in-r.html"><a href="creating-new-objects-in-r.html#working-with-object-assignments"><i class="fa fa-check"></i><b>1.2.2</b> Working with Object Assignments</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="calling-functions.html"><a href="calling-functions.html"><i class="fa fa-check"></i><b>1.3</b> Calling Functions</a></li>
+<li class="chapter" data-level="1.4" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html"><i class="fa fa-check"></i><b>1.4</b> Expanding R’s Functionality</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#installing-packages"><i class="fa fa-check"></i><b>1.4.1</b> Installing Packages</a></li>
+<li class="chapter" data-level="1.4.2" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#loading-packages-and-package-conflicts"><i class="fa fa-check"></i><b>1.4.2</b> Loading Packages and Package Conflicts</a></li>
+<li class="chapter" data-level="1.4.3" data-path="expanding-rs-functionality.html"><a href="expanding-rs-functionality.html#package-help-pages"><i class="fa fa-check"></i><b>1.4.3</b> Package Help Pages</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="working-with-data-in-r-and-rstudio.html"><a href="working-with-data-in-r-and-rstudio.html"><i class="fa fa-check"></i><b>2</b> Working with Data in R and RStudio</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="loading-data.html"><a href="loading-data.html"><i class="fa fa-check"></i><b>2.1</b> Loading Data</a></li>
+<li class="chapter" data-level="2.2" data-path="understanding-data-frames.html"><a href="understanding-data-frames.html"><i class="fa fa-check"></i><b>2.2</b> Understanding Data Frames</a></li>
+<li class="chapter" data-level="2.3" data-path="data-filtering.html"><a href="data-filtering.html"><i class="fa fa-check"></i><b>2.3</b> Data Filtering</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="data-filtering.html"><a href="data-filtering.html#comparison-operators"><i class="fa fa-check"></i><b>2.3.1</b> Comparison Operators</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html"><i class="fa fa-check"></i><b>2.4</b> Manipulating Data Frames (Data Transformation)</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#arrange-rows-with-arrange"><i class="fa fa-check"></i><b>2.4.1</b> Arrange Rows with <code>arrange()</code></a></li>
+<li class="chapter" data-level="2.4.2" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#select-columns-with-select"><i class="fa fa-check"></i><b>2.4.2</b> Select Columns with <code>select()</code></a></li>
+<li class="chapter" data-level="2.4.3" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#add-new-variables-with-mutate"><i class="fa fa-check"></i><b>2.4.3</b> Add New Variables with <code>mutate()</code></a></li>
+<li class="chapter" data-level="2.4.4" data-path="manipulating-data-frames-data-transformation.html"><a href="manipulating-data-frames-data-transformation.html#grouped-summaries-with-summarize"><i class="fa fa-check"></i><b>2.4.4</b> Grouped Summaries with <code>summarize()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="determining-data-quality-and-filtering.html"><a href="determining-data-quality-and-filtering.html"><i class="fa fa-check"></i><b>3</b> Determining Data Quality and Filtering</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="deciphering-dia-nn-search-result-files.html"><a href="deciphering-dia-nn-search-result-files.html"><i class="fa fa-check"></i><b>3.1</b> Deciphering DIA-NN Search Result Files</a></li>
+<li class="chapter" data-level="3.2" data-path="import-dia-nn-search-results.html"><a href="import-dia-nn-search-results.html"><i class="fa fa-check"></i><b>3.2</b> Import DIA-NN Search Results</a></li>
+<li class="chapter" data-level="3.3" data-path="evaluate-dia-nn-stats.html"><a href="evaluate-dia-nn-stats.html"><i class="fa fa-check"></i><b>3.3</b> Evaluate DIA-NN Stats</a></li>
+<li class="chapter" data-level="3.4" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html"><i class="fa fa-check"></i><b>3.4</b> Evaluate DIA-NN Results</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#explaining-the-dia-nn-report"><i class="fa fa-check"></i><b>3.4.1</b> Explaining the DIA-NN Report</a></li>
+<li class="chapter" data-level="3.4.2" data-path="evaluate-dia-nn-results.html"><a href="evaluate-dia-nn-results.html#evaluating-the-quality-of-the-runs"><i class="fa fa-check"></i><b>3.4.2</b> Evaluating the Quality of the Runs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="filtering-dia-nn-results.html"><a href="filtering-dia-nn-results.html"><i class="fa fa-check"></i><b>3.5</b> Filtering DIA-NN Results</a></li>
+<li class="chapter" data-level="3.6" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html"><i class="fa fa-check"></i><b>3.6</b> Prepare Data for Differential Expression Analysis (t-test)</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#filter-based-off-number-of-peptides-and-missing-values"><i class="fa fa-check"></i><b>3.6.1</b> Filter Based off Number of Peptides and Missing Values</a></li>
+<li class="chapter" data-level="3.6.2" data-path="prepare-data-for-differential-expression-analysis-t-test.html"><a href="prepare-data-for-differential-expression-analysis-t-test.html#impute-missing-values"><i class="fa fa-check"></i><b>3.6.2</b> Impute Missing Values</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="performing-differential-expression-statistics-t-test.html"><a href="performing-differential-expression-statistics-t-test.html"><i class="fa fa-check"></i><b>4</b> Performing Differential Expression Statistics (t-test)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>4.1</b> Background</a>
+<ul>
+<li class="chapter" data-level="" data-path="background.html"><a href="background.html#types-of-t-tests"><i class="fa fa-check"></i>Types of t-tests</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html"><i class="fa fa-check"></i><b>4.2</b> Prepare the t-test</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#create-the-comparison-table"><i class="fa fa-check"></i><b>4.2.1</b> Create the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.2" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#prepare-our-data-using-the-comparison-table"><i class="fa fa-check"></i><b>4.2.2</b> Prepare Our Data Using the Comparison Table</a></li>
+<li class="chapter" data-level="4.2.3" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#define-the-t-test-input"><i class="fa fa-check"></i><b>4.2.3</b> Define the T-Test Input</a></li>
+<li class="chapter" data-level="4.2.4" data-path="prepare-the-t-test.html"><a href="prepare-the-t-test.html#fit-the-t-test-regression-models"><i class="fa fa-check"></i><b>4.2.4</b> Fit the T-Test Regression Models</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="create-a-t-test-results-table.html"><a href="create-a-t-test-results-table.html"><i class="fa fa-check"></i><b>4.3</b> Create a T-Test Results Table</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="visualizing-proteomic-data.html"><a href="visualizing-proteomic-data.html"><i class="fa fa-check"></i><b>5</b> Visualizing Proteomic Data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="prep-work.html"><a href="prep-work.html"><i class="fa fa-check"></i><b>5.1</b> Prep Work</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="prep-work.html"><a href="prep-work.html#make-a-common-plotting-theme"><i class="fa fa-check"></i><b>5.1.1</b> Make a Common Plotting Theme</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html"><i class="fa fa-check"></i><b>5.2</b> Replicate Comparisons</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#sample-heatmap-and-hierarchical-clustering"><i class="fa fa-check"></i><b>5.2.1</b> Sample Heatmap and Hierarchical Clustering</a></li>
+<li class="chapter" data-level="5.2.2" data-path="replicate-comparisons.html"><a href="replicate-comparisons.html#principal-component-analysis-pca"><i class="fa fa-check"></i><b>5.2.2</b> Principal Component Analysis (PCA)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="differential-expression.html"><a href="differential-expression.html"><i class="fa fa-check"></i><b>5.3</b> Differential Expression</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="differential-expression.html"><a href="differential-expression.html#protein-expression-heatmap"><i class="fa fa-check"></i><b>5.3.1</b> Protein Expression Heatmap</a></li>
+<li class="chapter" data-level="5.3.2" data-path="differential-expression.html"><a href="differential-expression.html#volcano-plot"><i class="fa fa-check"></i><b>5.3.2</b> Volcano Plot</a></li>
+<li class="chapter" data-level="5.3.3" data-path="differential-expression.html"><a href="differential-expression.html#gene-ontology"><i class="fa fa-check"></i><b>5.3.3</b> Gene Ontology</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Proteomic Data Analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="expanding-rs-functionality" class="section level2 hasAnchor" number="1.4">
+<h2><span class="header-section-number">1.4</span> Expanding R’s Functionality<a href="expanding-rs-functionality.html#expanding-rs-functionality" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>While base R (R as you install it, with nothing else added) is very versatile and provides a lot of functionality, most times you are going to need additional functions to simplify your data analysis and make it more reproducible.</p>
+<p>Luckily, R provides a framework that easily allows for anyone to make their own functions, combine them into a <strong>package</strong>, and make them publicly available. Installing these packages greatly expands R’s capabilities.</p>
+<p>In general, there are 3 main ways to install new <strong>libraries</strong>:</p>
+<ol style="list-style-type: decimal">
+<li><p>CRAN (Comprehensive R Archive Network)- The official repository for R. All packages uploaded to CRAN have to meet certain minimum criteria and are more thoroughly tested with each new version of R.</p>
+<ul>
+<li>To install a package from CRAN, use: <code>install.packages("&lt;package_name&gt;")</code></li>
+</ul></li>
+<li><p>Bioconductor- A heavily curated, community-driven repository designed specifically for life science applications. Submissions undergo formal review by bioinformatics experts to ensure code quality. Bioconductor releases operate on a strict 6-month cycle that pairs exactly with specific R versions to prevent dependency conflicts.</p>
+<ul>
+<li>To install a package from Bioconductor, you first need to install the package <code>BiocManager</code> from CRAN (<code>install.packages("BiocManager")</code>). Then to install packages from Bioconductor, use: <code>BiocManager::install("&lt;package_name&gt;")</code></li>
+</ul></li>
+<li><p>GitHub- A code-hosting platform where people can upload packages through <em>Git</em> version control system. These do not have any review or update criteria so the quality of packages can vary greatly between authors.</p>
+<ul>
+<li>To install a package from GitHub, you first need to install the package <code>remotes</code> from CRAN (<code>install.packages("remotes")</code>). Then to install packages from GitHub, use:
+<code>remotes::install_github("&lt;github_url&gt;")</code></li>
+</ul></li>
+</ol>
+<p><strong>Packages</strong> are the fundamental, standardized unit of share-able code used to extend the capabilities of R. You can think of a <strong>package</strong> as a
+<em>book</em>, while <em>R</em>, providing the foundational functions and logic, is the entire <em>bookshelf</em>. Installing a <strong>package</strong> simply adds specialized <em>book</em> to that <em>bookshelf</em></p>
+<p>You only need to <strong>install a package once</strong>, but you need to <strong>reload it every time you start of a new R session</strong>. To continue with the <em>bookshelf</em> metaphor, the <em>bookshelf</em> is always there, along with it’s <em>books</em> (the <strong>installed packages</strong>). But the when you leave the room with the <em>bookshelf</em>, the <em>books</em> always have to be put back on the <em>bookshelf</em>. To be able to use the information contained in the <em>books</em>, we need to take them off the <em>bookshelf</em> every time we go into the room.</p>
+<p>To do this, use the <em>function</em> <code>library(&lt;package name&gt;)</code>, which takes the <em>book</em> off the <em>bookshelf</em>, allowing us to now use that <em>book</em> until we put it back on the <em>bookshelf</em> and leave the room ( <em>i.e.,</em> close RStudio).</p>
+<div id="installing-packages" class="section level3 hasAnchor" number="1.4.1">
+<h3><span class="header-section-number">1.4.1</span> Installing Packages<a href="expanding-rs-functionality.html#installing-packages" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>To start, let’s install the <code>tidyverse</code>, a set of packages (<code>dplyr</code>, <code>readr</code>, <code>forcats</code>, <code>stringr</code>, <code>ggplot2</code>, <code>tibble</code>, <code>lubridate</code>, <code>tidyr</code>, <code>purrr</code>) that comprise most of the functions you’ll need for the majority of your data science tasks, all using the same common conceptual framework.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="expanding-rs-functionality.html#cb33-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&#39;tidyverse&#39;</span>)</span></code></pre></div>
+<p>RStudio will then handle downloading and installing the packages. Once all the packages are installed, <code>&gt;</code> should be visible at the bottom line of your console, indicating R is ready for your next command.</p>
+</div>
+<div id="loading-packages-and-package-conflicts" class="section level3 hasAnchor" number="1.4.2">
+<h3><span class="header-section-number">1.4.2</span> Loading Packages and Package Conflicts<a href="expanding-rs-functionality.html#loading-packages-and-package-conflicts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Now that you have the <code>tidyverse</code> installed, let’s open it using <code>library()</code> as we described above. Using <code>library()</code> on tidyverse will load ALL of the package components at once instead of making you type each one out individually.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="expanding-rs-functionality.html#cb34-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
+<pre><code>## ── Attaching core tidyverse packages ───────────────────────────────────────────────────────────────────────────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.2.1     ✔ readr     2.2.0
+## ✔ forcats   1.0.1     ✔ stringr   1.6.0
+## ✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+## ✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+## ✔ purrr     1.2.2     
+## ── Conflicts ─────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<p>This specific output tells you which functions from the <code>tidyverse</code> were loaded, along with which functions from which package <strong>conflict</strong> with functions in base R (or from other packages you might have loaded). For example, one of the conflicts is <code>dplyr::filter() masks stats::filter()</code>. This means that when you use <code>filter()</code>, R is going to use <code>filter()</code> from the <code>tidyverse</code> <strong>package</strong> instead of <code>filter()</code> from the <code>stats</code> <strong>package</strong> (<code>dplyr filter()</code> <strong>masks</strong> <code>stats filter()</code>). Even though these two functions share the same name and serve a similar purpose, they have different <strong>arguments</strong> and syntax, so it is important to keep note of any function conflicts.</p>
+<p>If you find yourself in the scenario where <code>functionA()</code> from <code>packageX</code> <strong>masks</strong> <code>functionA()</code> from <code>packageY</code> but you still want to use <code>functionsA()</code> from <code>packageY</code>, you can be very explicit about which package you want R to use for <code>functionA()</code>. In the example above, where <code>dplyr::filter()</code> is masking <code>stats::filter()</code>, say we nede to use <code>filter()</code> from <code>stats</code> instead of from <code>dplyr</code>. The way we accomplish this is as follows:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="expanding-rs-functionality.html#cb36-1" tabindex="-1"></a>stats<span class="sc">::</span><span class="fu">filter</span>()</span></code></pre></div>
+<p>Where you enter the exact package, followed by <code>::</code> and then the exact function from that package.</p>
+</div>
+<div id="package-help-pages" class="section level3 hasAnchor" number="1.4.3">
+<h3><span class="header-section-number">1.4.3</span> Package Help Pages<a href="expanding-rs-functionality.html#package-help-pages" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As a part of any package, a brief description needs to be made for every function, telling the user how exactly to use that function. As described earlier, this can be accessed by typing <code>?</code> followed by the function name and pressing Enter.</p>
+<p>Every function’s help page is made up of four parts:</p>
+<ul>
+<li><p><strong>Description:</strong> a brief description of what the function does</p></li>
+<li><p><strong>Usage:</strong> an example of how you would enter the required variables</p></li>
+<li><p><strong>Arguments:</strong> a list of each of the variables (arguments) in the
+function along with a brief explanation of what it means and what kind
+of data it requires</p></li>
+<li><p><strong>Details:</strong> additional information required to fully use the package</p></li>
+</ul>
+
+</div>
+</div>
+<!-- </div> -->
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="calling-functions.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="working-with-data-in-r-and-rstudio.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/lunr.js"></script>
+<script src="assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "lunr",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection",
+    "scroll_highlight": true
+  },
+  "toolbar": {
+    "position": "static"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>
